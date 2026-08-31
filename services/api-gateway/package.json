@@ -1,0 +1,6 @@
+{
+  "name": "api-gateway",
+  "version": "1.0.0",
+  "scripts": { "start": "node index.js" },
+  "dependencies": { "express": "^4.19.2", "express-rate-limit": "^7.3.1" }
+}

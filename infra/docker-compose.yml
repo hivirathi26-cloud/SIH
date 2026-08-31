@@ -1,0 +1,138 @@
+version: "3.8"
+
+services:
+  postgres:
+    image: postgis/postgis:16-3.4-alpine
+    container_name: jsicp-postgres
+    environment:
+      POSTGRES_USER: jsicp_admin
+      POSTGRES_PASSWORD: jsicp_secure_password
+      POSTGRES_DB: jsicp_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - jsicp-network
+
+  mongo:
+    image: mongo:7
+    container_name: jsicp-mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    networks:
+      - jsicp-network
+
+  redis:
+    image: redis:7-alpine
+    container_name: jsicp-redis
+    ports:
+      - "6379:6379"
+    networks:
+      - jsicp-network
+
+  rabbitmq:
+    image: rabbitmq:3.12-management-alpine
+    container_name: jsicp-rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: jsicp
+      RABBITMQ_DEFAULT_PASS: jsicp_rabbit_pass
+    networks:
+      - jsicp-network
+
+  minio:
+    image: minio/minio:latest
+    container_name: jsicp-minio
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: minio_admin
+      MINIO_ROOT_PASSWORD: minio_secret_password
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - minio_data:/data
+    networks:
+      - jsicp-network
+
+  # Python AI/ML Service
+  ai-service:
+    build:
+      context: ./services/ai-service
+      dockerfile: Dockerfile
+    container_name: jsicp-ai-service
+    ports:
+      - "8000:8000"
+    environment:
+      - MONGO_URI=mongodb://mongo:27017/jsicp_ai
+    depends_on:
+      - mongo
+    networks:
+      - jsicp-network
+
+  # Node.js Microservices
+  auth-service:
+    build:
+      context: ./services/auth-service
+      dockerfile: Dockerfile
+    container_name: jsicp-auth-service
+    environment:
+      - DATABASE_URL=postgres://jsicp_admin:jsicp_secure_password@postgres:5432/jsicp_db
+      - JWT_SECRET=jsicp_jwt_secret_key_2026
+    depends_on:
+      - postgres
+    networks:
+      - jsicp-network
+
+  problem-service:
+    build:
+      context: ./services/problem-service
+      dockerfile: Dockerfile
+    container_name: jsicp-problem-service
+    environment:
+      - DATABASE_URL=postgres://jsicp_admin:jsicp_secure_password@postgres:5432/jsicp_db
+      - AI_SERVICE_URL=http://ai-service:8000
+    depends_on:
+      - postgres
+      - ai-service
+    networks:
+      - jsicp-network
+
+  api-gateway:
+    build:
+      context: ./services/api-gateway
+      dockerfile: Dockerfile
+    container_name: jsicp-api-gateway
+    ports:
+      - "4000:4000"
+    environment:
+      - AUTH_SERVICE_URL=http://auth-service:3001
+      - PROBLEM_SERVICE_URL=http://problem-service:3002
+    networks:
+      - jsicp-network
+
+  web:
+    build:
+      context: ./apps/web
+      dockerfile: Dockerfile
+    container_name: jsicp-web
+    ports:
+      - "3000:3000"
+    depends_on:
+      - api-gateway
+    networks:
+      - jsicp-network
+
+volumes:
+  postgres_data:
+  mongo_data:
+  minio_data:
+
+networks:
+  jsicp-network:
+    driver: bridge
