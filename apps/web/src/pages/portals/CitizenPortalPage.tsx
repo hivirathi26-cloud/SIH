@@ -21,12 +21,14 @@ import {
   Send,
   CheckCircle2,
   AlertCircle,
-  Search
+  Search,
+  Zap,
+  Briefcase
 } from "lucide-react";
 import confetti from "canvas-confetti";
 
 export const CitizenPortalPage: React.FC = () => {
-  const { problems, submitProblem, upvoteProblem, currentUser } = useApp();
+  const { problems, submitProblem, upvoteProblem, advanceProblemToDeployed, currentUser, agreements } = useApp();
   const { currentRole } = useAuth();
   const [activeTab, setActiveTab] = useState("dashboard");
 
@@ -47,7 +49,7 @@ export const CitizenPortalPage: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // My Problems
-  const myProblems = problems.filter((p) => p.submittedBy === currentUser?.id || p.submittedBy === "citizen-sunita");
+  const myProblems = problems.filter((p) => p.submittedBy === currentUser?.id || p.submittedBy === "citizen-sunita" || p.district === "Ranchi" || p.district === "Dhanbad");
   const districtProblems = problems.filter((p) => p.district.toLowerCase() === (currentUser?.district || "Ranchi").toLowerCase());
 
   const navItems: NavItem[] = [
@@ -126,7 +128,7 @@ export const CitizenPortalPage: React.FC = () => {
       case "routed": return 4;
       case "accepted_by_hei": return 5;
       case "team_formed": return 6;
-      case "in_progress": return 7;
+      case "in_progress": return 8; // Step 8: Industry Co-Funded & Prototyping Active!
       case "industry_matched": return 8;
       case "field_pilot": return 9;
       case "deployed":
@@ -207,7 +209,7 @@ export const CitizenPortalPage: React.FC = () => {
                 onClick={() => setActiveTab("my_issues")}
                 className="text-xs font-semibold text-blue-700 hover:text-blue-900"
               >
-                View All &rarr;
+                View All Tracked &rarr;
               </button>
             </div>
 
@@ -225,20 +227,24 @@ export const CitizenPortalPage: React.FC = () => {
                 </div>
 
                 {/* Stepper */}
-                <div className="pt-2 border-t border-slate-100">
-                  <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-2">
-                    Current Progress: Step {getStepIndex(myProblems[0].status)} of 10
-                  </span>
-                  <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+                <div className="pt-2 border-t border-slate-100 space-y-2">
+                  <div className="flex justify-between items-center text-[10px] font-bold text-slate-700 uppercase">
+                    <span>Current Resolution Step: {getStepIndex(myProblems[0].status)} of 10</span>
+                    <span className="text-emerald-700 font-mono">
+                      {getStepIndex(myProblems[0].status) >= 8 ? "✓ Industry CSR Funded & Lab Active" : "In Progress"}
+                    </span>
+                  </div>
+                  <div className="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden">
                     <div
                       className="bg-emerald-600 h-full transition-all duration-500"
                       style={{ width: `${getStepIndex(myProblems[0].status) * 10}%` }}
                     ></div>
                   </div>
-                  <div className="flex justify-between text-[10px] text-slate-500 mt-1.5 font-medium">
+                  <div className="flex justify-between text-[10px] text-slate-500 mt-1 font-medium">
                     <span>1. Submitted</span>
                     <span>4. HEI Routed</span>
-                    <span>7. Prototyping</span>
+                    <span>6. Team Formed</span>
+                    <span>8. CSR Funded</span>
                     <span>10. Deployed</span>
                   </div>
                 </div>
@@ -448,12 +454,15 @@ export const CitizenPortalPage: React.FC = () => {
             <h3 className="font-heading font-bold text-sm text-slate-900">
               My Registered Societal Challenges ({myProblems.length})
             </h3>
-            <span className="text-xs text-slate-500">Live Stage Stepper</span>
+            <span className="text-xs text-slate-500">Live 10-Step Resolution Pipeline</span>
           </div>
 
           <div className="space-y-4">
             {myProblems.map((p) => {
               const currentStep = getStepIndex(p.status);
+              const isDeployed = p.status === "deployed" || p.status === "closed";
+              const isFundedOrProgress = p.status === "in_progress" || p.status === "industry_matched";
+
               return (
                 <div key={p.id} className="bg-white p-5 rounded-lg border border-slate-200 shadow-xs space-y-4">
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2 border-b border-slate-100">
@@ -465,15 +474,33 @@ export const CitizenPortalPage: React.FC = () => {
                       <span className="text-slate-500 text-xs">{p.district} ({p.block || "Sadar"})</span>
                     </div>
 
-                    {(p.status === "deployed" || p.status === "closed") && (
-                      <button
-                        onClick={() => setRatingProb(p)}
-                        className="px-3 py-1 bg-amber-50 text-amber-800 border border-amber-300 rounded font-semibold text-xs hover:bg-amber-100 flex items-center space-x-1"
-                      >
-                        <Star className="w-3 h-3 fill-amber-500 text-amber-500" />
-                        <span>{p.feedbackRating ? `Rated ${p.feedbackRating}★` : "Submit Ground Feedback"}</span>
-                      </button>
-                    )}
+                    <div className="flex items-center space-x-2">
+                      {/* Rating Button */}
+                      {isDeployed && (
+                        <button
+                          onClick={() => setRatingProb(p)}
+                          className="px-3.5 py-1.5 bg-amber-50 text-amber-900 border border-amber-400 rounded font-bold text-xs hover:bg-amber-100 flex items-center space-x-1.5 shadow-xs"
+                        >
+                          <Star className="w-3.5 h-3.5 fill-amber-500 text-amber-500" />
+                          <span>{p.feedbackRating ? `Rated ${p.feedbackRating}★ (Edit)` : "⭐ Submit Ground Feedback"}</span>
+                        </button>
+                      )}
+
+                      {/* Demo Simulator button */}
+                      {!isDeployed && (
+                        <button
+                          onClick={() => {
+                            advanceProblemToDeployed(p.id);
+                            confetti({ particleCount: 70, spread: 60 });
+                          }}
+                          className="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded text-[11px] font-semibold flex items-center space-x-1"
+                          title="Simulate all milestones completed and advance to Deployed stage"
+                        >
+                          <Zap className="w-3 h-3 text-amber-500" />
+                          <span>Fast-Track to Deployed (Demo)</span>
+                        </button>
+                      )}
+                    </div>
                   </div>
 
                   <div>
@@ -489,24 +516,47 @@ export const CitizenPortalPage: React.FC = () => {
                     </div>
                   </div>
 
+                  {/* Lifecycle Event Callout */}
+                  {isFundedOrProgress && (
+                    <div className="bg-emerald-50/70 border border-emerald-300 p-3 rounded text-xs flex items-center space-x-2.5">
+                      <Briefcase className="w-4 h-4 text-emerald-800 shrink-0" />
+                      <div className="text-emerald-950">
+                        <strong>Milestone Update:</strong> Bilateral MoU executed with <strong>Tata Steel CSR Foundation</strong>. R&D grant funds committed. Multi-disciplinary student team active in BIT Mesra laboratory prototyping.
+                      </div>
+                    </div>
+                  )}
+
+                  {isDeployed && p.feedbackRating && (
+                    <div className="bg-amber-50/70 border border-amber-300 p-3 rounded text-xs flex items-center space-x-2">
+                      <Star className="w-4 h-4 text-amber-600 fill-amber-500 shrink-0" />
+                      <div className="text-amber-950">
+                        <strong>Verified Citizen Rating:</strong> {p.feedbackRating}/5 Stars — <em>"{p.feedbackComment || "Clean drinking water delivered to all households."}"</em>
+                      </div>
+                    </div>
+                  )}
+
                   {/* 10-Step Progress Stepper */}
                   <div className="pt-2 border-t border-slate-100 space-y-1.5">
-                    <span className="text-[10px] font-bold text-slate-500 uppercase block">
-                      Closed-Loop Resolution Pipeline (Step {currentStep} of 10 Completed):
-                    </span>
+                    <div className="flex justify-between items-center text-[10px] font-bold text-slate-700 uppercase">
+                      <span>10-Stage Closed Loop Resolution (Step {currentStep} of 10):</span>
+                      <span className="text-emerald-700 font-mono">
+                        {currentStep === 10 ? "✓ Ground Deployment Verified" : currentStep >= 8 ? "✓ CSR Co-Funded & Lab Testing" : "In Progress"}
+                      </span>
+                    </div>
+
                     <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
                       <div
                         className="bg-emerald-600 h-full transition-all duration-500"
                         style={{ width: `${currentStep * 10}%` }}
                       ></div>
                     </div>
-                    <div className="flex justify-between text-[9px] text-slate-500 font-medium">
-                      <span>1. Submitted</span>
-                      <span>3. Nodal Review</span>
-                      <span>5. HEI Accepted</span>
-                      <span>7. Prototyping</span>
-                      <span>9. Field Trial</span>
-                      <span>10. Deployed</span>
+
+                    <div className="grid grid-cols-5 text-[9px] text-slate-500 font-medium text-center pt-1">
+                      <span className={currentStep >= 1 ? "font-bold text-slate-800" : ""}>1. Logged</span>
+                      <span className={currentStep >= 4 ? "font-bold text-slate-800" : ""}>4. HEI Routed</span>
+                      <span className={currentStep >= 6 ? "font-bold text-slate-800" : ""}>6. Team Built</span>
+                      <span className={currentStep >= 8 ? "font-bold text-emerald-800" : ""}>8. CSR Funded</span>
+                      <span className={currentStep === 10 ? "font-bold text-emerald-800" : ""}>10. Deployed ⭐</span>
                     </div>
                   </div>
                 </div>

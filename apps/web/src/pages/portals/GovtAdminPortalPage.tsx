@@ -22,7 +22,7 @@ import {
 import confetti from "canvas-confetti";
 
 export const GovtAdminPortalPage: React.FC = () => {
-  const { problems, universities, agreements, milestones, approveMilestoneGovt, currentUser, selectedDistrict, setSelectedDistrict } = useApp();
+  const { problems, universities, agreements, proposals, milestones, approveMilestoneGovt, currentUser, selectedDistrict, setSelectedDistrict } = useApp();
   const [activeTab, setActiveTab] = useState("apex_overview");
   const [selectedProbForXAI, setSelectedProbForXAI] = useState<any>(null);
   const [blockchainModalOpen, setBlockchainModalOpen] = useState(false);
@@ -205,50 +205,91 @@ export const GovtAdminPortalPage: React.FC = () => {
         <div className="space-y-4 text-xs">
           <div className="bg-white p-4 rounded-lg border border-slate-200 shadow-xs">
             <h3 className="font-heading font-bold text-sm text-slate-900">
-              Government District Officer Sign-Off & Fund Authorization Gate
+              Government District Officer Sign-Off & Escrow Fund Authorization Gate
             </h3>
             <p className="text-slate-500 text-[11px]">
-              Authorizes milestone sign-off and triggers smart contract grant release to university escrow account
+              Dual sign-off authorization releasing tranche grants to university research escrow accounts and advancing problem status to Deployed.
             </p>
           </div>
 
-          <div className="bg-white p-5 rounded-lg border border-slate-200 shadow-xs space-y-4">
-            <div className="flex justify-between items-start pb-2 border-b border-slate-100">
-              <div>
-                <span className="font-mono text-slate-500 text-[11px] block">Project: JalShuddhi (BIT Mesra)</span>
-                <h4 className="font-heading font-bold text-slate-900 text-sm mt-0.5">
-                  Milestone 3: Field Testing & Water Quality Sensor Calibration
-                </h4>
-              </div>
-              <span className="bg-amber-50 text-amber-900 font-bold px-2 py-0.5 rounded border border-amber-300">
-                PENDING DISTRICT STAMP
-              </span>
-            </div>
+          <div className="space-y-4">
+            {milestones.map((m) => {
+              const targetProp = proposals.find((p) => p.id === m.proposalId) || proposals[0];
+              const isApproved = m.govtApproved;
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div className="bg-slate-50 p-3 rounded border border-slate-200">
-                <span className="text-slate-500 block text-[11px]">Faculty Mentor Sign-Off:</span>
-                <span className="font-bold text-emerald-800">Approved by Prof. Ananya Sen ✓</span>
-              </div>
-              <div className="bg-slate-50 p-3 rounded border border-slate-200">
-                <span className="text-slate-500 block text-[11px]">Next Tranche Fund to Release:</span>
-                <span className="font-mono font-bold text-slate-900">₹1,54,000 (Tranche 2)</span>
-              </div>
-            </div>
+              return (
+                <div
+                  key={m.id}
+                  className={`bg-white p-5 rounded-lg border shadow-xs space-y-3 transition ${
+                    isApproved ? "border-emerald-300 bg-emerald-50/10" : "border-slate-200"
+                  }`}
+                >
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2 border-b border-slate-100">
+                    <div>
+                      <span className="font-mono text-slate-500 text-[11px] block">
+                        Project: {targetProp?.title || "Active Research Cohort"} ({targetProp?.universityName || "BIT Mesra"})
+                      </span>
+                      <h4 className="font-heading font-bold text-slate-900 text-sm mt-0.5">
+                        {m.displayName}
+                      </h4>
+                    </div>
 
-            <div className="pt-2 border-t border-slate-100 flex items-center justify-between">
-              <span className="text-slate-500">Authorized Officer: Dr. Shailesh Kumar, IAS</span>
-              <button
-                onClick={() => {
-                  approveMilestoneGovt("ms-003", currentUser?.fullName || "Dr. Shailesh Kumar, IAS");
-                  confetti({ particleCount: 70, spread: 60 });
-                }}
-                className="px-4 py-2 bg-emerald-700 hover:bg-emerald-800 text-white font-semibold rounded flex items-center space-x-1.5"
-              >
-                <CheckCircle2 className="w-4 h-4" />
-                <span>Apply Government Sign-Off Stamp & Release Tranche</span>
-              </button>
-            </div>
+                    <div>
+                      {isApproved ? (
+                        <span className="bg-emerald-100 text-emerald-900 border border-emerald-300 font-bold px-2.5 py-1 rounded text-[11px] flex items-center space-x-1">
+                          <CheckCircle2 className="w-3.5 h-3.5 text-emerald-700" />
+                          <span>DISTRICT STAMP APPLIED & TRANCHE RELEASED</span>
+                        </span>
+                      ) : (
+                        <span className="bg-amber-50 text-amber-900 border border-amber-300 font-bold px-2 py-0.5 rounded text-[10px]">
+                          ACTION REQUIRED: PENDING DISTRICT STAMP
+                        </span>
+                      )}
+                    </div>
+                  </div>
+
+                  <p className="text-slate-600 leading-relaxed text-[11px]">{m.description}</p>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-[11px]">
+                    <div className="bg-slate-50 p-2.5 rounded border border-slate-200 flex items-center justify-between">
+                      <span className="text-slate-500">1. Faculty Academic Sign-Off:</span>
+                      <span className={m.facultyApproved ? "font-bold text-emerald-800" : "text-amber-700 font-semibold"}>
+                        {m.facultyApproved ? `Approved by ${m.facultyApprovedBy || "Faculty"} ✓` : "⏳ Pending Faculty Stamp"}
+                      </span>
+                    </div>
+
+                    <div className="bg-slate-50 p-2.5 rounded border border-slate-200 flex items-center justify-between">
+                      <span className="text-slate-500">Tranche Grant to Disburse:</span>
+                      <span className="font-mono font-bold text-slate-900">₹{((m.index * 65000) + 35000).toLocaleString("en-IN")}</span>
+                    </div>
+                  </div>
+
+                  <div className="pt-2 border-t border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                    <span className="text-slate-500 text-[11px]">
+                      Authorized Officer: <strong>Dr. Shailesh Kumar, IAS (State Project Director)</strong>
+                    </span>
+
+                    {!isApproved ? (
+                      <button
+                        onClick={() => {
+                          approveMilestoneGovt(m.id, currentUser?.fullName || "Dr. Shailesh Kumar, IAS");
+                          confetti({ particleCount: 80, spread: 70 });
+                        }}
+                        className="px-4 py-2 bg-emerald-700 hover:bg-emerald-800 text-white font-semibold rounded flex items-center space-x-1.5 shadow-xs"
+                      >
+                        <CheckCircle2 className="w-4 h-4" />
+                        <span>Apply Government Sign-Off Stamp & Release Tranche</span>
+                      </button>
+                    ) : (
+                      <span className="text-emerald-700 font-semibold flex items-center space-x-1">
+                        <CheckCircle2 className="w-4 h-4" />
+                        <span>Recorded in Blockchain Ledger Block #3891</span>
+                      </span>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
       )}

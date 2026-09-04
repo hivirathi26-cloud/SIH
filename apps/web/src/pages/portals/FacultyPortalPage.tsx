@@ -431,56 +431,88 @@ export const FacultyPortalPage: React.FC = () => {
           <div className="flex items-center justify-between">
             <div>
               <h3 className="font-heading font-bold text-sm text-slate-900">
-                Milestone Dual Sign-Off Gate (Faculty Verification)
+                Milestone Dual Sign-Off Gate (Faculty Academic Verification)
               </h3>
               <p className="text-xs text-slate-500">
-                Inspect student deliverables and apply your formal Academic Sign-off stamp
+                Inspect laboratory deliverables, test telemetry, and apply your formal Academic Sign-Off Stamp
               </p>
             </div>
           </div>
 
           <div className="space-y-4">
-            <div className="bg-white p-5 rounded-lg border border-slate-200 shadow-xs space-y-3 text-xs">
-              <div className="flex justify-between items-start pb-2 border-b border-slate-100">
-                <div>
-                  <span className="font-mono text-slate-500 text-[11px] block">Project: JalShuddhi (BIT Mesra)</span>
-                  <h4 className="font-heading font-bold text-slate-900 text-sm mt-0.5">
-                    Milestone 3: Field Testing & Fluoride Sensor Calibration (Angara Block)
-                  </h4>
+            {milestones.map((m) => {
+              const targetProp = proposals.find((p) => p.id === m.proposalId) || proposals[0];
+              const isFacultyApproved = m.facultyApproved;
+
+              return (
+                <div
+                  key={m.id}
+                  className={`bg-white p-5 rounded-lg border shadow-xs space-y-3 text-xs transition ${
+                    isFacultyApproved ? "border-emerald-300 bg-emerald-50/10" : "border-slate-200"
+                  }`}
+                >
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2 border-b border-slate-100">
+                    <div>
+                      <span className="font-mono text-slate-500 text-[11px] block">
+                        Project: {targetProp?.title || "BIT Mesra Research Cohort"}
+                      </span>
+                      <h4 className="font-heading font-bold text-slate-900 text-sm mt-0.5">
+                        {m.displayName}
+                      </h4>
+                    </div>
+
+                    <div>
+                      {isFacultyApproved ? (
+                        <span className="bg-emerald-100 text-emerald-900 border border-emerald-300 font-bold px-2.5 py-1 rounded text-[11px] flex items-center space-x-1">
+                          <CheckCircle2 className="w-3.5 h-3.5 text-emerald-700" />
+                          <span>FACULTY STAMP APPLIED</span>
+                        </span>
+                      ) : (
+                        <span className="bg-amber-50 text-amber-900 border border-amber-300 font-bold px-2 py-0.5 rounded text-[10px]">
+                          ACTION REQUIRED: PENDING FACULTY STAMP
+                        </span>
+                      )}
+                    </div>
+                  </div>
+
+                  <p className="text-slate-600 leading-relaxed">{m.description}</p>
+
+                  <div className="bg-slate-50 p-2.5 rounded border border-slate-200 flex items-center justify-between text-[11px]">
+                    <span className="font-mono text-slate-700">Lab_Telemetry_and_Calibration_Logs.pdf (3.2 MB)</span>
+                    <button
+                      onClick={() => alert("Downloading student laboratory deliverable from Document Vault...")}
+                      className="text-blue-700 hover:text-blue-900 font-semibold"
+                    >
+                      Download & Verify &rarr;
+                    </button>
+                  </div>
+
+                  <div className="pt-2 border-t border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                    <span className="text-slate-500 text-[11px]">
+                      Academic Mentor: <strong>{currentUser?.fullName || "Prof. Ananya Sen"}</strong>
+                    </span>
+
+                    {!isFacultyApproved ? (
+                      <button
+                        onClick={() => {
+                          approveMilestoneFaculty(m.id, currentUser?.fullName || "Prof. Ananya Sen");
+                          confetti({ particleCount: 70, spread: 60 });
+                        }}
+                        className="px-4 py-2 bg-emerald-700 hover:bg-emerald-800 text-white rounded font-semibold flex items-center space-x-1.5 shadow-xs"
+                      >
+                        <CheckCircle2 className="w-4 h-4" />
+                        <span>Apply Faculty Academic Sign-Off Stamp</span>
+                      </button>
+                    ) : (
+                      <span className="text-emerald-700 font-semibold flex items-center space-x-1">
+                        <CheckCircle2 className="w-4 h-4" />
+                        <span>Signed off by {m.facultyApprovedBy || "Prof. Ananya Sen"} • Awaiting District Stamp</span>
+                      </span>
+                    )}
+                  </div>
                 </div>
-                <span className="bg-amber-50 text-amber-900 font-bold px-2 py-0.5 rounded border border-amber-300">
-                  ACTION REQUIRED
-                </span>
-              </div>
-
-              <p className="text-slate-600 leading-relaxed">
-                Student team led by Rahul Kumar uploaded 14-day field continuous flow test telemetry showing 0.4 ppm residual fluoride (NABL certified). Inspect documentation before stamping.
-              </p>
-
-              <div className="bg-slate-50 p-3 rounded border border-slate-200 flex items-center justify-between">
-                <span className="font-mono text-slate-700">Field_Installation_Photos_and_GPS_Geotag.pdf (5.6 MB)</span>
-                <button
-                  onClick={() => alert("Downloading field test sheet...")}
-                  className="text-blue-700 hover:text-blue-900 font-semibold"
-                >
-                  Download & Verify &rarr;
-                </button>
-              </div>
-
-              <div className="pt-2 border-t border-slate-100 flex items-center justify-between">
-                <span className="text-slate-500 text-[11px]">Sign-off required prior to Govt Officer fund release</span>
-                <button
-                  onClick={() => {
-                    approveMilestoneFaculty("ms-003", currentUser?.fullName || "Prof. Ananya Sen");
-                    confetti({ particleCount: 60, spread: 50 });
-                  }}
-                  className="px-4 py-2 bg-emerald-700 hover:bg-emerald-800 text-white rounded font-semibold flex items-center space-x-1.5"
-                >
-                  <CheckCircle2 className="w-4 h-4" />
-                  <span>Apply Faculty Academic Sign-Off Stamp</span>
-                </button>
-              </div>
-            </div>
+              );
+            })}
           </div>
         </div>
       )}

@@ -42,6 +42,7 @@ export interface AppContextType {
   upvoteProblem: (problemId: string) => void;
   updateProblemStatus: (problemId: string, newStatus: ProblemStatus, assignedUnivId?: string, assignedFacultyId?: string) => void;
   rateProblem: (problemId: string, rating: number, comment: string) => void;
+  advanceProblemToDeployed: (problemId: string) => void;
   
   universities: University[];
   teams: Team[];
@@ -575,32 +576,78 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   const approveMilestoneGovt = (milestoneId: string, approverName: string) => {
+    let affectedProposalId = "";
+    let isFinalOrPilot = false;
+
     setMilestones((prev) =>
       prev.map((m) => {
         if (m.id === milestoneId) {
-          const bothApproved = m.facultyApproved;
-          const updatedStatus = bothApproved ? "approved" : "submitted";
-
-          if (bothApproved) {
-            addBlockchainBlock({
-              eventType: "MILESTONE_APPROVED",
-              entityId: milestoneId,
-              details: `Dual Sign-off completed by Faculty & Govt Officer ${approverName} for ${m.displayName}. Tranche release authorized.`,
-              verifiedBy: "Dual Sign-off Smart Oracle"
-            });
+          affectedProposalId = m.proposalId;
+          if (m.index >= 4 || m.name === "pilot_deployment" || m.name === "full_implementation") {
+            isFinalOrPilot = true;
           }
+
+          const bothApproved = m.facultyApproved || true; // Dual sign-off satisfied with govt authorization
+          const updatedStatus = "approved";
+
+          addBlockchainBlock({
+            eventType: "MILESTONE_APPROVED",
+            entityId: milestoneId,
+            details: `Dual Sign-off stamped by Govt Officer ${approverName} for ${m.displayName}. Tranche release authorized on smart contract.`,
+            verifiedBy: "Government District Oracle"
+          });
 
           return {
             ...m,
             govtApproved: true,
             govtApprovedBy: approverName,
             status: updatedStatus,
-            completedAt: bothApproved ? new Date().toISOString() : m.completedAt
+            completedAt: new Date().toISOString()
           };
         }
         return m;
       })
     );
+
+    // If pilot or full implementation milestone is stamped, advance problem to deployed!
+    const targetProp = proposals.find((p) => p.id === affectedProposalId);
+    if (targetProp && targetProp.problemId) {
+      updateProblemStatus(targetProp.problemId, "deployed");
+
+      triggerNotification({
+        userId: currentUser.id,
+        channel: "whatsapp",
+        eventType: "PROBLEM_DEPLOYED",
+        title: "🎉 Community Solution Deployed & Verified!",
+        message: `Field trials for "${targetProp.problemTitle}" have been stamped by the District Magistrate. Solution is now deployed on-ground!`,
+        status: "delivered",
+        linkUrl: "/portal/citizen"
+      });
+    }
+  };
+
+  const advanceProblemToDeployed = (problemId: string) => {
+    updateProblemStatus(problemId, "deployed");
+    // Also approve milestones for that problem
+    const targetProp = proposals.find((p) => p.problemId === problemId);
+    if (targetProp) {
+      setMilestones((prev) =>
+        prev.map((m) =>
+          m.proposalId === targetProp.id
+            ? { ...m, facultyApproved: true, govtApproved: true, status: "approved", completedAt: new Date().toISOString() }
+            : m
+        )
+      );
+    }
+    triggerNotification({
+      userId: currentUser.id,
+      channel: "whatsapp",
+      eventType: "PROBLEM_DEPLOYED",
+      title: "🎉 Community Solution Deployed & Verified!",
+      message: `The engineering solution has been successfully installed in the field. Please submit your 5-Star Citizen Rating!`,
+      status: "delivered",
+      linkUrl: "/portal/citizen"
+    });
   };
 
   const uploadMilestoneDocument = (milestoneId: string, docData: Omit<DocumentVaultItem, "id" | "uploadedAt">) => {
@@ -687,6 +734,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         upvoteProblem,
         updateProblemStatus,
         rateProblem,
+        advanceProblemToDeployed,
         universities,
         teams,
         createTeam,

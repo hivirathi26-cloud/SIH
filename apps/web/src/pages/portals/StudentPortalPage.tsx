@@ -20,6 +20,7 @@ export const StudentPortalPage: React.FC = () => {
   const { milestones, uploadMilestoneDocument, currentUser } = useApp();
   const [activeTab, setActiveTab] = useState("sprint");
   const [uploadTitle, setUploadTitle] = useState("");
+  const [targetMilestoneId, setTargetMilestoneId] = useState(milestones[0]?.id || "ms-001");
 
   const navItems: NavItem[] = [
     { id: "sprint", label: "Sprint Kanban Board", icon: Layers },
@@ -31,8 +32,8 @@ export const StudentPortalPage: React.FC = () => {
     e.preventDefault();
     if (!uploadTitle.trim()) return;
 
-    uploadMilestoneDocument("ms-003", {
-      milestoneId: "ms-003",
+    uploadMilestoneDocument(targetMilestoneId, {
+      milestoneId: targetMilestoneId,
       title: uploadTitle,
       docType: "test_data",
       storageUrl: `/vault/${uploadTitle.toLowerCase().replace(/ /g, "_")}.pdf`,
@@ -74,23 +75,48 @@ export const StudentPortalPage: React.FC = () => {
             <h3 className="font-heading font-bold text-sm text-slate-900">
               Upload Laboratory Telemetry / Field Calibration Data
             </h3>
+            <p className="text-xs text-slate-500">
+              Files uploaded here are instantly visible in the Faculty Mentor Gate and Government District Approval Gate.
+            </p>
 
-            <form onSubmit={handleUploadDoc} className="flex flex-col sm:flex-row items-center gap-3 text-xs">
-              <input
-                type="text"
-                required
-                value={uploadTitle}
-                onChange={(e) => setUploadTitle(e.target.value)}
-                placeholder="e.g. Angara_Field_Trial_Fluoride_Sensor_Telemetry_Week2.xlsx"
-                className="flex-1 p-2.5 border border-slate-300 rounded focus:border-[#0f2942] focus:outline-none"
-              />
-              <button
-                type="submit"
-                className="px-4 py-2.5 bg-[#0f2942] hover:bg-[#163b5f] text-white rounded font-semibold flex items-center space-x-1.5 shrink-0"
-              >
-                <Upload className="w-3.5 h-3.5" />
-                <span>Upload to Vault</span>
-              </button>
+            <form onSubmit={handleUploadDoc} className="space-y-3 text-xs">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div className="sm:col-span-1">
+                  <label className="block font-semibold text-slate-700 mb-1">Target Milestone</label>
+                  <select
+                    value={targetMilestoneId}
+                    onChange={(e) => setTargetMilestoneId(e.target.value)}
+                    className="w-full p-2 border border-slate-300 rounded bg-slate-50 focus:border-[#0f2942]"
+                  >
+                    {milestones.map((m) => (
+                      <option key={m.id} value={m.id}>
+                        {m.displayName.slice(0, 45)}...
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="sm:col-span-2">
+                  <label className="block font-semibold text-slate-700 mb-1">Deliverable Title / File Name</label>
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      required
+                      value={uploadTitle}
+                      onChange={(e) => setUploadTitle(e.target.value)}
+                      placeholder="e.g. Field_Trial_Telemetry_Sensor_Calibration_Week2.pdf"
+                      className="flex-1 p-2 border border-slate-300 rounded focus:border-[#0f2942] focus:outline-none"
+                    />
+                    <button
+                      type="submit"
+                      className="px-4 py-2 bg-[#0f2942] hover:bg-[#163b5f] text-white rounded font-semibold flex items-center space-x-1.5 shrink-0 shadow-xs"
+                    >
+                      <Upload className="w-3.5 h-3.5" />
+                      <span>Upload & Certify</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
             </form>
           </div>
 
