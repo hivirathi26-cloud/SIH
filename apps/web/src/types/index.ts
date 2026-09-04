@@ -1,18 +1,18 @@
+// JSICP Shared Types & Strict RBAC DTOs (SIH 2026)
+
 export type UserRole =
   | "citizen"
-  | "community_group"
-  | "pri" // Panchayati Raj Institution
-  | "ulb" // Urban Local Body
-  | "govt_officer"
-  | "university_nodal"
+  | "pri"
+  | "hei_nodal"
   | "faculty"
   | "student"
-  | "startup"
-  | "msme"
+  | "industry"
+  | "govt_admin"
+  | "university_nodal"
   | "csr"
-  | "research_lab"
   | "state_admin"
-  | "district_officer";
+  | "govt_officer"
+  | "community_group";
 
 export interface User {
   id: string;
@@ -22,6 +22,7 @@ export interface User {
   role: UserRole;
   roleTitle: string;
   organizationName?: string;
+  department?: string;
   district: string;
   aadhaarVerified: boolean;
   avatarUrl?: string;
@@ -59,7 +60,6 @@ export interface ProblemMedia {
   problemId: string;
   mediaType: "image" | "video" | "document" | "audio";
   storageUrl: string;
-  previewUrl?: string;
   cvValidationLabel?: string;
   cvValidationConfidence?: number;
 }
@@ -141,7 +141,7 @@ export interface TeamMember {
   studentName: string;
   discipline: string;
   yearOfStudy: string;
-  role: "Team Lead" | "Hardware Lead" | "Software Lead" | "Field Researcher" | "Design Specialist";
+  role: string;
   email: string;
   avatarUrl?: string;
 }

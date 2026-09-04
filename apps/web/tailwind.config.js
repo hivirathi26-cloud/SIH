@@ -4,44 +4,34 @@ export default {
     "./index.html",
     "./src/**/*.{js,ts,jsx,tsx}",
   ],
-  darkMode: "class",
   theme: {
     extend: {
       colors: {
-        jharkhand: {
-          green: "#0b6623",
-          emerald: "#10b981",
+        gov: {
+          navy: "#0f2942",
+          navylight: "#1e3a5f",
+          navydark: "#0a1c2e",
+          green: "#15803d",
+          greenlight: "#16a34a",
+          greendark: "#14532d",
+          saffron: "#c2410c",
+          saffronlight: "#ea580c",
+          amber: "#b45309",
           gold: "#d97706",
-          amber: "#f59e0b",
-          saffron: "#ea580c",
-          navy: "#0f172a",
-          tribal: "#7c2d12",
-          forest: "#064e3b"
-        },
-        civic: {
-          50: "#f0fdf4",
-          100: "#dcfce7",
-          500: "#22c55e",
-          600: "#16a34a",
-          700: "#15803d",
-          800: "#166534",
-          900: "#14532d",
+          surface: "#ffffff",
+          bg: "#f8fafc",
+          card: "#ffffff",
+          border: "#e2e8f0",
+          borderdark: "#cbd5e1",
+          muted: "#64748b",
+          text: "#0f172a",
+          textsecondary: "#334155",
         }
       },
       fontFamily: {
-        sans: ["Inter", "system-ui", "sans-serif"],
+        sans: ["Inter", "-apple-system", "BlinkMacSystemFont", "Segoe UI", "Roboto", "sans-serif"],
         heading: ["Plus Jakarta Sans", "Inter", "sans-serif"],
       },
-      animation: {
-        "pulse-slow": "pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite",
-        "float": "float 3s ease-in-out infinite",
-      },
-      keyframes: {
-        float: {
-          "0%, 100%": { transform: "translateY(0)" },
-          "50%": { transform: "translateY(-6px)" },
-        }
-      }
     },
   },
   plugins: [],
