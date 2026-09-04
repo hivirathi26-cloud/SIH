@@ -498,7 +498,27 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
     setAgreements((prev) => [agreement, ...prev]);
 
-    updateProposalStatus(agreementData.proposalId, "funded");
+    // Update proposal to funded with partner details
+    setProposals((prev) =>
+      prev.map((p) => {
+        if (p.id === agreementData.proposalId) {
+          return {
+            ...p,
+            status: "funded",
+            industryPartnerId: agreementData.industryPartnerId,
+            industryPartnerName: agreementData.industryPartnerName,
+            approvedAt: new Date().toISOString()
+          };
+        }
+        return p;
+      })
+    );
+
+    // Progress corresponding problem into active execution phase (industry_matched / in_progress)
+    const targetProp = proposals.find((p) => p.id === agreementData.proposalId);
+    if (targetProp && targetProp.problemId) {
+      updateProblemStatus(targetProp.problemId, "in_progress");
+    }
 
     // Blockchain block
     addBlockchainBlock({

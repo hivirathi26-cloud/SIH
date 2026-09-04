@@ -18,6 +18,7 @@ import { FacultyPortalPage } from "./pages/portals/FacultyPortalPage";
 import { StudentPortalPage } from "./pages/portals/StudentPortalPage";
 import { IndustryPortalPage } from "./pages/portals/IndustryPortalPage";
 import { GovtAdminPortalPage } from "./pages/portals/GovtAdminPortalPage";
+import { ProjectLifecyclePage } from "./pages/ProjectLifecyclePage";
 
 export const App: React.FC = () => {
   return (
@@ -50,8 +51,9 @@ export const App: React.FC = () => {
                 <Route path="/industry/marketplace" element={<Navigate to="/portal/industry" replace />} />
                 <Route path="/industry/agreements" element={<Navigate to="/portal/industry" replace />} />
                 <Route path="/govt/dashboard" element={<Navigate to="/portal/admin" replace />} />
-                <Route path="/lifecycle" element={<Navigate to="/portal/student" replace />} />
-                <Route path="/lifecycle/:proposalId" element={<Navigate to="/portal/student" replace />} />
+                {/* 5-Stage Project Lifecycle Tracker */}
+                <Route path="/lifecycle" element={<ProjectLifecyclePage />} />
+                <Route path="/lifecycle/:proposalId" element={<ProjectLifecyclePage />} />
 
                 {/* Catch-all */}
                 <Route path="*" element={<Navigate to="/" replace />} />
