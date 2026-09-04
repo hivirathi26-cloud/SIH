@@ -96,16 +96,20 @@ export const LoginPage: React.FC = () => {
           {/* Categorized Groups */}
           {[
             {
-              category: "💡 Multidisciplinary Student Innovators",
-              keys: ["student", "student_priya", "student_sneha", "student_amit"]
+              category: "🏛️ BIT Mesra Ecosystem (Water, Environment & IoT)",
+              keys: ["hei_nodal", "faculty", "student", "student_priya", "student_sneha", "student_amit"]
             },
             {
-              category: "🔬 Faculty Mentors & Research Guides",
-              keys: ["faculty"]
+              category: "⛏️ IIT (ISM) Dhanbad Ecosystem (Mining Tech & Robotics)",
+              keys: ["hei_iit_dhanbad", "faculty_iit", "student_iit_rohan", "student_iit_ananya", "student_iit_vikas"]
             },
             {
-              category: "🎓 University Nodal Innovation Desks",
-              keys: ["hei_nodal", "hei_iit_dhanbad", "hei_aiims_deoghar", "hei_bau_ranchi"]
+              category: "🏥 AIIMS Deoghar Ecosystem (MedTech & Cold-Chain)",
+              keys: ["hei_aiims_deoghar", "faculty_aiims", "student_aiims_deepak", "student_aiims_kavita"]
+            },
+            {
+              category: "🌾 Birsa Agricultural University - BAU (AgriTech & Bio-Processing)",
+              keys: ["hei_bau_ranchi", "faculty_bau", "student_bau_birsa", "student_bau_pooja"]
             },
             {
               category: "🏭 Industry & CSR Co-Funding Anchors",

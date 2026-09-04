@@ -6,6 +6,7 @@ import { useAuth } from "../../context/AuthContext";
 import { StatusPill } from "../../components/common/StatusPill";
 import { SdgBadge } from "../../components/common/SdgBadge";
 import { TeamBuilderModal } from "../../components/hei/TeamBuilderModal";
+import { getEcosystemByUserId } from "../../data/universityEcosystems";
 import {
   GraduationCap,
   Users,
@@ -46,18 +47,29 @@ export const FacultyPortalPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState("challenges");
   const [selectedProbForTeam, setSelectedProbForTeam] = useState<any>(null);
 
+  // Dynamic institution resolution
+  const eco = getEcosystemByUserId(currentUser?.id, currentUser?.organizationName);
+
   const assignedProblems = problems.filter(
-    (p) => p.assignedUniversityId === "univ-bit-mesra" || p.assignedFacultyName?.includes("Ananya") || p.district === "Ranchi" || p.district === "Dhanbad"
+    (p) =>
+      p.assignedUniversityId === eco.id ||
+      p.assignedFacultyId === eco.faculty.id ||
+      p.assignedFacultyName?.toLowerCase().includes(eco.faculty.fullName.toLowerCase()) ||
+      (p.district === eco.district && p.status !== "pending_nodal_review" && p.status !== "routed")
+  );
+
+  const univTeams = teams.filter(
+    (t) => t.universityId === eco.id || t.facultyMentorId === eco.faculty.id || t.facultyMentorName === eco.faculty.fullName
   );
 
   // Proposal drafting state
   const [selectedProblemId, setSelectedProblemId] = useState(assignedProblems[0]?.id || "");
-  const [propTitle, setPropTitle] = useState("Automated Drainage Siphon & Smart Water Logging Telemetry");
-  const [propSummary, setPropSummary] = useState("IoT ultrasound water-level detection network coupled with solar-assisted low-head axial pumps to rapidly clear waterlogged low-lying areas.");
-  const [propApproach, setPropApproach] = useState("Ultrasonic water depth sensors + ESP32 LoRaWAN gateway + automated solar siphoning pumps for community flood prevention.");
-  const [propOutcome, setPropOutcome] = useState("Rapid water evacuation within 45 minutes of heavy precipitation, zero vector-borne outbreak risk, real-time municipality alerts.");
-  const [propBudget, setPropBudget] = useState(250000);
-  const [propDuration, setPropDuration] = useState(4);
+  const [propTitle, setPropTitle] = useState("Automated Sensor & IoT Telemetry System");
+  const [propSummary, setPropSummary] = useState("Decentralized technology intervention addressing community challenge with robust field telemetry and sustainable rural deployment.");
+  const [propApproach, setPropApproach] = useState("Hardware prototype fabrication + low-power sensor mesh + automated cloud telemetry burst to JSICP gateway.");
+  const [propOutcome, setPropOutcome] = useState("Direct community empowerment, measurable environmental/health impact, and zero maintenance downtime.");
+  const [propBudget, setPropBudget] = useState(320000);
+  const [propDuration, setPropDuration] = useState(5);
   const [needsIndustrySupport, setNeedsIndustrySupport] = useState(true);
   const [lastSubmittedProposalId, setLastSubmittedProposalId] = useState<string | null>(null);
 
@@ -71,9 +83,26 @@ export const FacultyPortalPage: React.FC = () => {
   const [assignMilestoneId, setAssignMilestoneId] = useState<string>(milestones[0]?.id || "");
   const [assignTitle, setAssignTitle] = useState<string>("");
   const [assignDesc, setAssignDesc] = useState<string>("");
-  const [assignStudentId, setAssignStudentId] = useState<string>("student-priya");
+  const [assignStudentId, setAssignStudentId] = useState<string>(eco.students[0]?.id || "student-rahul");
 
-  const pendingDeliverables = studentDeliverables.filter(
+  React.useEffect(() => {
+    if (eco.students[0]) {
+      setAssignStudentId(eco.students[0].id);
+    }
+  }, [eco.id]);
+
+  const univDeliverables = studentDeliverables.filter((d) => {
+    const isOurStudent = eco.students.some((s) => s.id === d.assignedStudentId);
+    const isOurProposal = proposals.some(
+      (pr) =>
+        pr.id === d.proposalId &&
+        (pr.universityName?.toLowerCase().includes(eco.shortName.toLowerCase()) ||
+          pr.facultyMentorName === eco.faculty.fullName)
+    );
+    return isOurStudent || isOurProposal || studentDeliverables.length <= 4;
+  });
+
+  const pendingDeliverables = univDeliverables.filter(
     (d) => d.status === "in_review_by_faculty"
   );
   const pendingMilestones = milestones.filter((m) => !m.facultyApproved);
@@ -103,13 +132,13 @@ export const FacultyPortalPage: React.FC = () => {
     const targetProb = assignedProblems.find((p) => p.id === selectedProblemId) || assignedProblems[0];
 
     const newProp = createProposal({
-      teamId: teams[0]?.id || "team-001",
-      problemId: targetProb?.id || "prob-001",
+      teamId: univTeams[0]?.id || eco.defaultTeamId,
+      problemId: targetProb?.id || eco.defaultProblemId,
       problemTitle: targetProb?.title || "Societal Challenge",
       problemCategory: targetProb?.category || "Water Resources & Sanitation",
-      district: targetProb?.district || "Ranchi",
-      universityName: "Birla Institute of Technology, Mesra",
-      facultyMentorName: currentUser?.fullName || "Prof. Ananya Sen",
+      district: targetProb?.district || eco.district,
+      universityName: eco.name,
+      facultyMentorName: currentUser?.fullName || eco.faculty.fullName,
       title: propTitle,
       summary: propSummary,
       technicalApproach: propApproach,
@@ -134,7 +163,7 @@ export const FacultyPortalPage: React.FC = () => {
       taskId,
       decision,
       feedback,
-      currentUser?.fullName || "Prof. Ananya Sen (BIT Mesra)"
+      currentUser?.fullName || `${eco.faculty.fullName} (${eco.shortName})`
     );
 
     if (decision === "accept") {
@@ -146,26 +175,19 @@ export const FacultyPortalPage: React.FC = () => {
     e.preventDefault();
     if (!assignTitle.trim()) return;
 
-    const studentMap: Record<string, { name: string; dept: string }> = {
-      "student-rahul": { name: "Rahul Kumar (Team Lead)", dept: "Electronics & IoT Engineering" },
-      "student-priya": { name: "Priya Sharma (Student)", dept: "Computer Science & Engineering" },
-      "student-sneha": { name: "Sneha Soren (Student)", dept: "Chemical & Environmental Engineering" },
-      "student-amit": { name: "Amit Verma (Student)", dept: "Mechanical Engineering" }
-    };
-
     const targetMilestone = milestones.find((m) => m.id === assignMilestoneId) || milestones[0];
-    const targetStudent = studentMap[assignStudentId] || studentMap["student-priya"];
+    const targetStudent = eco.students.find((s) => s.id === assignStudentId) || eco.students[0];
 
     assignStudentTask({
-      proposalId: targetMilestone?.proposalId || "prop-001",
-      proposalTitle: "JalShuddhi: Solar-Powered Nano-Adsorptive Fluoride Filter",
+      proposalId: targetMilestone?.proposalId || eco.defaultProposalId,
+      proposalTitle: targetMilestone?.displayName || `${eco.shortName} Innovation Project`,
       milestoneId: targetMilestone.id,
       milestoneName: targetMilestone.displayName,
       title: assignTitle,
-      description: assignDesc || "Task assigned directly by Faculty Mentor for laboratory milestone verification.",
-      assignedStudentId: assignStudentId,
-      assignedStudentName: targetStudent.name,
-      studentDiscipline: targetStudent.dept,
+      description: assignDesc || `Task assigned directly by ${eco.faculty.fullName} for laboratory milestone verification.`,
+      assignedStudentId: targetStudent.id,
+      assignedStudentName: `${targetStudent.fullName} (${targetStudent.role})`,
+      studentDiscipline: targetStudent.discipline,
       progressPercent: 0,
       status: "assigned"
     });
@@ -176,7 +198,7 @@ export const FacultyPortalPage: React.FC = () => {
     confetti({ particleCount: 50, spread: 50 });
   };
 
-  const filteredDeliverables = studentDeliverables.filter((d) => {
+  const filteredDeliverables = univDeliverables.filter((d) => {
     if (deliverableFilter === "pending") return d.status === "in_review_by_faculty";
     if (deliverableFilter === "approved") return d.status === "approved_by_faculty";
     if (deliverableFilter === "revisions") return d.status === "revision_requested";
@@ -186,7 +208,7 @@ export const FacultyPortalPage: React.FC = () => {
   return (
     <PortalLayout
       portalTitle="Faculty Mentor Workspace"
-      portalSubtitle="प्राध्यापक परामर्शदाता एवं शोध पटल — BIT Mesra, Ranchi"
+      portalSubtitle={`प्राध्यापक परामर्शदाता एवं शोध पटल — ${eco.name} (${eco.shortName})`}
       navItems={navItems}
       activeTab={activeTab}
       setActiveTab={setActiveTab}
@@ -704,10 +726,11 @@ export const FacultyPortalPage: React.FC = () => {
                     onChange={(e) => setAssignStudentId(e.target.value)}
                     className="w-full p-2 border border-slate-300 rounded bg-white text-slate-800 font-semibold"
                   >
-                    <option value="student-rahul">Rahul Kumar (Team Lead - IoT & Embedded Hardware)</option>
-                    <option value="student-priya">Priya Sharma (Student - Cloud Telemetry & MQTT)</option>
-                    <option value="student-sneha">Sneha Soren (Student - Chemical & NABL Water Testing)</option>
-                    <option value="student-amit">Amit Verma (Student - Mechanical CAD & Enclosure)</option>
+                    {eco.students.map((s) => (
+                      <option key={s.id} value={s.id}>
+                        {s.fullName} ({s.role} - {s.discipline})
+                      </option>
+                    ))}
                   </select>
                 </div>
 
@@ -908,7 +931,7 @@ export const FacultyPortalPage: React.FC = () => {
 
                         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-2 border-t border-slate-200">
                           <span className="text-[11px] text-slate-600">
-                            Academic Signatory: <strong>{currentUser?.fullName || "Prof. Ananya Sen"}</strong> (BIT Mesra)
+                            Academic Signatory: <strong>{currentUser?.fullName || eco.faculty.fullName}</strong> ({eco.shortName})
                           </span>
 
                           <div className="flex items-center space-x-2">
@@ -1010,13 +1033,13 @@ export const FacultyPortalPage: React.FC = () => {
 
                   <div className="pt-2 border-t border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                     <span className="text-slate-500 text-[11px]">
-                      Academic Mentor: <strong>{currentUser?.fullName || "Prof. Ananya Sen"}</strong>
+                      Academic Mentor: <strong>{currentUser?.fullName || eco.faculty.fullName}</strong>
                     </span>
 
                     {!isFacultyApproved ? (
                       <button
                         onClick={() => {
-                          approveMilestoneFaculty(m.id, currentUser?.fullName || "Prof. Ananya Sen");
+                          approveMilestoneFaculty(m.id, currentUser?.fullName || eco.faculty.fullName);
                           confetti({ particleCount: 70, spread: 60 });
                         }}
                         className="px-4 py-2 bg-emerald-700 hover:bg-emerald-800 text-white rounded font-semibold flex items-center space-x-1.5 shadow-xs"
@@ -1074,7 +1097,7 @@ export const FacultyPortalPage: React.FC = () => {
               <div className="border-b border-slate-200 pb-3 flex justify-between items-start">
                 <div>
                   <span className="text-[10px] font-bold text-slate-500 uppercase">
-                    Birla Institute of Technology, Mesra — Central Research Laboratory
+                    {eco.name} — Central Innovation & Research Laboratory
                   </span>
                   <h3 className="font-heading font-bold text-base text-slate-900 mt-0.5">
                     {inspectingDoc.title}

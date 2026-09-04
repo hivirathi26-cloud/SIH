@@ -18,6 +18,7 @@ import {
   DocumentVaultItem,
   StudentDeliverableTask
 } from "../types";
+import { useAuth } from "./AuthContext";
 import {
   MOCK_USERS,
   MOCK_PROBLEMS,
@@ -167,15 +168,143 @@ const INITIAL_STUDENT_DELIVERABLES: StudentDeliverableTask[] = [
     facultyFeedback: "Excellent dimensional tolerance and ergonomic latch design. Approved for lab CNC milling.",
     facultySignedAt: "2026-02-20T16:00:00Z",
     facultySignedBy: "Prof. Ananya Sen"
+  },
+  // IIT (ISM) Dhanbad Deliverables
+  {
+    id: "dt-iit-001",
+    proposalId: "prop-003",
+    proposalTitle: "AgniShanti: Autonomous Thermal Drone & Fly-Ash Slurry Micro-Capping for Coal Fires",
+    milestoneId: "ms-001",
+    milestoneName: "Milestone 1: Drone Thermal Survey & Underground Fire Boundary Mapping",
+    title: "Hexacopter Thermal FLIR Radiometric Survey & Hotspot GeoTIFF",
+    description: "Execute 5 autonomous UAV thermal grid flights over Ghanudih opencast seam to detect subsurface combustion hotspots > 120°C.",
+    assignedStudentId: "student-iit-rohan",
+    assignedStudentName: "Rohan Deshmukh (Team Lead)",
+    studentDiscipline: "Mining Machinery & Robotics",
+    progressPercent: 100,
+    status: "in_review_by_faculty",
+    pdfUrl: "/vault/jharia_coal_seam_thermal_radiometric_survey_v1.pdf",
+    submissionNotes: "Completed night thermal flights over Jharia Ghanudih. 14 critical hot spots identified with GPS coordinates. GeoTIFF dataset and flight telemetry logs attached.",
+    submittedAt: "2026-03-03T18:00:00Z"
+  },
+  {
+    id: "dt-iit-002",
+    proposalId: "prop-003",
+    proposalTitle: "AgniShanti: Autonomous Thermal Drone & Fly-Ash Slurry Micro-Capping for Coal Fires",
+    milestoneId: "ms-002",
+    milestoneName: "Milestone 2: Fly-Ash Geopolymer Slurry Formulation & Viscosity Testing",
+    title: "Geopolymer Slurry Rheology & Thermal Retardant Lab Analysis",
+    description: "Bench testing slurry viscosity at 200°C to verify surface crack sealing without thermal decomposition.",
+    assignedStudentId: "student-iit-ananya",
+    assignedStudentName: "Ananya Sengupta (Student)",
+    studentDiscipline: "Applied Geophysics & AI",
+    progressPercent: 90,
+    status: "in_progress",
+    submissionNotes: "Mix ratio 3:1 fly-ash to sodium silicate tested. Thermal retardance validated up to 350°C in Dhanbad high-temp lab."
+  },
+  {
+    id: "dt-iit-003",
+    proposalId: "prop-003",
+    proposalTitle: "AgniShanti: Autonomous Thermal Drone & Fly-Ash Slurry Micro-Capping for Coal Fires",
+    milestoneId: "ms-001",
+    milestoneName: "Milestone 1: Drone Thermal Survey & Underground Fire Boundary Mapping",
+    title: "Subsurface Methane & CO Sensor Mesh Node Prototyping",
+    description: "LoRaWAN gas monitoring probes to be placed near subsidence cracks in Jharia basti.",
+    assignedStudentId: "student-iit-vikas",
+    assignedStudentName: "Vikas Mahto (Student)",
+    studentDiscipline: "Computer Science & Mining Systems",
+    progressPercent: 100,
+    status: "approved_by_faculty",
+    pdfUrl: "/vault/lora_methane_node_bench_test_results.pdf",
+    submissionNotes: "Gas probes calibrated against reference methane chamber. Zero packet loss over 3.2km range.",
+    facultyFeedback: "Excellent calibration curve and LoRa link budget. Approved for pilot field deployment.",
+    facultySignedAt: "2026-02-26T14:00:00Z",
+    facultySignedBy: "Prof. Arvind Mukhopadhyay"
+  },
+
+  // AIIMS Deoghar Deliverables
+  {
+    id: "dt-aiims-001",
+    proposalId: "prop-004",
+    proposalTitle: "SwasthyaVahak: Smart PCM Solar Vaccine Carrier with LoRa Telemetry & GPS Geofencing",
+    milestoneId: "ms-001",
+    milestoneName: "Milestone 1: PCM Thermal Retention Testing & Ergonomic Enclosure",
+    title: "72-Hour Ambient Chamber Temperature Stress Evaluation (45°C External)",
+    description: "Validate vaccine internal chamber holds 2°C-8°C under direct solar simulation without external grid power.",
+    assignedStudentId: "student-aiims-deepak",
+    assignedStudentName: "Dr. Deepak Soren (Team Lead)",
+    studentDiscipline: "Centre for Community Medicine & MedTech Devices",
+    progressPercent: 100,
+    status: "in_review_by_faculty",
+    pdfUrl: "/vault/aiims_deoghar_vaccine_cold_chain_stress_test.pdf",
+    submissionNotes: "Vaccine chamber maintained 4.1°C average across 72 continuous hours at 45°C external ambient heat. Full data sheet attached.",
+    submittedAt: "2026-03-03T16:20:00Z"
+  },
+  {
+    id: "dt-aiims-002",
+    proposalId: "prop-004",
+    proposalTitle: "SwasthyaVahak: Smart PCM Solar Vaccine Carrier with LoRa Telemetry & GPS Geofencing",
+    milestoneId: "ms-002",
+    milestoneName: "Milestone 2: Telemetry Node & Geofence SMS Integration",
+    title: "Biomedical Temperature Telemetry & GSM Breach Alert Unit",
+    description: "Fabricate PCB board with digital PT100 temperature sensor and GSM transmitter.",
+    assignedStudentId: "student-aiims-kavita",
+    assignedStudentName: "Kavita Tirkey (Student)",
+    studentDiscipline: "Biomedical Engineering & Tele-Health",
+    progressPercent: 80,
+    status: "in_progress",
+    submissionNotes: "Firmware flashing completed, integrating buzzer alarm for lid open breach."
+  },
+
+  // BAU Ranchi Deliverables
+  {
+    id: "dt-bau-001",
+    proposalId: "prop-002",
+    proposalTitle: "VanDhan SolarLac: Portable Hybrid Solar Scraping & Deseeding Machine",
+    milestoneId: "ms-001",
+    milestoneName: "Milestone 1: Mechanical Deseeding Drum & Solar Drive Prototyping",
+    title: "Rotary Blade Scraper Speed & Seed Damage Optimization Report",
+    description: "Calibrate cutting speed to ensure <2% broodlac damage during automated peeling.",
+    assignedStudentId: "student-bau-birsa",
+    assignedStudentName: "Birsa Oraon (Team Lead)",
+    studentDiscipline: "Agricultural Engineering & Soil Sensors",
+    progressPercent: 100,
+    status: "in_review_by_faculty",
+    pdfUrl: "/vault/bau_solarlac_scraping_efficiency_trial.pdf",
+    submissionNotes: "Prototype achieved 26.4 kg/hr processing speed with 98.8% seed integrity. Testing video and CAD spec sheet uploaded.",
+    submittedAt: "2026-03-02T19:15:00Z"
+  },
+  {
+    id: "dt-bau-002",
+    proposalId: "prop-002",
+    proposalTitle: "VanDhan SolarLac: Portable Hybrid Solar Scraping & Deseeding Machine",
+    milestoneId: "ms-002",
+    milestoneName: "Milestone 2: Field SHG Training & Moisture Drying Chamber",
+    title: "Torpa Tribal Women SHG Ergonomics & Solar Dryer Field Manual",
+    description: "Translate operating instructions into Ho and Mundari with pictorial safety guides.",
+    assignedStudentId: "student-bau-pooja",
+    assignedStudentName: "Pooja Kumari (Student)",
+    studentDiscipline: "Centre for Bio-Inoculants & Post-Harvest Tech",
+    progressPercent: 75,
+    status: "in_progress",
+    submissionNotes: "First draft reviewed with Torpa SHG federation. Formatting final laminate cards."
   }
 ];
 
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { currentUser: authUser } = useAuth();
   // Load state or fallback to mocks
   const [currentUser, setCurrentUser] = useState<User>(() => {
+    if (authUser) return authUser;
     const saved = localStorage.getItem("jsicp_current_user_id");
     return saved && MOCK_USERS[saved] ? MOCK_USERS[saved] : MOCK_USERS["citizen-sunita"];
   });
+
+  useEffect(() => {
+    if (authUser) {
+      setCurrentUser(authUser);
+    }
+  }, [authUser]);
 
   const [problems, setProblems] = useState<Problem[]>(() => {
     const saved = localStorage.getItem("jsicp_problems");

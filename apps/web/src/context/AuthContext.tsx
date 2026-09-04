@@ -20,6 +20,7 @@ export const getPortalPath = (role?: UserRole | string): string => {
   if (typeof role === "string") {
     if (role.startsWith("student")) return "/portal/student";
     if (role.startsWith("hei_")) return "/portal/hei-nodal";
+    if (role.startsWith("faculty")) return "/portal/faculty";
   }
   switch (role) {
     case "citizen":
@@ -158,6 +159,7 @@ export const DEMO_STAKEHOLDERS: Record<string, User> = {
     badges: ["CAD Designer", "CNC Fabricator"],
     createdAt: "2026-01-08T12:00:00Z"
   },
+  // IIT (ISM) Dhanbad Ecosystem
   hei_iit_dhanbad: {
     id: "user-nodal-iit",
     fullName: "Prof. S. K. Roy",
@@ -165,7 +167,7 @@ export const DEMO_STAKEHOLDERS: Record<string, User> = {
     email: "nodal.rnd@iitism.ac.in",
     role: "hei_nodal",
     roleTitle: "Nodal Officer (IIT ISM Dhanbad)",
-    organizationName: "IIT (ISM) Dhanbad",
+    organizationName: "Indian Institute of Technology (ISM) Dhanbad",
     department: "Centre of Mining Innovation & Tech",
     district: "Dhanbad",
     aadhaarVerified: true,
@@ -173,6 +175,68 @@ export const DEMO_STAKEHOLDERS: Record<string, User> = {
     badges: ["Mining Tech Nodal", "Geo Specialist"],
     createdAt: "2025-10-01T08:00:00Z"
   },
+  faculty_iit: {
+    id: "faculty-iit-arvind",
+    fullName: "Prof. Arvind Mukhopadhyay",
+    phone: "+91 94311 33445",
+    email: "arvind.mining@iitism.ac.in",
+    role: "faculty",
+    roleTitle: "Professor of Mining Machinery & Robotics",
+    organizationName: "Indian Institute of Technology (ISM) Dhanbad",
+    department: "Dept of Mining Engineering & Robotics",
+    district: "Dhanbad",
+    aadhaarVerified: true,
+    reputationPoints: 1120,
+    badges: ["Mining Automation Expert", "Geo-Robotics Pioneer"],
+    createdAt: "2025-11-01T10:00:00Z"
+  },
+  student_iit_rohan: {
+    id: "student-iit-rohan",
+    fullName: "Rohan Deshmukh (Team Lead)",
+    phone: "+91 91234 44556",
+    email: "rohan.mining@iitism.ac.in",
+    role: "student",
+    roleTitle: "Student Lead (Team KhananSuraksha - Geo-Robotics)",
+    organizationName: "Indian Institute of Technology (ISM) Dhanbad",
+    department: "Mining Machinery & Robotics (3rd Year)",
+    district: "Dhanbad",
+    aadhaarVerified: true,
+    reputationPoints: 560,
+    badges: ["UAV Pilot", "Thermal Mapping Lead"],
+    createdAt: "2026-01-05T10:00:00Z"
+  },
+  student_iit_ananya: {
+    id: "student-iit-ananya",
+    fullName: "Ananya Sengupta (Student)",
+    phone: "+91 91234 77889",
+    email: "ananya.geo@iitism.ac.in",
+    role: "student",
+    roleTitle: "Rock Mechanics & Thermal AI Engineer",
+    organizationName: "Indian Institute of Technology (ISM) Dhanbad",
+    department: "Applied Geophysics & AI (4th Year)",
+    district: "Dhanbad",
+    aadhaarVerified: true,
+    reputationPoints: 490,
+    badges: ["Thermal AI", "Seismic Modeler"],
+    createdAt: "2026-01-06T10:00:00Z"
+  },
+  student_iit_vikas: {
+    id: "student-iit-vikas",
+    fullName: "Vikas Mahto (Student)",
+    phone: "+91 91234 99001",
+    email: "vikas.mining@iitism.ac.in",
+    role: "student",
+    roleTitle: "LoRaWAN Underground Mesh Networks",
+    organizationName: "Indian Institute of Technology (ISM) Dhanbad",
+    department: "Computer Science & Mining Systems (3rd Year)",
+    district: "Dhanbad",
+    aadhaarVerified: true,
+    reputationPoints: 470,
+    badges: ["LoRa Mesh", "Dhanbad Local Innovator"],
+    createdAt: "2026-01-07T10:00:00Z"
+  },
+
+  // AIIMS Deoghar MedTech Ecosystem
   hei_aiims_deoghar: {
     id: "user-nodal-aiims",
     fullName: "Dr. A. K. Mishra",
@@ -188,6 +252,53 @@ export const DEMO_STAKEHOLDERS: Record<string, User> = {
     badges: ["MedTech Nodal", "Public Health Director"],
     createdAt: "2025-09-15T08:00:00Z"
   },
+  faculty_aiims: {
+    id: "faculty-aiims-rajesh",
+    fullName: "Dr. Rajesh Soren",
+    phone: "+91 94301 66778",
+    email: "rajesh.soren@aiimsdeoghar.edu.in",
+    role: "faculty",
+    roleTitle: "Associate Professor & MedTech Lab Director",
+    organizationName: "AIIMS Deoghar",
+    department: "Centre for Community Medicine & MedTech Devices",
+    district: "Deoghar",
+    aadhaarVerified: true,
+    reputationPoints: 1080,
+    badges: ["Public Health Innovator", "Cold-Chain Specialist"],
+    createdAt: "2025-10-15T10:00:00Z"
+  },
+  student_aiims_deepak: {
+    id: "student-aiims-deepak",
+    fullName: "Dr. Deepak Soren (Lead)",
+    phone: "+91 93341 55667",
+    email: "deepak.soren@aiimsdeoghar.edu.in",
+    role: "student",
+    roleTitle: "Senior Resident & MedTech Prototyper",
+    organizationName: "AIIMS Deoghar",
+    department: "Centre for Community Medicine & MedTech Devices",
+    district: "Deoghar",
+    aadhaarVerified: true,
+    reputationPoints: 580,
+    badges: ["MedTech Lead", "Clinical Prototyper"],
+    createdAt: "2026-01-08T10:00:00Z"
+  },
+  student_aiims_kavita: {
+    id: "student-aiims-kavita",
+    fullName: "Kavita Tirkey (Student)",
+    phone: "+91 93341 77889",
+    email: "kavita.biomed@aiimsdeoghar.edu.in",
+    role: "student",
+    roleTitle: "Biomedical Instrumentation & Cold-Chain Telemetry",
+    organizationName: "AIIMS Deoghar",
+    department: "Biomedical Engineering & Tele-Health",
+    district: "Deoghar",
+    aadhaarVerified: true,
+    reputationPoints: 510,
+    badges: ["Cold-Chain IoT", "Sensors Specialist"],
+    createdAt: "2026-01-09T10:00:00Z"
+  },
+
+  // Birsa Agricultural University (BAU) Ecosystem
   hei_bau_ranchi: {
     id: "user-nodal-bau",
     fullName: "Dr. Manoj Tiwary",
@@ -202,6 +313,51 @@ export const DEMO_STAKEHOLDERS: Record<string, User> = {
     reputationPoints: 1380,
     badges: ["AgriTech Lead", "Tribal Livelihoods"],
     createdAt: "2025-09-20T08:00:00Z"
+  },
+  faculty_bau: {
+    id: "faculty-bau-sunita",
+    fullName: "Dr. Sunita Murmu",
+    phone: "+91 94311 77889",
+    email: "sunita.murmu@bauranchi.org",
+    role: "faculty",
+    roleTitle: "Associate Professor of Agronomy & Farm Tech",
+    organizationName: "Birsa Agricultural University (BAU Kanke)",
+    department: "Dept of Agronomy & Farm Mechanization",
+    district: "Ranchi",
+    aadhaarVerified: true,
+    reputationPoints: 1040,
+    badges: ["Tribal Agriculture Expert", "Bio-Processing Lead"],
+    createdAt: "2025-10-20T10:00:00Z"
+  },
+  student_bau_birsa: {
+    id: "student-bau-birsa",
+    fullName: "Birsa Oraon (Team Lead)",
+    phone: "+91 94701 22334",
+    email: "birsa.agri@bauranchi.org",
+    role: "student",
+    roleTitle: "Student Lead (Team KrishiVikas - Agri-IoT)",
+    organizationName: "Birsa Agricultural University (BAU Kanke)",
+    department: "Agricultural Engineering & Soil Sensors (3rd Year)",
+    district: "Ranchi",
+    aadhaarVerified: true,
+    reputationPoints: 530,
+    badges: ["Agri-IoT Lead", "Soil Health Coder"],
+    createdAt: "2026-01-10T10:00:00Z"
+  },
+  student_bau_pooja: {
+    id: "student-bau-pooja",
+    fullName: "Pooja Kumari (Student)",
+    phone: "+91 94701 55667",
+    email: "pooja.biotech@bauranchi.org",
+    role: "student",
+    roleTitle: "Post-Harvest Bio-Processing & Tribal Value Chains",
+    organizationName: "Birsa Agricultural University (BAU Kanke)",
+    department: "Centre for Bio-Inoculants & Post-Harvest Tech (4th Year)",
+    district: "Ranchi",
+    aadhaarVerified: true,
+    reputationPoints: 480,
+    badges: ["Bio-Processor", "Lac Specialist"],
+    createdAt: "2026-01-11T10:00:00Z"
   },
   industry: {
     id: "industry-tatasteel",

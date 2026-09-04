@@ -224,31 +224,35 @@ export const GovtHeader: React.FC = () => {
 
                       <div className="py-1 max-h-80 overflow-y-auto divide-y divide-slate-100">
                         {[
-                          {
-                            category: "💡 Student Innovators",
-                            keys: ["student", "student_priya", "student_sneha", "student_amit"]
-                          },
-                          {
-                            category: "🔬 Faculty Mentors",
-                            keys: ["faculty"]
-                          },
-                          {
-                            category: "🎓 University Nodal Desks",
-                            keys: ["hei_nodal", "hei_iit_dhanbad", "hei_aiims_deoghar", "hei_bau_ranchi"]
-                          },
-                          {
-                            category: "🏭 Industry & CSR",
-                            keys: ["industry"]
-                          },
-                          {
-                            category: "🏛️ State Apex & District",
-                            keys: ["govt_admin"]
-                          },
-                          {
-                            category: "👥 Citizens & PRIs",
-                            keys: ["citizen", "pri"]
-                          }
-                        ].map((grp) => (
+            {
+              category: "🏛️ BIT Mesra Ecosystem (Water, Environment & IoT)",
+              keys: ["hei_nodal", "faculty", "student", "student_priya", "student_sneha", "student_amit"]
+            },
+            {
+              category: "⛏️ IIT (ISM) Dhanbad Ecosystem (Mining Tech & Robotics)",
+              keys: ["hei_iit_dhanbad", "faculty_iit", "student_iit_rohan", "student_iit_ananya", "student_iit_vikas"]
+            },
+            {
+              category: "🏥 AIIMS Deoghar Ecosystem (MedTech & Cold-Chain)",
+              keys: ["hei_aiims_deoghar", "faculty_aiims", "student_aiims_deepak", "student_aiims_kavita"]
+            },
+            {
+              category: "🌾 Birsa Agricultural University - BAU (AgriTech & Bio-Processing)",
+              keys: ["hei_bau_ranchi", "faculty_bau", "student_bau_birsa", "student_bau_pooja"]
+            },
+            {
+              category: "🏭 Industry & CSR Co-Funding Anchors",
+              keys: ["industry"]
+            },
+            {
+              category: "🏛️ State Apex Command & District Administration",
+              keys: ["govt_admin"]
+            },
+            {
+              category: "👥 Grassroots Citizens & Panchayati Raj (PRI)",
+              keys: ["citizen", "pri"]
+            }
+          ].map((grp) => (
                           <div key={grp.category} className="py-1">
                             <span className="px-3.5 py-0.5 text-[9px] font-bold text-slate-400 uppercase tracking-wider block bg-slate-50/70">
                               {grp.category}

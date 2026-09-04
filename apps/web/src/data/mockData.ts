@@ -120,6 +120,26 @@ export const MOCK_UNIVERSITIES: University[] = [
     logoBadge: "BAU"
   },
   {
+    id: "univ-aiims-deoghar",
+    name: "All India Institute of Medical Sciences, Deoghar",
+    shortName: "AIIMS Deoghar",
+    district: "Deoghar",
+    expertiseDomains: [
+      "Healthcare & MedTech",
+      "Public Health Telemetry",
+      "Cold-Chain Logistics",
+      "Bio-Medical Engineering"
+    ] as any,
+    nodalOfficerId: "user-nodal-aiims",
+    nodalOfficerName: "Dr. A. K. Mishra",
+    activeProjectsCount: 9,
+    completedProjectsCount: 16,
+    patentsCount: 7,
+    startupsIncubated: 5,
+    nirfRank: 32,
+    logoBadge: "AIIMS"
+  },
+  {
     id: "univ-ranchi-univ",
     name: "Ranchi University",
     shortName: "Ranchi Univ",
@@ -215,6 +235,246 @@ export const MOCK_USERS: Record<string, User> = {
     badges: ["SIH Finalist", "Hardware Hacker", "Prototype Champion"],
     createdAt: "2026-01-05T14:30:00Z"
   },
+  "student-priya": {
+    id: "student-priya",
+    fullName: "Priya Sharma",
+    phone: "+91 91234 66778",
+    email: "priya.chem@bitmesra.ac.in",
+    role: "student",
+    roleTitle: "Student Innovator (Chemical & Membrane Tech)",
+    organizationName: "Dept of Chemical Engineering, BIT Mesra (4th Year)",
+    district: "Ranchi",
+    aadhaarVerified: true,
+    avatarUrl: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&auto=format&fit=crop&q=80",
+    reputationPoints: 490,
+    badges: ["Membrane Specialist", "Filtration Researcher"],
+    createdAt: "2026-01-06T11:00:00Z"
+  },
+  "student-sneha": {
+    id: "student-sneha",
+    fullName: "Sneha Soren",
+    phone: "+91 91234 77889",
+    email: "sneha.rural@bitmesra.ac.in",
+    role: "student",
+    roleTitle: "Field Researcher (Tribal & Community Deployment)",
+    organizationName: "Dept of Rural Management, BIT Mesra (2nd Year M.Tech)",
+    district: "Ranchi",
+    aadhaarVerified: true,
+    avatarUrl: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80",
+    reputationPoints: 460,
+    badges: ["Tribal Field Liaison", "NABL Assayer"],
+    createdAt: "2026-01-07T09:30:00Z"
+  },
+  "student-amit": {
+    id: "student-amit",
+    fullName: "Amit Verma",
+    phone: "+91 91234 88990",
+    email: "amit.mech@bitmesra.ac.in",
+    role: "student",
+    roleTitle: "Hardware Prototyper (CAD & Structural Enclosures)",
+    organizationName: "Dept of Mechanical Engineering, BIT Mesra (3rd Year)",
+    district: "Ranchi",
+    aadhaarVerified: true,
+    avatarUrl: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&auto=format&fit=crop&q=80",
+    reputationPoints: 475,
+    badges: ["CAD Designer", "CNC Fabricator"],
+    createdAt: "2026-01-08T12:00:00Z"
+  },
+  "user-nodal-iit": {
+    id: "user-nodal-iit",
+    fullName: "Prof. S. K. Roy",
+    phone: "+91 94311 22334",
+    email: "nodal.rnd@iitism.ac.in",
+    role: "hei_nodal",
+    roleTitle: "Nodal Officer (IIT ISM Dhanbad)",
+    organizationName: "Indian Institute of Technology (ISM) Dhanbad",
+    department: "Centre of Mining Innovation & Tech",
+    district: "Dhanbad",
+    aadhaarVerified: true,
+    reputationPoints: 1380,
+    badges: ["Mining Tech Nodal", "Geo Specialist"],
+    createdAt: "2025-10-01T08:00:00Z"
+  },
+  "faculty-iit-arvind": {
+    id: "faculty-iit-arvind",
+    fullName: "Prof. Arvind Mukhopadhyay",
+    phone: "+91 94311 33445",
+    email: "arvind.mining@iitism.ac.in",
+    role: "faculty",
+    roleTitle: "Professor of Mining Machinery & Robotics",
+    organizationName: "Indian Institute of Technology (ISM) Dhanbad",
+    department: "Dept of Mining Engineering & Robotics",
+    district: "Dhanbad",
+    aadhaarVerified: true,
+    reputationPoints: 1120,
+    badges: ["Mining Automation Expert", "Geo-Robotics Pioneer"],
+    createdAt: "2025-11-01T10:00:00Z"
+  },
+  "student-iit-rohan": {
+    id: "student-iit-rohan",
+    fullName: "Rohan Deshmukh",
+    phone: "+91 91234 44556",
+    email: "rohan.mining@iitism.ac.in",
+    role: "student",
+    roleTitle: "Student Lead (Team KhananSuraksha - Geo-Robotics)",
+    organizationName: "Indian Institute of Technology (ISM) Dhanbad",
+    department: "Mining Machinery & Robotics (3rd Year)",
+    district: "Dhanbad",
+    aadhaarVerified: true,
+    reputationPoints: 560,
+    badges: ["UAV Pilot", "Thermal Mapping Lead"],
+    createdAt: "2026-01-05T10:00:00Z"
+  },
+  "student-iit-ananya": {
+    id: "student-iit-ananya",
+    fullName: "Ananya Sengupta",
+    phone: "+91 91234 77889",
+    email: "ananya.geo@iitism.ac.in",
+    role: "student",
+    roleTitle: "Rock Mechanics & Thermal AI Engineer",
+    organizationName: "Indian Institute of Technology (ISM) Dhanbad",
+    department: "Applied Geophysics & AI (4th Year)",
+    district: "Dhanbad",
+    aadhaarVerified: true,
+    reputationPoints: 490,
+    badges: ["Thermal AI", "Seismic Modeler"],
+    createdAt: "2026-01-06T10:00:00Z"
+  },
+  "student-iit-vikas": {
+    id: "student-iit-vikas",
+    fullName: "Vikas Mahto",
+    phone: "+91 91234 99001",
+    email: "vikas.mining@iitism.ac.in",
+    role: "student",
+    roleTitle: "LoRaWAN Underground Mesh Networks",
+    organizationName: "Indian Institute of Technology (ISM) Dhanbad",
+    department: "Computer Science & Mining Systems (3rd Year)",
+    district: "Dhanbad",
+    aadhaarVerified: true,
+    reputationPoints: 470,
+    badges: ["LoRa Mesh", "Dhanbad Local Innovator"],
+    createdAt: "2026-01-07T10:00:00Z"
+  },
+  "user-nodal-aiims": {
+    id: "user-nodal-aiims",
+    fullName: "Dr. A. K. Mishra",
+    phone: "+91 94301 44556",
+    email: "nodal.rnd@aiimsdeoghar.edu.in",
+    role: "hei_nodal",
+    roleTitle: "Nodal Officer (AIIMS Deoghar)",
+    organizationName: "AIIMS Deoghar",
+    department: "Directorate of Medical Research & Devices",
+    district: "Deoghar",
+    aadhaarVerified: true,
+    reputationPoints: 1290,
+    badges: ["MedTech Nodal", "Public Health Director"],
+    createdAt: "2025-09-15T08:00:00Z"
+  },
+  "faculty-aiims-rajesh": {
+    id: "faculty-aiims-rajesh",
+    fullName: "Dr. Rajesh Soren",
+    phone: "+91 94301 66778",
+    email: "rajesh.soren@aiimsdeoghar.edu.in",
+    role: "faculty",
+    roleTitle: "Associate Professor & MedTech Lab Director",
+    organizationName: "AIIMS Deoghar",
+    department: "Centre for Community Medicine & MedTech Devices",
+    district: "Deoghar",
+    aadhaarVerified: true,
+    reputationPoints: 1080,
+    badges: ["Public Health Innovator", "Cold-Chain Specialist"],
+    createdAt: "2025-10-15T10:00:00Z"
+  },
+  "student-aiims-deepak": {
+    id: "student-aiims-deepak",
+    fullName: "Dr. Deepak Soren",
+    phone: "+91 93341 55667",
+    email: "deepak.soren@aiimsdeoghar.edu.in",
+    role: "student",
+    roleTitle: "Senior Resident & MedTech Prototyper",
+    organizationName: "AIIMS Deoghar",
+    department: "Centre for Community Medicine & MedTech Devices",
+    district: "Deoghar",
+    aadhaarVerified: true,
+    reputationPoints: 580,
+    badges: ["MedTech Lead", "Clinical Prototyper"],
+    createdAt: "2026-01-08T10:00:00Z"
+  },
+  "student-aiims-kavita": {
+    id: "student-aiims-kavita",
+    fullName: "Kavita Tirkey",
+    phone: "+91 93341 77889",
+    email: "kavita.biomed@aiimsdeoghar.edu.in",
+    role: "student",
+    roleTitle: "Biomedical Instrumentation & Cold-Chain Telemetry",
+    organizationName: "AIIMS Deoghar",
+    department: "Biomedical Engineering & Tele-Health",
+    district: "Deoghar",
+    aadhaarVerified: true,
+    reputationPoints: 510,
+    badges: ["Cold-Chain IoT", "Sensors Specialist"],
+    createdAt: "2026-01-09T10:00:00Z"
+  },
+  "user-nodal-bau": {
+    id: "user-nodal-bau",
+    fullName: "Dr. Manoj Tiwary",
+    phone: "+91 94311 55667",
+    email: "nodal.rnd@bauranchi.org",
+    role: "hei_nodal",
+    roleTitle: "Nodal Officer (BAU Ranchi)",
+    organizationName: "Birsa Agricultural University (BAU Kanke)",
+    department: "Directorate of Agricultural Research",
+    district: "Ranchi",
+    aadhaarVerified: true,
+    reputationPoints: 1220,
+    badges: ["AgriTech Lead", "Tribal Livelihoods"],
+    createdAt: "2025-09-20T08:00:00Z"
+  },
+  "faculty-bau-sunita": {
+    id: "faculty-bau-sunita",
+    fullName: "Dr. Sunita Murmu",
+    phone: "+91 94311 77889",
+    email: "sunita.murmu@bauranchi.org",
+    role: "faculty",
+    roleTitle: "Associate Professor of Agronomy & Farm Tech",
+    organizationName: "Birsa Agricultural University (BAU Kanke)",
+    department: "Dept of Agronomy & Farm Mechanization",
+    district: "Ranchi",
+    aadhaarVerified: true,
+    reputationPoints: 1040,
+    badges: ["Tribal Agriculture Expert", "Bio-Processing Lead"],
+    createdAt: "2025-10-20T10:00:00Z"
+  },
+  "student-bau-birsa": {
+    id: "student-bau-birsa",
+    fullName: "Birsa Oraon",
+    phone: "+91 94701 22334",
+    email: "birsa.agri@bauranchi.org",
+    role: "student",
+    roleTitle: "Student Lead (Team KrishiVikas - Agri-IoT)",
+    organizationName: "Birsa Agricultural University (BAU Kanke)",
+    department: "Agricultural Engineering & Soil Sensors (3rd Year)",
+    district: "Ranchi",
+    aadhaarVerified: true,
+    reputationPoints: 530,
+    badges: ["Agri-IoT Lead", "Soil Health Coder"],
+    createdAt: "2026-01-10T10:00:00Z"
+  },
+  "student-bau-pooja": {
+    id: "student-bau-pooja",
+    fullName: "Pooja Kumari",
+    phone: "+91 94701 55667",
+    email: "pooja.biotech@bauranchi.org",
+    role: "student",
+    roleTitle: "Post-Harvest Bio-Processing & Tribal Value Chains",
+    organizationName: "Birsa Agricultural University (BAU Kanke)",
+    department: "Centre for Bio-Inoculants & Post-Harvest Tech (4th Year)",
+    district: "Ranchi",
+    aadhaarVerified: true,
+    reputationPoints: 480,
+    badges: ["Bio-Processor", "Lac Specialist"],
+    createdAt: "2026-01-11T10:00:00Z"
+  },
   "industry-tatasteel": {
     id: "industry-tatasteel",
     fullName: "Mr. Alok Sanyal",
@@ -248,6 +508,142 @@ export const MOCK_USERS: Record<string, User> = {
 };
 
 export const MOCK_PROBLEMS: Problem[] = [
+  {
+    id: "prob-006",
+    ticketNumber: "JSICP-2026-1342",
+    submittedBy: "citizen-sunita",
+    submitterName: "Dr. B. K. Marandi (Civil Surgeon, Pakur)",
+    submitterRole: "govt_officer",
+    title: "Silicosis Early Detection & Dust Suppression System for Stone Crushers in Pakur",
+    description: "Over 4,200 quarry workers in Malpahari stone belt show respiratory distress. Need portable spirometry screening kiosk with AI lung sound analysis and electrostatic water-mist dust suppressors.",
+    detectedLanguage: "English (en)",
+    category: "Healthcare & MedTech",
+    subCategory: "Occupational Health & AI Screening",
+    categoryConfidence: 0.96,
+    priorityScore: 92.4,
+    status: "pending_nodal_review",
+    district: "Pakur",
+    block: "Pakur",
+    village: "Malpahari",
+    latitude: 24.6341,
+    longitude: 87.8492,
+    isDuplicateOf: null,
+    citizenSupportCount: 265,
+    sdgTags: ["SDG 3: Good Health & Well-Being", "SDG 8: Decent Work & Economic Growth"],
+    media: [
+      {
+        id: "med-006",
+        problemId: "prob-006",
+        mediaType: "image",
+        storageUrl: "https://images.unsplash.com/photo-1584820927498-cfe5211fd8bf?w=600&auto=format&fit=crop&q=80",
+        cvValidationLabel: "Stone Crusher Dust Plume & Worker Mask Violation",
+        cvValidationConfidence: 0.95
+      }
+    ],
+    aiExplanation: {
+      nlpKeywords: ["silicosis", "stone crusher", "spirometry", "Pakur", "dust suppression"],
+      cvSceneTags: ["quarry", "dust plume", "crusher unit"],
+      duplicateCheckResult: "High priority occupational health alert for Santhal Pargana division.",
+      priorityBreakdown: { severityWeight: 38.0, affectedPopulationEstimate: 24.0, locationVulnerabilityIndex: 18.0, sdgImpactScore: 12.4 },
+      suggestedUniversities: [
+        { universityId: "univ-aiims-deoghar", universityName: "AIIMS Deoghar", score: 0.97, rank: 1, reason: "Specialized Occupational Medicine & Pulmonary Dept (Nearest Apex Medical Institute)" },
+        { universityId: "univ-bit-mesra", universityName: "BIT Mesra, Ranchi", score: 0.78, rank: 2, reason: "Mechanical misting nozzle fabrication" }
+      ]
+    },
+    createdAt: "2026-02-26T10:00:00Z",
+    updatedAt: "2026-02-26T10:05:00Z"
+  },
+  {
+    id: "prob-007",
+    ticketNumber: "JSICP-2026-1410",
+    submittedBy: "pri-mukhia-khunti",
+    submitterName: "Mangal Singh (Mukhia, Palamu)",
+    submitterRole: "pri",
+    title: "Drought-Resilient Millets & Micro-Solar Drip Irrigation in Palamu Uplands",
+    description: "Recurrent drought in Lesliganj block causes 60% crop failure in upland rainfed tracts. Need drought-tolerant Marua/Kodo millet seed priming and ultra low-pressure solar micro-drip kits.",
+    detectedLanguage: "English (en)",
+    category: "Agriculture & Allied Technologies",
+    subCategory: "Climate-Resilient Agriculture & Smart Drip",
+    categoryConfidence: 0.95,
+    priorityScore: 88.7,
+    status: "pending_nodal_review",
+    district: "Palamu",
+    block: "Lesliganj",
+    village: "Tarhasi",
+    latitude: 24.0112,
+    longitude: 84.1523,
+    isDuplicateOf: null,
+    citizenSupportCount: 180,
+    sdgTags: ["SDG 2: Zero Hunger", "SDG 13: Climate Action", "SDG 1: No Poverty"],
+    media: [
+      {
+        id: "med-007",
+        problemId: "prob-007",
+        mediaType: "image",
+        storageUrl: "https://images.unsplash.com/photo-1592417817098-8f3d6eb22509?w=600&auto=format&fit=crop&q=80",
+        cvValidationLabel: "Dry Upland Soil & Drought Stunted Crop",
+        cvValidationConfidence: 0.92
+      }
+    ],
+    aiExplanation: {
+      nlpKeywords: ["drought", "millets", "drip irrigation", "Palamu", "solar"],
+      cvSceneTags: ["arid field", "cracked soil"],
+      duplicateCheckResult: "Aligned with Jharkhand State Drought Mitigation Mission 2026.",
+      priorityBreakdown: { severityWeight: 35.0, affectedPopulationEstimate: 23.0, locationVulnerabilityIndex: 18.0, sdgImpactScore: 12.7 },
+      suggestedUniversities: [
+        { universityId: "univ-bau-kanke", universityName: "BAU Ranchi", score: 0.98, rank: 1, reason: "Leading Dryland Farming & Millets Agronomy Centre in Eastern India" },
+        { universityId: "univ-bit-mesra", universityName: "BIT Mesra, Ranchi", score: 0.81, rank: 2, reason: "Solar pumping electronics lab" }
+      ]
+    },
+    createdAt: "2026-02-27T08:30:00Z",
+    updatedAt: "2026-02-27T08:35:00Z"
+  },
+  {
+    id: "prob-008",
+    ticketNumber: "JSICP-2026-1502",
+    submittedBy: "citizen-sunita",
+    submitterName: "Subhash Mahato (Mine Safety Advocate)",
+    submitterRole: "citizen",
+    title: "Heavy Metal Leachate & Acid Mine Drainage from Abandoned Coal Seams in Katras",
+    description: "Acid mine discharge (pH 3.2) containing dissolved iron and sulfate leaching into Katras Nullah contaminating local drinking ponds. Need automated continuous pH neutralization and passive limestone wetland bio-reactors.",
+    detectedLanguage: "English (en)",
+    category: "Environment & Mining Remediation",
+    subCategory: "Acid Mine Drainage & Wetland Neutralization",
+    categoryConfidence: 0.97,
+    priorityScore: 95.1,
+    status: "pending_nodal_review",
+    district: "Dhanbad",
+    block: "Baghmara",
+    village: "Katras",
+    latitude: 23.8114,
+    longitude: 86.2941,
+    isDuplicateOf: null,
+    citizenSupportCount: 340,
+    sdgTags: ["SDG 6: Clean Water & Sanitation", "SDG 15: Life on Land"],
+    media: [
+      {
+        id: "med-008",
+        problemId: "prob-008",
+        mediaType: "image",
+        storageUrl: "https://images.unsplash.com/photo-1618083707368-b3823daa2726?w=600&auto=format&fit=crop&q=80",
+        cvValidationLabel: "Acid Mine Drainage Red Ochre Stream",
+        cvValidationConfidence: 0.96
+      }
+    ],
+    aiExplanation: {
+      nlpKeywords: ["acid mine drainage", "pH", "heavy metals", "Katras", "Dhanbad"],
+      cvSceneTags: ["mine effluent", "ochre runoff"],
+      duplicateCheckResult: "Critical environmental remediation priority flagged in Dhanbad coal belt.",
+      priorityBreakdown: { severityWeight: 39.0, affectedPopulationEstimate: 24.5, locationVulnerabilityIndex: 18.5, sdgImpactScore: 13.1 },
+      suggestedUniversities: [
+        { universityId: "univ-iit-dhanbad", universityName: "IIT (ISM) Dhanbad", score: 0.99, rank: 1, reason: "Premier Department of Environmental Science & Mining Engineering, Dhanbad" },
+        { universityId: "univ-bit-mesra", universityName: "BIT Mesra, Ranchi", score: 0.84, rank: 2, reason: "Chemical wastewater treatment lab" }
+      ]
+    },
+    createdAt: "2026-02-28T11:00:00Z",
+    updatedAt: "2026-02-28T11:05:00Z"
+  },
+
   {
     id: "prob-001",
     ticketNumber: "JSICP-2026-0841",
@@ -358,6 +754,8 @@ export const MOCK_PROBLEMS: Problem[] = [
     ],
     assignedUniversityId: "univ-bau-kanke",
     assignedUniversityName: "Birsa Agricultural University, Kanke",
+    assignedFacultyId: "faculty-bau-sunita",
+    assignedFacultyName: "Dr. Sunita Murmu",
     activeProposalId: "prop-002",
     aiExplanation: {
       nlpKeywords: ["lac", "Rangeeni", "Kusmi", "Torpa", "Khunti", "tribal produce", "solar drying", "mandi"],
@@ -430,6 +828,8 @@ export const MOCK_PROBLEMS: Problem[] = [
     ],
     assignedUniversityId: "univ-iit-dhanbad",
     assignedUniversityName: "Indian Institute of Technology (ISM) Dhanbad",
+    assignedFacultyId: "faculty-iit-arvind",
+    assignedFacultyName: "Prof. Arvind Mukhopadhyay",
     activeProposalId: "prop-003",
     aiExplanation: {
       nlpKeywords: ["coal seam fire", "methane", "sulfur dioxide", "subsidence", "Jharia", "Dhanbad", "drone"],
@@ -500,8 +900,10 @@ export const MOCK_PROBLEMS: Problem[] = [
         cvValidationConfidence: 0.93
       }
     ],
-    assignedUniversityId: "univ-bit-mesra",
-    assignedUniversityName: "Birla Institute of Technology, Mesra",
+    assignedUniversityId: "univ-aiims-deoghar",
+    assignedUniversityName: "All India Institute of Medical Sciences, Deoghar",
+    assignedFacultyId: "faculty-aiims-rajesh",
+    assignedFacultyName: "Dr. Rajesh Soren",
     activeProposalId: "prop-004",
     feedbackRating: 5,
     feedbackComment: "12 units deployed across Dumka PHCs. Zero vaccine spoilage recorded in 45 days. Tremendous relief for ASHA workers!",
@@ -636,6 +1038,122 @@ export const MOCK_TEAMS: Team[] = [
       }
     ],
     createdAt: "2026-01-22T12:00:00Z"
+  },
+  {
+    id: "team-002",
+    problemId: "prob-003",
+    problemTitle: "Underground Coal Seam Fire & Toxic Methane Vents Near Jharia Basti",
+    universityId: "univ-iit-dhanbad",
+    universityName: "Indian Institute of Technology (ISM) Dhanbad",
+    facultyMentorId: "faculty-iit-arvind",
+    facultyMentorName: "Prof. Arvind Mukhopadhyay",
+    facultyDepartment: "Dept of Mining Engineering & Robotics",
+    members: [
+      {
+        id: "mem-iit-001",
+        teamId: "team-002",
+        studentId: "student-iit-rohan",
+        studentName: "Rohan Deshmukh",
+        discipline: "Mining Machinery & Robotics",
+        yearOfStudy: "3rd Year",
+        role: "Team Lead",
+        email: "rohan.mining@iitism.ac.in",
+        avatarUrl: "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=150&auto=format&fit=crop&q=80"
+      },
+      {
+        id: "mem-iit-002",
+        teamId: "team-002",
+        studentId: "student-iit-ananya",
+        studentName: "Ananya Sengupta",
+        discipline: "Applied Geophysics & AI",
+        yearOfStudy: "4th Year",
+        role: "Hardware Lead",
+        email: "ananya.geo@iitism.ac.in",
+        avatarUrl: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&auto=format&fit=crop&q=80"
+      },
+      {
+        id: "mem-iit-003",
+        teamId: "team-002",
+        studentId: "student-iit-vikas",
+        studentName: "Vikas Mahto",
+        discipline: "Computer Science & Mining Systems",
+        yearOfStudy: "3rd Year",
+        role: "Software Lead",
+        email: "vikas.mining@iitism.ac.in",
+        avatarUrl: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&auto=format&fit=crop&q=80"
+      }
+    ],
+    createdAt: "2026-01-24T10:00:00Z"
+  },
+  {
+    id: "team-003",
+    problemId: "prob-002",
+    problemTitle: "Post-Harvest Lac & Minor Forest Produce Processing Wastage in Torpa",
+    universityId: "univ-bau-kanke",
+    universityName: "Birsa Agricultural University, Kanke",
+    facultyMentorId: "faculty-bau-sunita",
+    facultyMentorName: "Dr. Sunita Murmu",
+    facultyDepartment: "Dept of Agronomy & Farm Mechanization",
+    members: [
+      {
+        id: "mem-bau-001",
+        teamId: "team-003",
+        studentId: "student-bau-birsa",
+        studentName: "Birsa Oraon",
+        discipline: "Agricultural Engineering & Soil Sensors",
+        yearOfStudy: "3rd Year",
+        role: "Team Lead",
+        email: "birsa.agri@bauranchi.org",
+        avatarUrl: "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=150&auto=format&fit=crop&q=80"
+      },
+      {
+        id: "mem-bau-002",
+        teamId: "team-003",
+        studentId: "student-bau-pooja",
+        studentName: "Pooja Kumari",
+        discipline: "Centre for Bio-Inoculants & Post-Harvest Tech",
+        yearOfStudy: "4th Year",
+        role: "Field Researcher",
+        email: "pooja.biotech@bauranchi.org",
+        avatarUrl: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80"
+      }
+    ],
+    createdAt: "2026-01-26T11:00:00Z"
+  },
+  {
+    id: "team-004",
+    problemId: "prob-004",
+    problemTitle: "Cold-Chain Failure in Vaccine Delivery Across Deep Forest Villages of Dumka",
+    universityId: "univ-aiims-deoghar",
+    universityName: "All India Institute of Medical Sciences, Deoghar",
+    facultyMentorId: "faculty-aiims-rajesh",
+    facultyMentorName: "Dr. Rajesh Soren",
+    facultyDepartment: "Centre for Community Medicine & MedTech Devices",
+    members: [
+      {
+        id: "mem-aiims-001",
+        teamId: "team-004",
+        studentId: "student-aiims-deepak",
+        studentName: "Dr. Deepak Soren",
+        discipline: "Centre for Community Medicine & MedTech Devices",
+        yearOfStudy: "Senior Resident",
+        role: "Team Lead",
+        email: "deepak.soren@aiimsdeoghar.edu.in",
+        avatarUrl: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80"
+      },
+      {
+        id: "mem-aiims-002",
+        teamId: "team-004",
+        studentId: "student-aiims-kavita",
+        studentName: "Kavita Tirkey",
+        discipline: "Biomedical Engineering & Tele-Health",
+        yearOfStudy: "3rd Year",
+        role: "Hardware Lead",
+        email: "kavita.biomed@aiimsdeoghar.edu.in",
+        avatarUrl: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&auto=format&fit=crop&q=80"
+      }
+    ],
+    createdAt: "2026-01-28T14:00:00Z"
   }
 ];
 
@@ -666,13 +1184,13 @@ export const MOCK_PROPOSALS: Proposal[] = [
   },
   {
     id: "prop-002",
-    teamId: "team-002",
+    teamId: "team-003",
     problemId: "prob-002",
     problemTitle: "Post-Harvest Lac & Minor Forest Produce Processing Wastage in Torpa",
     problemCategory: "Forest & Tribal Livelihoods",
     district: "Khunti",
     universityName: "Birsa Agricultural University, Kanke",
-    facultyMentorName: "Dr. Arvind Kumar",
+    facultyMentorName: "Dr. Sunita Murmu",
     title: "VanDhan SolarLac: Portable Hybrid Solar Scraping & Deseeding Machine for Lac Farmers",
     summary: "Ergonomic portable unit capable of processing 25kg lac per hour with 98% purity, powered by foldable solar panels and DC brushless motor.",
     technicalApproach: "Planetary blade scrapper with rotary seed separator + solar MPPT charge controller + light-weight aluminum frame.",
@@ -690,13 +1208,13 @@ export const MOCK_PROPOSALS: Proposal[] = [
   },
   {
     id: "prop-003",
-    teamId: "team-003",
+    teamId: "team-002",
     problemId: "prob-003",
     problemTitle: "Underground Coal Seam Fire & Toxic Methane Vents Near Jharia Basti",
     problemCategory: "Environment & Mining Remediation",
     district: "Dhanbad",
     universityName: "Indian Institute of Technology (ISM) Dhanbad",
-    facultyMentorName: "Prof. S. K. Mahato",
+    facultyMentorName: "Prof. Arvind Mukhopadhyay",
     title: "AgniShanti: Autonomous Thermal Drone & Fly-Ash Slurry Micro-Capping for Coal Fires",
     summary: "Thermal infrared drone mapping to identify underground combustion hotspots, followed by high-pressure injection of geopolymer fly-ash composite slurry to smother oxygen ingress.",
     technicalApproach: "Hexacopter with FLIR Boson 640 thermal camera + RTK GPS + automated nozzle injection rig.",
@@ -710,6 +1228,30 @@ export const MOCK_PROPOSALS: Proposal[] = [
     approvedAt: "2026-01-25T17:00:00Z",
     industryPartnerId: "ind-bccldhanbad",
     industryPartnerName: "Bharat Coking Coal Limited (BCCL)",
+    startupIncubationEligible: true
+  },
+  {
+    id: "prop-004",
+    teamId: "team-004",
+    problemId: "prob-004",
+    problemTitle: "Cold-Chain Failure in Vaccine Delivery Across Deep Forest Villages of Dumka",
+    problemCategory: "Healthcare & MedTech",
+    district: "Dumka",
+    universityName: "All India Institute of Medical Sciences, Deoghar",
+    facultyMentorName: "Dr. Rajesh Soren",
+    title: "SwasthyaVahak: Smart PCM Solar Vaccine Carrier with LoRa Telemetry & GPS Geofencing",
+    summary: "Active PCM (Phase Change Material) cooling chamber maintaining 2°C to 8°C for up to 72 hours under 45°C ambient temperature, integrated with solar lid recharge and real-time cold-chain SMS alert triggers.",
+    technicalApproach: "Vacuum insulated panels + PCM gel pack + low-power STM32 telemetry unit + GPS/GSM antenna.",
+    expectedOutcome: "Zero vaccine potency loss across 42 remote Anganwadis and sub-centers in Dumka and Deoghar.",
+    estimatedBudget: 340000,
+    durationMonths: 5,
+    needsIndustrySupport: true,
+    supportTypeNeeded: ["funding", "prototyping"],
+    status: "funded",
+    submittedAt: "2026-01-25T11:00:00Z",
+    approvedAt: "2026-01-30T16:00:00Z",
+    industryPartnerId: "industry-tatasteel",
+    industryPartnerName: "Tata Steel CSR Foundation",
     startupIncubationEligible: true
   }
 ];
@@ -745,6 +1287,38 @@ export const MOCK_AGREEMENTS: Agreement[] = [
     signedAt: "2026-02-12T11:00:00Z",
     documentUrl: "/documents/mou-coalindia-bau-solarlac.pdf",
     blockchainTxHash: "0x3e18a9942bf7c8911002da77931bfa28919ca0129841fbee4391aa892019cb42",
+    status: "active"
+  },
+  {
+    id: "agr-003",
+    proposalId: "prop-003",
+    proposalTitle: "AgniShanti: Autonomous Thermal Drone & Fly-Ash Slurry Micro-Capping for Coal Fires",
+    universityName: "Indian Institute of Technology (ISM) Dhanbad",
+    industryPartnerId: "industry-tatasteel",
+    industryPartnerName: "Bharat Coking Coal Limited (BCCL CSR Trust)",
+    industryType: "csr",
+    agreementType: "csr_grant",
+    amount: 620000,
+    terms: "Full grant funding for autonomous FLIR drone mapping and field bore-capping trials in Ghanudih basti, Jharia.",
+    signedAt: "2026-02-14T15:00:00Z",
+    documentUrl: "/documents/mou-bccl-iitism-agnishanti.pdf",
+    blockchainTxHash: "0x889a71239bfec1239921bda00192837190284abf8190284812349182a819c991",
+    status: "active"
+  },
+  {
+    id: "agr-004",
+    proposalId: "prop-004",
+    proposalTitle: "SwasthyaVahak: Smart PCM Solar Vaccine Carrier with LoRa Telemetry",
+    universityName: "All India Institute of Medical Sciences, Deoghar",
+    industryPartnerId: "industry-tatasteel",
+    industryPartnerName: "Tata Steel CSR Foundation & Urban Services",
+    industryType: "csr",
+    agreementType: "csr_grant",
+    amount: 340000,
+    terms: "CSR Grant for fabrication and field deployment of 20 units across Shikaripara and Raneshwar PHCs.",
+    signedAt: "2026-02-18T12:30:00Z",
+    documentUrl: "/documents/mou-tatasteel-aiims-swasthyavahak.pdf",
+    blockchainTxHash: "0x4421b981290384712093812039841029834102938410281b49a12c849102837b",
     status: "active"
   }
 ];

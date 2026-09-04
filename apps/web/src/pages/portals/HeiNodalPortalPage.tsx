@@ -6,6 +6,7 @@ import { useAuth } from "../../context/AuthContext";
 import { StatusPill } from "../../components/common/StatusPill";
 import { SdgBadge } from "../../components/common/SdgBadge";
 import { ExplainableAIModal } from "../../components/ai/ExplainableAIModal";
+import { getEcosystemByUserId } from "../../data/universityEcosystems";
 import {
   GraduationCap,
   Building,
@@ -16,7 +17,8 @@ import {
   FileText,
   Clock,
   ArrowRight,
-  ShieldCheck
+  ShieldCheck,
+  Award
 } from "lucide-react";
 import confetti from "canvas-confetti";
 
@@ -26,23 +28,35 @@ export const HeiNodalPortalPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState("routed");
   const [selectedProbForXAI, setSelectedProbForXAI] = useState<any>(null);
 
-  // STRICT FILTERING:
-  // "Routed Challenges" are strictly those awaiting institutional acceptance
-  const routedProblems = problems.filter(
-    (p) => p.status === "routed" || p.status === "pending_nodal_review"
-  );
+  // Dynamic institution resolution
+  const eco = getEcosystemByUserId(currentUser?.id, currentUser?.organizationName);
 
-  // "Accepted Challenges" are strictly those already accepted by HEI
+  // STRICT FILTERING by university:
+  // "Routed Challenges" are those awaiting acceptance for this university
+  const routedProblems = problems.filter((p) => {
+    const isPending = p.status === "routed" || p.status === "pending_nodal_review";
+    if (!isPending) return false;
+    const isAssignedToUs = p.assignedUniversityId === eco.id;
+    const isTopSuggested = p.aiExplanation?.suggestedUniversities?.[0]?.universityId === eco.id;
+    const isDistrictMatch = p.district === eco.district;
+    return isAssignedToUs || isTopSuggested || isDistrictMatch;
+  });
+
+  // "Accepted Challenges" are strictly those assigned to this institution
   const acceptedProblems = problems.filter(
     (p) =>
-      p.status === "accepted_by_hei" ||
-      p.status === "team_formed" ||
-      p.status === "in_progress" ||
-      p.status === "industry_matched" ||
-      p.status === "field_pilot" ||
-      p.status === "deployed" ||
-      p.status === "closed" ||
-      p.assignedUniversityId === "univ-bit-mesra"
+      p.assignedUniversityId === eco.id &&
+      p.status !== "pending_nodal_review" &&
+      p.status !== "routed" &&
+      p.status !== "submitted"
+  );
+
+  // Filter proposals belonging to this university
+  const univProposals = proposals.filter(
+    (pr) =>
+      pr.universityName?.toLowerCase().includes(eco.shortName.toLowerCase()) ||
+      pr.universityName?.toLowerCase().includes(eco.name.toLowerCase()) ||
+      pr.facultyMentorName === eco.faculty.fullName
   );
 
   const navItems: NavItem[] = [
@@ -50,25 +64,25 @@ export const HeiNodalPortalPage: React.FC = () => {
     { id: "routed", label: "Routed Challenges", icon: BrainCircuit, badge: routedProblems.length },
     { id: "accepted", label: "Accepted Challenges", icon: CheckCircle2, badge: acceptedProblems.length },
     { id: "faculty_roster", label: "Faculty Mentors Roster", icon: Users },
-    { id: "proposals", label: "Proposals & Cohorts", icon: FileText, badge: proposals.length }
+    { id: "proposals", label: "Proposals & Cohorts", icon: FileText, badge: univProposals.length }
   ];
 
   const handleAccept = (probId: string) => {
-    updateProblemStatus(probId, "accepted_by_hei", "univ-bit-mesra", "faculty-ananya");
+    updateProblemStatus(probId, "accepted_by_hei", eco.id, eco.faculty.id);
     confetti({ particleCount: 70, spread: 60 });
-    // Automatically switch to Accepted Challenges tab so user sees the newly accepted challenge immediately!
     setActiveTab("accepted");
   };
 
   const handleDecline = (probId: string) => {
-    updateProblemStatus(probId, "routed", "univ-iit-dhanbad");
-    alert("Challenge declined by BIT Mesra. AI Routing Engine automatically assigned ticket to next ranked HEI: IIT (ISM) Dhanbad.");
+    const fallbackUniv = eco.id === "univ-bit-mesra" ? "univ-iit-dhanbad" : "univ-bit-mesra";
+    updateProblemStatus(probId, "routed", fallbackUniv);
+    alert(`Challenge declined by ${eco.shortName}. AI Routing Engine re-assigned ticket to next ranked HEI.`);
   };
 
   return (
     <PortalLayout
       portalTitle="University Nodal Desk (HEI Portal)"
-      portalSubtitle="विश्वविद्यालय एवं उच्च शिक्षण संस्थान नवाचार पटल — BIT Mesra, Ranchi"
+      portalSubtitle={`विश्वविद्यालय एवं उच्च शिक्षण संस्थान नवाचार पटल — ${eco.name} (${eco.shortName})`}
       navItems={navItems}
       activeTab={activeTab}
       setActiveTab={setActiveTab}
@@ -78,17 +92,20 @@ export const HeiNodalPortalPage: React.FC = () => {
         <div className="space-y-6">
           <div className="bg-white p-5 rounded-lg border border-slate-200 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
-              <h3 className="font-heading font-bold text-base text-slate-900">
-                {currentUser?.organizationName || "Birla Institute of Technology, Mesra"}
-              </h3>
-              <p className="text-xs text-slate-600 mt-0.5">
-                Nodal Officer: <strong>{currentUser?.fullName}</strong> • NIRF Rank: <strong>#53</strong> • District: <strong>Ranchi</strong>
+              <div className="flex items-center space-x-2">
+                <span className="text-xl">{eco.domainIcon}</span>
+                <h3 className="font-heading font-bold text-base text-slate-900">
+                  {eco.name}
+                </h3>
+              </div>
+              <p className="text-xs text-slate-600 mt-1">
+                Nodal Officer: <strong>{eco.nodal.fullName}</strong> ({eco.nodal.title}) • District: <strong>{eco.district}</strong>
               </p>
               <p className="text-[11px] text-slate-500 mt-1">
-                Designated State Nodal Desk for Environmental Engg, Water Purification, Smart IoT & Renewable Energy.
+                Designated State Nodal Centre for <strong>{eco.domainName}</strong>.
               </p>
             </div>
-            <div className="bg-slate-50 px-3 py-2 border border-slate-200 rounded text-center">
+            <div className="bg-slate-50 px-3 py-2 border border-slate-200 rounded text-center shrink-0">
               <span className="text-[10px] text-slate-500 block uppercase font-mono">Institutional TRL Level</span>
               <span className="font-bold text-emerald-800 text-sm font-mono">TRL 6 - TRL 8 Ready</span>
             </div>
@@ -108,31 +125,31 @@ export const HeiNodalPortalPage: React.FC = () => {
               </span>
             </div>
             <div className="bg-white p-4 rounded-lg border border-slate-200">
-              <span className="text-[11px] text-slate-500 block">Approved Proposals</span>
+              <span className="text-[11px] text-slate-500 block">Active Proposals</span>
               <span className="font-heading font-extrabold text-xl text-purple-700 font-mono mt-0.5 block">
-                {proposals.length}
+                {univProposals.length}
               </span>
             </div>
             <div className="bg-white p-4 rounded-lg border border-slate-200">
-              <span className="text-[11px] text-slate-500 block">Patents / IP Disclosures</span>
-              <span className="font-heading font-extrabold text-xl text-amber-700 font-mono mt-0.5 block">
-                12 Filed
+              <span className="text-[11px] text-slate-500 block">Designated Faculty Lead</span>
+              <span className="font-heading font-bold text-xs text-slate-800 mt-1 block truncate">
+                {eco.faculty.fullName}
               </span>
             </div>
           </div>
         </div>
       )}
 
-      {/* 2. Routed Challenges Tab (Only pending ones!) */}
+      {/* 2. Routed Challenges Tab */}
       {activeTab === "routed" && (
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <div>
               <h3 className="font-heading font-bold text-sm text-slate-900">
-                Challenges Routed by State AI Engine Awaiting Acceptance ({routedProblems.length})
+                Challenges Routed to {eco.shortName} by State AI Engine ({routedProblems.length})
               </h3>
               <p className="text-xs text-slate-500">
-                Matched based on institutional domain expertise and geographic proximity
+                Matched based on institutional domain expertise ({eco.domainName}) and field requirements
               </p>
             </div>
           </div>
@@ -178,14 +195,14 @@ export const HeiNodalPortalPage: React.FC = () => {
                   <div className="bg-blue-50/60 p-3 rounded border border-blue-100 text-xs space-y-1">
                     <span className="font-bold text-blue-950 block text-[11px]">AI Matching Rationale:</span>
                     <p className="text-blue-900 text-[11px]">
-                      Direct fit with BIT Mesra Environmental Engg lab facilities + Same District ({p.district}) + High Priority Score ({p.priorityScore}/100).
+                      Optimal match for {eco.name} laboratory facilities • Domain: {p.category} • Priority Score: {p.priorityScore}/100.
                     </p>
                   </div>
 
                   <div className="pt-2 border-t border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
                     <div className="flex items-center space-x-2">
-                      <span className="text-slate-500">Suggested Dept:</span>
-                      <span className="font-semibold text-slate-800">Water & Environmental Engineering</span>
+                      <span className="text-slate-500">Proposed Mentor:</span>
+                      <span className="font-semibold text-slate-800">{eco.faculty.fullName} ({eco.faculty.dept})</span>
                     </div>
 
                     <div className="flex items-center space-x-2">
@@ -200,7 +217,7 @@ export const HeiNodalPortalPage: React.FC = () => {
                         className="px-4 py-1.5 bg-[#0f2942] hover:bg-[#163b5f] text-white rounded font-semibold flex items-center space-x-1"
                       >
                         <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
-                        <span>Accept Challenge & Assign Faculty &rarr;</span>
+                        <span>Accept & Assign to {eco.faculty.fullName.split(" ")[0]} {eco.faculty.fullName.split(" ").slice(-1)[0]} &rarr;</span>
                       </button>
                     </div>
                   </div>
@@ -217,10 +234,10 @@ export const HeiNodalPortalPage: React.FC = () => {
           <div className="flex items-center justify-between">
             <div>
               <h3 className="font-heading font-bold text-sm text-slate-900">
-                Accepted Challenges in Active University Pipeline ({acceptedProblems.length})
+                Accepted Challenges in Active {eco.shortName} Pipeline ({acceptedProblems.length})
               </h3>
               <p className="text-xs text-slate-500">
-                Challenges officially accepted by BIT Mesra with faculty mentors assigned
+                Challenges officially accepted by {eco.name} with faculty mentors assigned
               </p>
             </div>
           </div>
@@ -237,7 +254,7 @@ export const HeiNodalPortalPage: React.FC = () => {
 
                   <span className="bg-emerald-50 text-emerald-800 font-bold px-2.5 py-1 rounded text-[11px] border border-emerald-300 flex items-center space-x-1">
                     <CheckCircle2 className="w-3.5 h-3.5 text-emerald-700" />
-                    <span>ACCEPTED BY BIT MESRA</span>
+                    <span>ACCEPTED BY {eco.shortName.toUpperCase()}</span>
                   </span>
                 </div>
 
@@ -249,12 +266,12 @@ export const HeiNodalPortalPage: React.FC = () => {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 bg-slate-50 p-3 rounded border border-slate-200">
                   <div>
                     <span className="text-slate-500 block text-[11px]">Assigned Faculty Mentor:</span>
-                    <strong className="text-slate-900">{p.assignedFacultyName || "Prof. Ananya Sen"}</strong>
-                    <span className="text-slate-500 block text-[10px]">Dept of Water & Environmental Engg</span>
+                    <strong className="text-slate-900">{p.assignedFacultyName || eco.faculty.fullName}</strong>
+                    <span className="text-slate-500 block text-[10px]">{eco.faculty.dept}</span>
                   </div>
                   <div>
                     <span className="text-slate-500 block text-[11px]">Academic Cohort Status:</span>
-                    <strong className="text-emerald-800 uppercase font-mono">{p.status.replace("_", " ")}</strong>
+                    <strong className="text-emerald-800 uppercase font-mono">{p.status.replace(/_/g, " ")}</strong>
                     <span className="text-slate-500 block text-[10px]">Priority Score: {p.priorityScore}/100</span>
                   </div>
                 </div>
@@ -281,7 +298,7 @@ export const HeiNodalPortalPage: React.FC = () => {
       {activeTab === "faculty_roster" && (
         <div className="bg-white rounded-lg border border-slate-200 shadow-xs overflow-hidden">
           <div className="px-5 py-3 border-b border-slate-200 bg-slate-50 font-heading font-bold text-xs uppercase tracking-wider text-slate-800">
-            Registered Faculty Mentors & Research Specializations
+            Registered Faculty Mentors & Research Specializations — {eco.shortName}
           </div>
 
           <table className="gov-table">
@@ -290,31 +307,31 @@ export const HeiNodalPortalPage: React.FC = () => {
                 <th>Faculty Name</th>
                 <th>Department</th>
                 <th>Specialization Domains</th>
-                <th>Active Student Teams</th>
-                <th>Patents Filed</th>
+                <th>Designation</th>
+                <th>Status</th>
               </tr>
             </thead>
             <tbody>
               <tr>
-                <td className="font-bold text-slate-900">Prof. Ananya Sen</td>
-                <td>Dept of Water & Environmental Engg</td>
-                <td>Fluoride Removal, Nano-adsorption, Sensor Telemetry</td>
-                <td>3 Teams</td>
-                <td>4 Patents</td>
+                <td className="font-bold text-slate-900">{eco.faculty.fullName}</td>
+                <td>{eco.faculty.dept}</td>
+                <td>{eco.faculty.specialization}</td>
+                <td>{eco.faculty.title}</td>
+                <td><span className="bg-emerald-50 text-emerald-800 font-bold px-1.5 py-0.5 rounded border border-emerald-200 text-[10px]">Active Lead</span></td>
               </tr>
               <tr>
                 <td className="font-bold text-slate-900">Dr. K. N. Chatterjee</td>
-                <td>Dept of Electronics & Communication</td>
-                <td>IoT LoRaWAN Networks, Low-Power Sensors</td>
-                <td>2 Teams</td>
-                <td>2 Patents</td>
+                <td>Dept of Electronics & Sensor Instrumentation</td>
+                <td>LoRaWAN Mesh Telemetry, IoT Edge Hardware</td>
+                <td>Associate Professor</td>
+                <td><span className="bg-blue-50 text-blue-800 font-bold px-1.5 py-0.5 rounded border border-blue-200 text-[10px]">Co-Mentor</span></td>
               </tr>
               <tr>
-                <td className="font-bold text-slate-900">Dr. Sunita Murmu</td>
-                <td>Dept of Chemical Engineering</td>
-                <td>Polymer Membranes, Water Testing NABL Labs</td>
-                <td>2 Teams</td>
-                <td>3 Patents</td>
+                <td className="font-bold text-slate-900">Dr. S. K. Mahato</td>
+                <td>Centre for Applied Science & Prototyping</td>
+                <td>Field Pilot Commissioning, NABL Standards</td>
+                <td>Professor</td>
+                <td><span className="bg-slate-100 text-slate-700 font-bold px-1.5 py-0.5 rounded text-[10px]">Lab Director</span></td>
               </tr>
             </tbody>
           </table>
@@ -326,12 +343,12 @@ export const HeiNodalPortalPage: React.FC = () => {
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <h3 className="font-heading font-bold text-sm text-slate-900">
-              Institutional Solution Proposals ({proposals.length})
+              Institutional Solution Proposals — {eco.shortName} ({univProposals.length})
             </h3>
           </div>
 
           <div className="space-y-3">
-            {proposals.map((pr) => (
+            {univProposals.map((pr) => (
               <div key={pr.id} className="bg-white p-4 rounded-lg border border-slate-200 shadow-xs space-y-2 text-xs">
                 <div className="flex justify-between items-start">
                   <div>

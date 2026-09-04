@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Problem, TeamMember } from "../../types";
 import { useApp } from "../../context/AppContext";
+import { getEcosystemByUserId } from "../../data/universityEcosystems";
 import { Users, Plus, Trash2, CheckCircle2, X, GraduationCap } from "lucide-react";
 import confetti from "canvas-confetti";
 
@@ -9,44 +10,22 @@ export const TeamBuilderModal: React.FC<{
   onClose: () => void;
 }> = ({ problem, onClose }) => {
   const { createTeam, currentUser, universities } = useApp();
-  const [facultyDept, setFacultyDept] = useState("Dept of Environmental & Water Engineering");
-  const [members, setMembers] = useState<Omit<TeamMember, "id" | "teamId">[]>([
-    {
-      studentId: "student-rahul",
-      studentName: "Rahul Kumar",
-      discipline: "Electronics & IoT Engineering",
-      yearOfStudy: "3rd Year B.Tech",
-      role: "Team Lead",
-      email: "rahul.iot@bitmesra.ac.in"
-    },
-    {
-      studentId: "student-priya",
-      studentName: "Priya Sharma",
-      discipline: "Chemical & Membrane Tech",
-      yearOfStudy: "4th Year B.Tech",
-      role: "Hardware Lead",
-      email: "priya.chem@bitmesra.ac.in"
-    },
-    {
-      studentId: "student-amit",
-      studentName: "Amit Oraon",
-      discipline: "Computer Science & Cloud Systems",
-      yearOfStudy: "3rd Year B.Tech",
-      role: "Software Lead",
-      email: "amit.cs@bitmesra.ac.in"
-    },
-    {
-      studentId: "student-sneha",
-      studentName: "Sneha Soren",
-      discipline: "Rural Management & Field Social Work",
-      yearOfStudy: "2nd Year M.Tech",
-      role: "Field Researcher",
-      email: "sneha.rural@bitmesra.ac.in"
-    }
-  ]);
+  const eco = getEcosystemByUserId(currentUser?.id, currentUser?.organizationName, problem?.assignedUniversityId);
+
+  const [facultyDept, setFacultyDept] = useState(eco.faculty.dept);
+  const [members, setMembers] = useState<Omit<TeamMember, "id" | "teamId">[]>(() =>
+    eco.students.map((s) => ({
+      studentId: s.id,
+      studentName: s.fullName,
+      discipline: s.discipline,
+      yearOfStudy: s.yearOfStudy,
+      role: s.role,
+      email: s.email
+    }))
+  );
 
   const [newStudentName, setNewStudentName] = useState("");
-  const [newDiscipline, setNewDiscipline] = useState("Mechanical Engineering");
+  const [newDiscipline, setNewDiscipline] = useState("Engineering & Prototyping");
   const [newRole, setNewRole] = useState<TeamMember["role"]>("Design Specialist");
 
   if (!problem) return null;
@@ -60,9 +39,9 @@ export const TeamBuilderModal: React.FC<{
         studentId: `stu-${Date.now()}`,
         studentName: newStudentName,
         discipline: newDiscipline,
-        yearOfStudy: "3rd Year B.Tech",
+        yearOfStudy: "3rd Year",
         role: newRole,
-        email: `${newStudentName.toLowerCase().replace(/ /g, ".")}@univ.ac.in`
+        email: `${newStudentName.toLowerCase().replace(/ /g, ".")}@${eco.id.replace("univ-", "")}.ac.in`
       }
     ]);
     setNewStudentName("");
@@ -76,10 +55,10 @@ export const TeamBuilderModal: React.FC<{
     createTeam({
       problemId: problem.id,
       problemTitle: problem.title,
-      universityId: problem.assignedUniversityId || "univ-bit-mesra",
-      universityName: problem.assignedUniversityName || "Birla Institute of Technology, Mesra",
+      universityId: problem.assignedUniversityId || eco.id,
+      universityName: problem.assignedUniversityName || eco.name,
       facultyMentorId: currentUser.id,
-      facultyMentorName: currentUser.fullName,
+      facultyMentorName: currentUser.fullName || eco.faculty.fullName,
       facultyDepartment: facultyDept,
       members: members.map((m, i) => ({ ...m, id: `mem-${Date.now()}-${i}`, teamId: "" }))
     });
@@ -100,90 +79,120 @@ export const TeamBuilderModal: React.FC<{
                 Form Multidisciplinary Student Team
               </h3>
               <p className="text-xs text-slate-500">
-                Assign cross-department student innovators to solve: {problem.title.slice(0, 45)}...
+                {eco.name} ({eco.shortName}) Innovation Cohort
               </p>
             </div>
           </div>
-          <button onClick={onClose} className="text-slate-400 hover:text-slate-700">
+          <button
+            onClick={onClose}
+            className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition"
+          >
             <X className="w-5 h-5" />
           </button>
         </div>
 
-        {/* Faculty Mentor Details */}
-        <div className="bg-purple-50/60 p-3.5 rounded-xl border border-purple-200 flex items-center justify-between text-xs">
-          <div>
-            <span className="text-[10px] uppercase font-bold text-purple-900 block">Faculty Mentor</span>
-            <span className="font-bold text-slate-900">{currentUser.fullName}</span>
-            <span className="text-slate-500 block">{facultyDept}</span>
+        {/* Problem context */}
+        <div className="bg-slate-50 p-3 rounded-xl border border-slate-200 space-y-1">
+          <span className="text-[10px] uppercase font-mono font-bold text-slate-400">Target Challenge</span>
+          <p className="font-semibold text-xs text-slate-800">{problem.title}</p>
+          <div className="flex items-center space-x-2 text-[11px] text-slate-500">
+            <span>District: {problem.district}</span>
+            <span>•</span>
+            <span>Category: {problem.category}</span>
           </div>
-          <span className="bg-purple-200 text-purple-900 px-2.5 py-1 rounded font-mono font-bold">
-            Lead Mentor ✓
-          </span>
         </div>
 
-        {/* Team Members List */}
-        <div className="space-y-2">
-          <label className="block text-xs font-bold text-slate-800">
-            Team Members ({members.length} Multidisciplinary Innovators):
+        {/* Department input */}
+        <div>
+          <label className="block text-xs font-semibold text-slate-700 mb-1">
+            Faculty Department / Anchor Laboratory
           </label>
+          <input
+            type="text"
+            value={facultyDept}
+            onChange={(e) => setFacultyDept(e.target.value)}
+            className="w-full p-2.5 text-xs border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0f2942]"
+          />
+        </div>
 
-          <div className="max-h-48 overflow-y-auto divide-y divide-slate-100 border border-slate-200 rounded-xl">
+        {/* Current members */}
+        <div className="space-y-2">
+          <div className="flex justify-between items-center">
+            <span className="text-xs font-bold text-slate-800 uppercase tracking-wider">
+              Assigned Student Innovators ({members.length})
+            </span>
+            <span className="text-[11px] text-slate-400">Recommended: 3 to 5 multidisciplinary students</span>
+          </div>
+
+          <div className="space-y-2 max-h-48 overflow-y-auto pr-1">
             {members.map((m, idx) => (
-              <div key={idx} className="p-2.5 flex items-center justify-between text-xs hover:bg-slate-50">
+              <div
+                key={idx}
+                className="flex items-center justify-between p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-xs"
+              >
                 <div className="flex items-center space-x-2.5">
-                  <div className="w-7 h-7 rounded-full bg-slate-200 text-slate-700 flex items-center justify-center font-bold text-[11px]">
-                    {m.studentName[0]}
+                  <div className="w-7 h-7 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center font-bold text-[11px]">
+                    {m.studentName.charAt(0)}
                   </div>
                   <div>
-                    <span className="font-bold text-slate-900">{m.studentName}</span>
-                    <div className="flex items-center space-x-2 text-[11px] text-slate-500">
-                      <span>{m.discipline}</span>
-                      <span>•</span>
-                      <span className="font-semibold text-emerald-700">{m.role}</span>
+                    <div className="flex items-center space-x-1.5">
+                      <span className="font-semibold text-slate-800">{m.studentName}</span>
+                      <span className="px-1.5 py-0.2 bg-purple-100 text-purple-700 rounded text-[9px] font-bold">
+                        {m.role}
+                      </span>
                     </div>
+                    <span className="text-[10px] text-slate-500">
+                      {m.discipline} • {m.yearOfStudy}
+                    </span>
                   </div>
                 </div>
 
                 <button
                   type="button"
                   onClick={() => handleRemoveMember(idx)}
-                  className="text-slate-400 hover:text-rose-600 p-1"
+                  className="p-1 text-slate-400 hover:text-rose-600 transition"
                 >
-                  <Trash2 className="w-4 h-4" />
+                  <Trash2 className="w-3.5 h-3.5" />
                 </button>
               </div>
             ))}
           </div>
         </div>
 
-        {/* Add Member Row */}
+        {/* Add extra member form */}
         <form onSubmit={handleAddMember} className="bg-slate-50 p-3 rounded-xl border border-slate-200 space-y-2">
-          <span className="text-[11px] font-bold text-slate-600 uppercase block">
-            Add Another Student Innovator:
-          </span>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+          <span className="text-xs font-bold text-slate-700 block">Add Additional Student</span>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs">
             <input
               type="text"
+              placeholder="Student Full Name"
               value={newStudentName}
               onChange={(e) => setNewStudentName(e.target.value)}
-              placeholder="Student Full Name"
-              className="text-xs p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none"
+              className="p-2 border border-slate-200 rounded-lg bg-white focus:outline-none"
             />
-            <select
+            <input
+              type="text"
+              placeholder="Discipline / Branch"
               value={newDiscipline}
               onChange={(e) => setNewDiscipline(e.target.value)}
-              className="text-xs p-2 border border-slate-300 rounded-lg bg-white"
+              className="p-2 border border-slate-200 rounded-lg bg-white focus:outline-none"
+            />
+            <select
+              value={newRole}
+              onChange={(e) => setNewRole(e.target.value as any)}
+              className="p-2 border border-slate-200 rounded-lg bg-white focus:outline-none"
             >
-              <option value="Computer Science">Computer Science & AI</option>
-              <option value="Electronics & IoT">Electronics & IoT</option>
-              <option value="Mechanical Engineering">Mechanical Engineering</option>
-              <option value="Civil & Environmental Engg">Civil & Environmental Engg</option>
-              <option value="Biotechnology">Biotechnology</option>
-              <option value="Rural Development & Social Work">Rural Development</option>
+              <option value="Team Lead">Team Lead</option>
+              <option value="Hardware Lead">Hardware Lead</option>
+              <option value="Software Lead">Software Lead</option>
+              <option value="Field Researcher">Field Researcher</option>
+              <option value="Design Specialist">Design Specialist</option>
             </select>
+          </div>
+          <div className="flex justify-end">
             <button
               type="submit"
-              className="flex items-center justify-center space-x-1 bg-purple-600 hover:bg-purple-700 text-white rounded-lg text-xs font-bold py-2 transition"
+              className="px-3 py-1 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-lg text-xs font-semibold flex items-center space-x-1"
             >
               <Plus className="w-3.5 h-3.5" />
               <span>Add Member</span>
@@ -191,19 +200,22 @@ export const TeamBuilderModal: React.FC<{
           </div>
         </form>
 
-        {/* Actions */}
-        <div className="flex items-center justify-end space-x-3 pt-2 border-t border-slate-100">
+        {/* Finalize button */}
+        <div className="pt-2 border-t border-slate-100 flex justify-end space-x-2">
           <button
+            type="button"
             onClick={onClose}
-            className="px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-100 rounded-xl"
+            className="px-4 py-2 border border-slate-200 text-slate-600 font-semibold text-xs rounded-xl hover:bg-slate-50"
           >
             Cancel
           </button>
           <button
+            type="button"
             onClick={handleFinalizeTeam}
-            className="px-6 py-2.5 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white rounded-xl text-xs font-bold shadow-md shadow-purple-600/20 transition hover:scale-105"
+            className="px-5 py-2 bg-[#0f2942] hover:bg-[#163b5f] text-white font-semibold text-xs rounded-xl flex items-center space-x-1.5 shadow-md shadow-slate-900/10"
           >
-            Finalize Team & Open Proposal Desk &rarr;
+            <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+            <span>Confirm & Lock Innovation Cohort &rarr;</span>
           </button>
         </div>
       </div>

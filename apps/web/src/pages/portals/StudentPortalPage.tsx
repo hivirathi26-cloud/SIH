@@ -4,6 +4,7 @@ import { PortalLayout, NavItem } from "../../components/layout/PortalLayout";
 import { useApp } from "../../context/AppContext";
 import { useAuth } from "../../context/AuthContext";
 import { KanbanBoard } from "../../components/hei/KanbanBoard";
+import { getEcosystemByUserId } from "../../data/universityEcosystems";
 import { GanttChart } from "../../components/lifecycle/GanttChart";
 import {
   Users,
@@ -40,6 +41,9 @@ export const StudentPortalPage: React.FC = () => {
 
   const [activeTab, setActiveTab] = useState("my_tasks");
 
+  // Dynamic institution resolution
+  const eco = getEcosystemByUserId(currentUser?.id, currentUser?.organizationName);
+
   // Progress submission modal / card state
   const [editingTaskId, setEditingTaskId] = useState<string | null>(null);
   const [progressInput, setProgressInput] = useState(100);
@@ -49,21 +53,45 @@ export const StudentPortalPage: React.FC = () => {
   // Task Delegation state (for team lead or faculty)
   const [delTitle, setDelTitle] = useState("");
   const [delDesc, setDelDesc] = useState("");
-  const [delStudentId, setDelStudentId] = useState("student-priya");
+  const [delStudentId, setDelStudentId] = useState(eco.students[1]?.id || eco.students[0]?.id || "student-priya");
   const [delMilestoneId, setDelMilestoneId] = useState(milestones[0]?.id || "ms-001");
+
+  React.useEffect(() => {
+    if (eco.students[1]) {
+      setDelStudentId(eco.students[1].id);
+    } else if (eco.students[0]) {
+      setDelStudentId(eco.students[0].id);
+    }
+  }, [eco.id]);
 
   // Document Vault state
   const [uploadDocTitle, setUploadDocTitle] = useState("");
   const [targetMilestoneId, setTargetMilestoneId] = useState(milestones[0]?.id || "ms-001");
 
-  // Filter tasks assigned to current student
-  const myTasks = studentDeliverables.filter(
-    (t) => t.assignedStudentId === currentUser?.id || currentUser?.id === "student-rahul" || !t.assignedStudentId
+  // Filter tasks assigned to current student or visible to team lead
+  const isTeamLead =
+    currentUser?.roleTitle?.toLowerCase().includes("lead") ||
+    currentUser?.id === eco.students[0]?.id;
+
+  const myTasks = studentDeliverables.filter((t) => {
+    const isDirectlyAssigned = t.assignedStudentId === currentUser?.id;
+    const isOurEcosystem = eco.students.some((s) => s.id === t.assignedStudentId);
+    if (isTeamLead) {
+      return isOurEcosystem || isDirectlyAssigned;
+    }
+    return isDirectlyAssigned || (!t.assignedStudentId && isOurEcosystem);
+  });
+
+  const univProposals = proposals.filter(
+    (pr) =>
+      pr.universityName?.toLowerCase().includes(eco.shortName.toLowerCase()) ||
+      pr.universityName?.toLowerCase().includes(eco.name.toLowerCase()) ||
+      pr.facultyMentorName === eco.faculty.fullName
   );
 
   const navItems: NavItem[] = [
     { id: "my_tasks", label: "My Milestone Deliverables", icon: CheckSquare, badge: myTasks.length },
-    { id: "projects", label: "Active Projects & MoUs", icon: Briefcase, badge: proposals.length },
+    { id: "projects", label: "Active Projects & MoUs", icon: Briefcase, badge: univProposals.length },
     { id: "team_sprint", label: "Team Sprint Kanban", icon: Layers },
     { id: "task_delegator", label: "Delegate Tasks to Team", icon: Users },
     { id: "vault", label: "Document Vault", icon: FileText }
@@ -95,26 +123,19 @@ export const StudentPortalPage: React.FC = () => {
     e.preventDefault();
     if (!delTitle.trim()) return;
 
-    const studentMap: Record<string, { name: string; dept: string }> = {
-      "student-rahul": { name: "Rahul Kumar (Team Lead)", dept: "Electronics & IoT Engineering" },
-      "student-priya": { name: "Priya Sharma (Student)", dept: "Computer Science & Engineering" },
-      "student-sneha": { name: "Sneha Soren (Student)", dept: "Chemical & Environmental Engineering" },
-      "student-amit": { name: "Amit Verma (Student)", dept: "Mechanical Engineering" }
-    };
-
     const targetMilestone = milestones.find((m) => m.id === delMilestoneId) || milestones[0];
-    const targetStudent = studentMap[delStudentId] || studentMap["student-rahul"];
+    const targetStudent = eco.students.find((s) => s.id === delStudentId) || eco.students[0];
 
     assignStudentTask({
-      proposalId: targetMilestone?.proposalId || "prop-001",
-      proposalTitle: "JalShuddhi: Solar-Powered Nano-Adsorptive Fluoride Filter",
+      proposalId: targetMilestone?.proposalId || eco.defaultProposalId,
+      proposalTitle: targetMilestone?.displayName || `${eco.shortName} Innovation Project`,
       milestoneId: targetMilestone.id,
       milestoneName: targetMilestone.displayName,
       title: delTitle,
-      description: delDesc || "Deliverable assigned as part of student innovation cohort.",
-      assignedStudentId: delStudentId,
-      assignedStudentName: targetStudent.name,
-      studentDiscipline: targetStudent.dept,
+      description: delDesc || `Deliverable assigned as part of ${eco.shortName} student innovation cohort.`,
+      assignedStudentId: targetStudent.id,
+      assignedStudentName: `${targetStudent.fullName} (${targetStudent.role})`,
+      studentDiscipline: targetStudent.discipline,
       progressPercent: 0,
       status: "assigned"
     });
@@ -146,7 +167,7 @@ export const StudentPortalPage: React.FC = () => {
   return (
     <PortalLayout
       portalTitle="Student Innovator Workspace"
-      portalSubtitle={`छात्र नवाचार एवं स्प्रिंट पटल — ${currentUser?.fullName || "Rahul Kumar"}`}
+      portalSubtitle={`छात्र नवाचार एवं स्प्रिंट पटल — ${currentUser?.fullName || "Student Innovator"} • ${eco.shortName}`}
       navItems={navItems}
       activeTab={activeTab}
       setActiveTab={setActiveTab}
@@ -157,7 +178,7 @@ export const StudentPortalPage: React.FC = () => {
           <div className="bg-blue-50/70 border border-blue-200 p-3.5 rounded-lg flex items-start space-x-3 text-xs">
             <Info className="w-4 h-4 text-[#0f2942] shrink-0 mt-0.5" />
             <div className="text-slate-700 leading-relaxed">
-              <strong>Your Personal Innovation Roster:</strong> As an individual team member, report your milestone progress %, attach laboratory test sheets or CAD PDFs, and submit for <strong>Faculty Mentor (Prof. Ananya Sen) inspection & E-Signature</strong>.
+              <strong>Your Personal Innovation Roster:</strong> As an individual team member, report your milestone progress %, attach laboratory test sheets or CAD PDFs, and submit for <strong>Faculty Mentor (${eco.faculty.fullName}) inspection & E-Signature</strong>.
             </div>
           </div>
 
@@ -292,7 +313,7 @@ export const StudentPortalPage: React.FC = () => {
                     {t.status === "in_review_by_faculty" && (
                       <span className="bg-blue-100 text-blue-900 border border-blue-300 font-bold px-2.5 py-1 rounded text-[11px] flex items-center space-x-1">
                         <Clock className="w-3.5 h-3.5 text-blue-700" />
-                        <span>IN REVIEW BY PROF. ANANYA SEN</span>
+                        <span>IN REVIEW BY {eco.faculty.fullName.toUpperCase()}</span>
                       </span>
                     )}
                     {t.status === "in_progress" && (
@@ -386,12 +407,12 @@ export const StudentPortalPage: React.FC = () => {
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <h3 className="font-heading font-bold text-sm text-slate-900">
-              Active Research Projects & Innovation MoUs ({proposals.length})
+              Active Research Projects & Innovation MoUs — {eco.shortName} ({univProposals.length})
             </h3>
           </div>
 
           <div className="space-y-4">
-            {proposals.map((pr) => {
+            {univProposals.map((pr) => {
               const linkedAgr = agreements.find(
                 (a) => a.proposalId === pr.id || a.proposalTitle.toLowerCase() === pr.title.toLowerCase()
               );
@@ -548,10 +569,11 @@ export const StudentPortalPage: React.FC = () => {
                   onChange={(e) => setDelStudentId(e.target.value)}
                   className="w-full p-2 border border-slate-300 rounded bg-slate-50 focus:border-[#0f2942]"
                 >
-                  <option value="student-rahul">Rahul Kumar (Electronics & IoT Lead)</option>
-                  <option value="student-priya">Priya Sharma (Computer Science & Cloud)</option>
-                  <option value="student-sneha">Sneha Soren (Chemical & NABL Testing)</option>
-                  <option value="student-amit">Amit Verma (Mechanical CAD & Design)</option>
+                  {eco.students.map((s) => (
+                    <option key={s.id} value={s.id}>
+                      {s.fullName} ({s.role} - {s.discipline})
+                    </option>
+                  ))}
                 </select>
               </div>
             </div>
