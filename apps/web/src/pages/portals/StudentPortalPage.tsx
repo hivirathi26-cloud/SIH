@@ -17,76 +17,381 @@ import {
   Building,
   ShieldCheck,
   ArrowRight,
-  Info
+  Info,
+  Send,
+  Sliders,
+  Paperclip,
+  CheckSquare,
+  AlertCircle
 } from "lucide-react";
 import confetti from "canvas-confetti";
 
 export const StudentPortalPage: React.FC = () => {
-  const { proposals, agreements, milestones, uploadMilestoneDocument, currentUser } = useApp();
-  const [activeTab, setActiveTab] = useState("projects");
-  const [uploadTitle, setUploadTitle] = useState("");
+  const {
+    proposals,
+    agreements,
+    milestones,
+    studentDeliverables,
+    submitStudentDeliverable,
+    assignStudentTask,
+    uploadMilestoneDocument,
+    currentUser
+  } = useApp();
+
+  const [activeTab, setActiveTab] = useState("my_tasks");
+
+  // Progress submission modal / card state
+  const [editingTaskId, setEditingTaskId] = useState<string | null>(null);
+  const [progressInput, setProgressInput] = useState(100);
+  const [notesInput, setNotesInput] = useState("");
+  const [pdfFileName, setPdfFileName] = useState("");
+
+  // Task Delegation state (for team lead or faculty)
+  const [delTitle, setDelTitle] = useState("");
+  const [delDesc, setDelDesc] = useState("");
+  const [delStudentId, setDelStudentId] = useState("student-priya");
+  const [delMilestoneId, setDelMilestoneId] = useState(milestones[0]?.id || "ms-001");
+
+  // Document Vault state
+  const [uploadDocTitle, setUploadDocTitle] = useState("");
   const [targetMilestoneId, setTargetMilestoneId] = useState(milestones[0]?.id || "ms-001");
 
-  // All active proposals assigned to the student team
-  const studentProposals = proposals;
-  const fundedProposals = studentProposals.filter(
-    (p) => p.status === "funded" || agreements.some((a) => a.proposalId === p.id || a.proposalTitle.toLowerCase() === p.title.toLowerCase())
+  // Filter tasks assigned to current student
+  const myTasks = studentDeliverables.filter(
+    (t) => t.assignedStudentId === currentUser?.id || currentUser?.id === "student-rahul" || !t.assignedStudentId
   );
 
   const navItems: NavItem[] = [
-    { id: "projects", label: "Active Projects & MoUs", icon: Briefcase, badge: studentProposals.length },
-    { id: "sprint", label: "Sprint Kanban Board", icon: Layers },
-    { id: "milestones", label: "Milestone Roadmap", icon: Clock },
-    { id: "vault", label: "Document & Telemetry Vault", icon: FileText }
+    { id: "my_tasks", label: "My Milestone Deliverables", icon: CheckSquare, badge: myTasks.length },
+    { id: "projects", label: "Active Projects & MoUs", icon: Briefcase, badge: proposals.length },
+    { id: "team_sprint", label: "Team Sprint Kanban", icon: Layers },
+    { id: "task_delegator", label: "Delegate Tasks to Team", icon: Users },
+    { id: "vault", label: "Document Vault", icon: FileText }
   ];
+
+  const handleStartSubmit = (task: any) => {
+    setEditingTaskId(task.id);
+    setProgressInput(task.progressPercent || 100);
+    setNotesInput(task.submissionNotes || "");
+    setPdfFileName(`${task.title.toLowerCase().replace(/[^a-z0-9]/g, "_")}_test_report.pdf`);
+  };
+
+  const handleConfirmSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingTaskId) return;
+
+    submitStudentDeliverable(
+      editingTaskId,
+      Number(progressInput),
+      notesInput,
+      `/vault/${pdfFileName}`
+    );
+
+    setEditingTaskId(null);
+    confetti({ particleCount: 70, spread: 60 });
+  };
+
+  const handleDelegateTask = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!delTitle.trim()) return;
+
+    const studentMap: Record<string, { name: string; dept: string }> = {
+      "student-rahul": { name: "Rahul Kumar (Team Lead)", dept: "Electronics & IoT Engineering" },
+      "student-priya": { name: "Priya Sharma (Student)", dept: "Computer Science & Engineering" },
+      "student-sneha": { name: "Sneha Soren (Student)", dept: "Chemical & Environmental Engineering" },
+      "student-amit": { name: "Amit Verma (Student)", dept: "Mechanical Engineering" }
+    };
+
+    const targetMilestone = milestones.find((m) => m.id === delMilestoneId) || milestones[0];
+    const targetStudent = studentMap[delStudentId] || studentMap["student-rahul"];
+
+    assignStudentTask({
+      proposalId: targetMilestone?.proposalId || "prop-001",
+      proposalTitle: "JalShuddhi: Solar-Powered Nano-Adsorptive Fluoride Filter",
+      milestoneId: targetMilestone.id,
+      milestoneName: targetMilestone.displayName,
+      title: delTitle,
+      description: delDesc || "Deliverable assigned as part of student innovation cohort.",
+      assignedStudentId: delStudentId,
+      assignedStudentName: targetStudent.name,
+      studentDiscipline: targetStudent.dept,
+      progressPercent: 0,
+      status: "assigned"
+    });
+
+    setDelTitle("");
+    setDelDesc("");
+    confetti({ particleCount: 50, spread: 50 });
+    setActiveTab("my_tasks");
+  };
 
   const handleUploadDoc = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!uploadTitle.trim()) return;
+    if (!uploadDocTitle.trim()) return;
 
     uploadMilestoneDocument(targetMilestoneId, {
       milestoneId: targetMilestoneId,
-      title: uploadTitle,
+      title: uploadDocTitle,
       docType: "test_data",
-      storageUrl: `/vault/${uploadTitle.toLowerCase().replace(/ /g, "_")}.pdf`,
+      storageUrl: `/vault/${uploadDocTitle.toLowerCase().replace(/ /g, "_")}.pdf`,
       fileSize: "2.8 MB",
       uploadedBy: currentUser?.id || "student-rahul",
-      uploadedByName: currentUser?.fullName || "Rahul Kumar"
+      uploadedByName: currentUser?.fullName || "Student Innovator"
     });
 
-    setUploadTitle("");
+    setUploadDocTitle("");
     confetti({ particleCount: 50, spread: 50 });
   };
 
   return (
     <PortalLayout
       portalTitle="Student Innovator Workspace"
-      portalSubtitle="छात्र नवाचार एवं स्प्रिंट पटल — Team JalRakshak, BIT Mesra"
+      portalSubtitle={`छात्र नवाचार एवं स्प्रिंट पटल — ${currentUser?.fullName || "Rahul Kumar"}`}
       navItems={navItems}
       activeTab={activeTab}
       setActiveTab={setActiveTab}
     >
-      {/* 1. Active Projects & Funded MoUs */}
-      {activeTab === "projects" && (
+      {/* 1. My Milestone Deliverables (Individual Student Progress & PDF Upload) */}
+      {activeTab === "my_tasks" && (
         <div className="space-y-4">
           <div className="bg-blue-50/70 border border-blue-200 p-3.5 rounded-lg flex items-start space-x-3 text-xs">
             <Info className="w-4 h-4 text-[#0f2942] shrink-0 mt-0.5" />
             <div className="text-slate-700 leading-relaxed">
-              <span className="font-bold text-[#0f2942]">Active Student R&D Portfolio:</span> When an industry partner (Tata Steel CSR / Startup) e-signs an MoU, the funded project immediately appears here in your active project workspace. You can formulate hardware schematics, log sprint tasks on the Kanban board, and upload telemetry to the Document Vault for Faculty & Govt dual sign-offs.
+              <strong>Your Personal Innovation Roster:</strong> As an individual team member, report your milestone progress %, attach laboratory test sheets or CAD PDFs, and submit for <strong>Faculty Mentor (Prof. Ananya Sen) inspection & E-Signature</strong>.
             </div>
           </div>
 
           <div className="flex items-center justify-between">
+            <div>
+              <h3 className="font-heading font-bold text-sm text-slate-900">
+                Milestone Deliverables Assigned to You ({myTasks.length})
+              </h3>
+              <p className="text-xs text-slate-500">
+                Logged in as: <strong>{currentUser?.fullName}</strong> ({currentUser?.roleTitle})
+              </p>
+            </div>
+          </div>
+
+          {/* Submission Modal / Card */}
+          {editingTaskId && (
+            <div className="bg-white p-5 rounded-lg border-2 border-[#0f2942] shadow-md space-y-4 animate-in fade-in text-xs">
+              <div className="flex justify-between items-center border-b border-slate-200 pb-2">
+                <span className="font-bold text-slate-900 text-sm flex items-center space-x-1.5">
+                  <Upload className="w-4 h-4 text-[#0f2942]" />
+                  <span>Submit Deliverable Report & Progress</span>
+                </span>
+                <button
+                  onClick={() => setEditingTaskId(null)}
+                  className="text-slate-400 hover:text-slate-700 font-bold"
+                >
+                  ✕ Close
+                </button>
+              </div>
+
+              <form onSubmit={handleConfirmSubmit} className="space-y-3">
+                <div>
+                  <label className="block font-semibold text-slate-700 mb-1">
+                    Progress Completed: <strong className="text-emerald-700">{progressInput}%</strong>
+                  </label>
+                  <input
+                    type="range"
+                    min={10}
+                    max={100}
+                    step={5}
+                    value={progressInput}
+                    onChange={(e) => setProgressInput(Number(e.target.value))}
+                    className="w-full accent-[#0f2942] cursor-pointer"
+                  />
+                  <div className="flex justify-between text-[10px] text-slate-400 font-mono">
+                    <span>25% Prototype</span>
+                    <span>50% Bench Tested</span>
+                    <span>75% Field Trial</span>
+                    <span>100% Ready for Faculty Stamp</span>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block font-semibold text-slate-700 mb-1">
+                    Attach Lab Telemetry / Test Report (PDF)
+                  </label>
+                  <div className="flex items-center space-x-2">
+                    <input
+                      type="text"
+                      required
+                      value={pdfFileName}
+                      onChange={(e) => setPdfFileName(e.target.value)}
+                      placeholder="e.g. nabl_certified_water_fluoride_titration_sheet.pdf"
+                      className="flex-1 p-2 border border-slate-300 rounded font-mono text-xs focus:border-[#0f2942]"
+                    />
+                    <span className="text-[11px] text-slate-500 font-mono">.PDF</span>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block font-semibold text-slate-700 mb-1">
+                    Laboratory Observations & Test Notes for Faculty Mentor
+                  </label>
+                  <textarea
+                    rows={3}
+                    required
+                    value={notesInput}
+                    onChange={(e) => setNotesInput(e.target.value)}
+                    placeholder="Describe laboratory readings, tolerance thresholds, sensor accuracy, or field site observations..."
+                    className="w-full p-2 border border-slate-300 rounded text-xs focus:border-[#0f2942]"
+                  />
+                </div>
+
+                <div className="pt-2 border-t border-slate-200 flex justify-end space-x-2">
+                  <button
+                    type="button"
+                    onClick={() => setEditingTaskId(null)}
+                    className="px-3 py-1.5 border border-slate-300 rounded text-slate-700 font-semibold"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="px-4 py-1.5 bg-[#0f2942] hover:bg-[#163b5f] text-white font-semibold rounded flex items-center space-x-1.5 shadow-xs"
+                  >
+                    <Send className="w-3.5 h-3.5" />
+                    <span>Submit to Faculty for E-Sign &rarr;</span>
+                  </button>
+                </div>
+              </form>
+            </div>
+          )}
+
+          {/* List of Tasks */}
+          <div className="space-y-3">
+            {myTasks.map((t) => (
+              <div
+                key={t.id}
+                className={`bg-white p-5 rounded-lg border shadow-xs space-y-3 text-xs transition ${
+                  t.status === "approved_by_faculty"
+                    ? "border-emerald-300 bg-emerald-50/15"
+                    : t.status === "in_review_by_faculty"
+                    ? "border-blue-300 bg-blue-50/15"
+                    : "border-slate-200"
+                }`}
+              >
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2 border-b border-slate-100">
+                  <div>
+                    <span className="text-[10px] text-slate-500 font-mono block">
+                      {t.milestoneName} • {t.proposalTitle}
+                    </span>
+                    <h4 className="font-heading font-bold text-sm text-slate-900 mt-0.5">{t.title}</h4>
+                  </div>
+
+                  <div>
+                    {t.status === "approved_by_faculty" && (
+                      <span className="bg-emerald-100 text-emerald-900 border border-emerald-300 font-bold px-2.5 py-1 rounded text-[11px] flex items-center space-x-1">
+                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-700" />
+                        <span>FACULTY E-SIGNED & APPROVED</span>
+                      </span>
+                    )}
+                    {t.status === "in_review_by_faculty" && (
+                      <span className="bg-blue-100 text-blue-900 border border-blue-300 font-bold px-2.5 py-1 rounded text-[11px] flex items-center space-x-1">
+                        <Clock className="w-3.5 h-3.5 text-blue-700" />
+                        <span>IN REVIEW BY PROF. ANANYA SEN</span>
+                      </span>
+                    )}
+                    {t.status === "in_progress" && (
+                      <span className="bg-amber-100 text-amber-900 border border-amber-300 font-bold px-2.5 py-1 rounded text-[11px]">
+                        IN PROGRESS ({t.progressPercent}%)
+                      </span>
+                    )}
+                    {t.status === "revision_requested" && (
+                      <span className="bg-rose-100 text-rose-900 border border-rose-300 font-bold px-2.5 py-1 rounded text-[11px]">
+                        ⚠️ REVISIONS REQUESTED
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                <p className="text-slate-600 leading-relaxed">{t.description}</p>
+
+                {/* Progress bar */}
+                <div className="space-y-1">
+                  <div className="flex justify-between text-[10px] font-bold text-slate-600">
+                    <span>Task Progress</span>
+                    <span className="font-mono">{t.progressPercent}%</span>
+                  </div>
+                  <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+                    <div
+                      className={`h-full transition-all duration-500 ${
+                        t.progressPercent >= 100 ? "bg-emerald-600" : "bg-blue-600"
+                      }`}
+                      style={{ width: `${t.progressPercent}%` }}
+                    ></div>
+                  </div>
+                </div>
+
+                {/* Attached PDF & Notes if submitted */}
+                {t.pdfUrl && (
+                  <div className="bg-slate-50 p-2.5 rounded border border-slate-200 flex items-center justify-between text-[11px]">
+                    <span className="font-mono text-slate-700 truncate max-w-sm">
+                      Attached: <strong>{t.pdfUrl.replace("/vault/", "")}</strong>
+                    </span>
+                    <button
+                      onClick={() => alert(`Opening ${t.pdfUrl}...`)}
+                      className="text-blue-700 hover:text-blue-900 font-semibold flex items-center space-x-1"
+                    >
+                      <Download className="w-3 h-3" />
+                      <span>View PDF</span>
+                    </button>
+                  </div>
+                )}
+
+                {t.submissionNotes && (
+                  <p className="text-[11px] text-slate-600 italic bg-white p-2 rounded border border-slate-100">
+                    Student Notes: "{t.submissionNotes}"
+                  </p>
+                )}
+
+                {/* Faculty Feedback if approved or rejected */}
+                {t.facultyFeedback && (
+                  <div className="bg-emerald-50/70 border border-emerald-300 p-2.5 rounded text-[11px] text-emerald-950">
+                    <strong>Faculty Feedback:</strong> {t.facultyFeedback}
+                    {t.facultySignedBy && (
+                      <span className="block text-[10px] text-emerald-800 mt-0.5">
+                        Digitally E-Signed by: {t.facultySignedBy} on {new Date(t.facultySignedAt || "").toLocaleDateString()}
+                      </span>
+                    )}
+                  </div>
+                )}
+
+                <div className="pt-2 border-t border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                  <span className="text-[11px] text-slate-500">
+                    Assigned to: <strong>{t.assignedStudentName}</strong> ({t.studentDiscipline})
+                  </span>
+
+                  {t.status !== "approved_by_faculty" && (
+                    <button
+                      onClick={() => handleStartSubmit(t)}
+                      className="px-3.5 py-1.5 bg-[#0f2942] hover:bg-[#163b5f] text-white font-semibold rounded flex items-center space-x-1 shadow-xs"
+                    >
+                      <Upload className="w-3.5 h-3.5" />
+                      <span>Update Progress & Attach Report &rarr;</span>
+                    </button>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* 2. Active Projects & Funded MoUs */}
+      {activeTab === "projects" && (
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
             <h3 className="font-heading font-bold text-sm text-slate-900">
-              Assigned Research Projects & Industry MoUs ({studentProposals.length})
+              Active Research Projects & Innovation MoUs ({proposals.length})
             </h3>
-            <span className="text-xs text-slate-500 font-mono">
-              Team JalRakshak (Electronics + Chemical + CS + Rural Mgmt)
-            </span>
           </div>
 
           <div className="space-y-4">
-            {studentProposals.map((pr) => {
+            {proposals.map((pr) => {
               const linkedAgr = agreements.find(
                 (a) => a.proposalId === pr.id || a.proposalTitle.toLowerCase() === pr.title.toLowerCase()
               );
@@ -95,7 +400,7 @@ export const StudentPortalPage: React.FC = () => {
               return (
                 <div
                   key={pr.id}
-                  className={`bg-white p-5 rounded-lg border shadow-xs space-y-3.5 transition ${
+                  className={`bg-white p-5 rounded-lg border shadow-xs space-y-3 transition ${
                     isFunded ? "border-emerald-300 bg-emerald-50/10" : "border-slate-200"
                   }`}
                 >
@@ -109,11 +414,16 @@ export const StudentPortalPage: React.FC = () => {
                       {isFunded ? (
                         <span className="bg-emerald-100 text-emerald-900 border border-emerald-300 text-[10px] font-bold px-2 py-0.5 rounded flex items-center space-x-1">
                           <CheckCircle2 className="w-3 h-3 text-emerald-700" />
-                          <span>MOU EXECUTED & CSR FUNDED</span>
+                          <span>MOU EXECUTED & CSR CO-FUNDED</span>
+                        </span>
+                      ) : !pr.needsIndustrySupport ? (
+                        <span className="bg-blue-50 text-blue-900 border border-blue-300 text-[10px] font-bold px-2 py-0.5 rounded">
+                          DIRECT ACADEMIC RESEARCH (ACTIVE)
                         </span>
                       ) : (
-                        <span className="bg-amber-50 text-amber-900 border border-amber-300 text-[10px] font-bold px-2 py-0.5 rounded">
-                          PROPOSAL IN REVIEW
+                        <span className="bg-amber-50 text-amber-950 border border-amber-300 text-[10px] font-bold px-2 py-0.5 rounded flex items-center space-x-1">
+                          <Clock className="w-3 h-3 text-amber-700" />
+                          <span>AWAITING INDUSTRY MOU & CSR GRANT (LOCKED)</span>
                         </span>
                       )}
                     </div>
@@ -122,9 +432,17 @@ export const StudentPortalPage: React.FC = () => {
                       <span className="font-mono font-bold text-emerald-800 text-sm block">
                         ₹{(pr.estimatedBudget).toLocaleString("en-IN")}
                       </span>
-                      {isFunded && (
+                      {isFunded ? (
                         <span className="text-[10px] text-slate-500 font-medium block">
                           Partner: {linkedAgr?.industryPartnerName || "Tata Steel CSR Foundation"}
+                        </span>
+                      ) : pr.needsIndustrySupport ? (
+                        <span className="text-[10px] text-amber-700 font-semibold block">
+                          Listed on Open Innovation Marketplace
+                        </span>
+                      ) : (
+                        <span className="text-[10px] text-blue-700 font-semibold block">
+                          Internal Institute Grant
                         </span>
                       )}
                     </div>
@@ -138,10 +456,19 @@ export const StudentPortalPage: React.FC = () => {
                     <p className="text-xs text-slate-600 mt-1.5 leading-relaxed">{pr.summary}</p>
                   </div>
 
-                  <div className="bg-slate-50 p-3 rounded border border-slate-200 text-xs space-y-1">
-                    <span className="font-bold text-slate-700 block text-[11px]">Engineering Methodology:</span>
-                    <p className="text-slate-600 text-[11px]">{pr.technicalApproach}</p>
-                  </div>
+                  {pr.needsIndustrySupport && !isFunded && (
+                    <div className="bg-amber-50/70 border border-amber-200 p-2.5 rounded text-[11px] text-amber-950 flex items-center justify-between">
+                      <span>
+                        🔒 <strong>Awaiting MoU Digital Execution:</strong> This project is currently seeking industry co-funding on the Marketplace. Once an MoU is e-signed by Tata Steel / Coal India, laboratory sprint fabrication will unlock.
+                      </span>
+                      <Link
+                        to="/portal/industry"
+                        className="text-[#0f2942] hover:underline font-bold shrink-0 ml-2"
+                      >
+                        Inspect Industry Marketplace &rarr;
+                      </Link>
+                    </div>
+                  )}
 
                   <div className="pt-2 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
                     <div className="flex items-center space-x-1.5 text-[11px] text-slate-600">
@@ -149,26 +476,22 @@ export const StudentPortalPage: React.FC = () => {
                       <span>Assigned Cohort: <strong>Team JalRakshak (Rahul, Priya, Sneha, Amit)</strong></span>
                     </div>
 
-                    <div className="flex flex-wrap items-center gap-2">
+                    <div className="flex items-center space-x-2">
                       <button
-                        onClick={() => setActiveTab("sprint")}
+                        onClick={() => setActiveTab("my_tasks")}
                         className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded font-semibold flex items-center space-x-1"
                       >
-                        <Layers className="w-3.5 h-3.5" />
-                        <span>Sprint Tasks</span>
-                      </button>
-
-                      <button
-                        onClick={() => setActiveTab("vault")}
-                        className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded font-semibold flex items-center space-x-1"
-                      >
-                        <Upload className="w-3.5 h-3.5" />
-                        <span>Upload Lab Data</span>
+                        <CheckSquare className="w-3.5 h-3.5" />
+                        <span>My Deliverables</span>
                       </button>
 
                       <Link
                         to={`/lifecycle/${pr.id}`}
-                        className="px-3.5 py-1.5 bg-[#0f2942] hover:bg-[#163b5f] text-white rounded font-semibold flex items-center space-x-1 shadow-xs"
+                        className={`px-3.5 py-1.5 rounded font-semibold flex items-center space-x-1 shadow-xs ${
+                          pr.needsIndustrySupport && !isFunded
+                            ? "bg-slate-300 text-slate-500 cursor-not-allowed"
+                            : "bg-[#0f2942] hover:bg-[#163b5f] text-white"
+                        }`}
                       >
                         <Clock className="w-3.5 h-3.5 text-amber-400" />
                         <span>5-Stage Lifecycle & Gantt &rarr;</span>
@@ -182,21 +505,96 @@ export const StudentPortalPage: React.FC = () => {
         </div>
       )}
 
-      {/* 2. Kanban Sprint Board */}
-      {activeTab === "sprint" && (
+      {/* 3. Team Sprint Kanban Board */}
+      {activeTab === "team_sprint" && (
         <div className="bg-white p-6 rounded-lg border border-slate-200 shadow-xs space-y-4">
           <KanbanBoard teamId="all" />
         </div>
       )}
 
-      {/* 3. Milestone Roadmap */}
-      {activeTab === "milestones" && (
-        <div className="bg-white p-6 rounded-lg border border-slate-200 shadow-xs space-y-4">
-          <GanttChart milestones={milestones} />
+      {/* 4. Delegate Milestone Tasks to Team Members */}
+      {activeTab === "task_delegator" && (
+        <div className="bg-white rounded-lg border border-slate-200 shadow-xs overflow-hidden">
+          <div className="bg-[#0f2942] text-white px-5 py-3 border-b border-[#163b5f]">
+            <h3 className="font-heading font-bold text-sm">
+              छात्र टीम कार्य वितरण (Milestone Task Delegation to Students)
+            </h3>
+            <p className="text-[11px] text-slate-300">
+              Break down project milestones into specific hardware, software, chemical, and CAD tasks for individual team members.
+            </p>
+          </div>
+
+          <form onSubmit={handleDelegateTask} className="p-6 space-y-4 text-xs">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="block font-semibold text-slate-700 mb-1">Target Project Milestone</label>
+                <select
+                  value={delMilestoneId}
+                  onChange={(e) => setDelMilestoneId(e.target.value)}
+                  className="w-full p-2 border border-slate-300 rounded bg-slate-50 focus:border-[#0f2942]"
+                >
+                  {milestones.map((m) => (
+                    <option key={m.id} value={m.id}>
+                      {m.displayName}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block font-semibold text-slate-700 mb-1">Assign to Student Innovator</label>
+                <select
+                  value={delStudentId}
+                  onChange={(e) => setDelStudentId(e.target.value)}
+                  className="w-full p-2 border border-slate-300 rounded bg-slate-50 focus:border-[#0f2942]"
+                >
+                  <option value="student-rahul">Rahul Kumar (Electronics & IoT Lead)</option>
+                  <option value="student-priya">Priya Sharma (Computer Science & Cloud)</option>
+                  <option value="student-sneha">Sneha Soren (Chemical & NABL Testing)</option>
+                  <option value="student-amit">Amit Verma (Mechanical CAD & Design)</option>
+                </select>
+              </div>
+            </div>
+
+            <div>
+              <label className="block font-semibold text-slate-700 mb-1">
+                Specific Task Title <span className="text-rose-600">*</span>
+              </label>
+              <input
+                type="text"
+                required
+                value={delTitle}
+                onChange={(e) => setDelTitle(e.target.value)}
+                placeholder="e.g. Calibrate optical fluoride sensor in Angara field trial station..."
+                className="w-full p-2.5 border border-slate-300 rounded focus:border-[#0f2942]"
+              />
+            </div>
+
+            <div>
+              <label className="block font-semibold text-slate-700 mb-1">Deliverable Requirements</label>
+              <textarea
+                rows={3}
+                value={delDesc}
+                onChange={(e) => setDelDesc(e.target.value)}
+                placeholder="Specify laboratory benchmarks, test conditions, or CAD output formats required..."
+                className="w-full p-2 border border-slate-300 rounded focus:border-[#0f2942]"
+              />
+            </div>
+
+            <div className="pt-2 border-t border-slate-200 flex justify-end">
+              <button
+                type="submit"
+                className="px-5 py-2.5 bg-[#0f2942] hover:bg-[#163b5f] text-white font-semibold rounded shadow-xs flex items-center space-x-1.5"
+              >
+                <PlusSquareIcon className="w-3.5 h-3.5" />
+                <span>Assign Task to Student &rarr;</span>
+              </button>
+            </div>
+          </form>
         </div>
       )}
 
-      {/* 4. Document Vault */}
+      {/* 5. Document Vault */}
       {activeTab === "vault" && (
         <div className="space-y-4">
           <div className="bg-white p-5 rounded-lg border border-slate-200 shadow-xs space-y-4">
@@ -232,8 +630,8 @@ export const StudentPortalPage: React.FC = () => {
                     <input
                       type="text"
                       required
-                      value={uploadTitle}
-                      onChange={(e) => setUploadTitle(e.target.value)}
+                      value={uploadDocTitle}
+                      onChange={(e) => setUploadDocTitle(e.target.value)}
                       placeholder="e.g. Field_Trial_Telemetry_Sensor_Calibration_Week2.pdf"
                       className="flex-1 p-2 border border-slate-300 rounded focus:border-[#0f2942] focus:outline-none"
                     />
@@ -291,3 +689,9 @@ export const StudentPortalPage: React.FC = () => {
     </PortalLayout>
   );
 };
+
+const PlusSquareIcon = ({ className }: { className?: string }) => (
+  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
+  </svg>
+);

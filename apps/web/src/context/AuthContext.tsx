@@ -6,16 +6,21 @@ export interface AuthContextType {
   currentUser: User | null;
   currentRole: UserRole | null;
   isAuthenticated: boolean;
-  loginAsRole: (role: UserRole) => void;
+  loginAsRole: (role: UserRole | string) => void;
   loginWithCredentials: (username: string, pass: string) => boolean;
   logout: () => void;
-  getPortalPath: (role?: UserRole) => string;
+  getPortalPath: (role?: UserRole | string) => string;
   demoUsers: Record<string, User>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const getPortalPath = (role?: UserRole): string => {
+export const getPortalPath = (role?: UserRole | string): string => {
+  if (!role) return "/login";
+  if (typeof role === "string") {
+    if (role.startsWith("student")) return "/portal/student";
+    if (role.startsWith("hei_")) return "/portal/hei-nodal";
+  }
   switch (role) {
     case "citizen":
     case "pri":
@@ -95,18 +100,108 @@ export const DEMO_STAKEHOLDERS: Record<string, User> = {
   },
   student: {
     id: "student-rahul",
-    fullName: "Rahul Kumar",
+    fullName: "Rahul Kumar (Team Lead)",
     phone: "+91 91234 56789",
-    email: "btech10452.23@bitmesra.ac.in",
+    email: "rahul.btech@bitmesra.ac.in",
     role: "student",
-    roleTitle: "Student Team Lead (Team JalRakshak)",
+    roleTitle: "Student Lead (Team JalRakshak - Hardware & IoT)",
     organizationName: "Birla Institute of Technology, Mesra",
     department: "Electronics & IoT Engineering (3rd Year)",
     district: "Ranchi",
     aadhaarVerified: true,
     reputationPoints: 540,
-    badges: ["SIH Finalist", "Hardware Hacker"],
+    badges: ["Team Lead", "Hardware Pro"],
     createdAt: "2026-01-05T14:30:00Z"
+  },
+  student_priya: {
+    id: "student-priya",
+    fullName: "Priya Sharma (Student)",
+    phone: "+91 98234 11223",
+    email: "priya.cs@bitmesra.ac.in",
+    role: "student",
+    roleTitle: "Software & Cloud Telemetry Engineer",
+    organizationName: "Birla Institute of Technology, Mesra",
+    department: "Computer Science & Engg (3rd Year)",
+    district: "Ranchi",
+    aadhaarVerified: true,
+    reputationPoints: 480,
+    badges: ["Cloud Specialist", "MQTT Coder"],
+    createdAt: "2026-01-06T10:00:00Z"
+  },
+  student_sneha: {
+    id: "student-sneha",
+    fullName: "Sneha Soren (Student)",
+    phone: "+91 94701 44556",
+    email: "sneha.chem@bitmesra.ac.in",
+    role: "student",
+    roleTitle: "Chemical & NABL Lab Testing Lead",
+    organizationName: "Birla Institute of Technology, Mesra",
+    department: "Chemical & Environmental Engg (3rd Year)",
+    district: "Ranchi",
+    aadhaarVerified: true,
+    reputationPoints: 510,
+    badges: ["NABL Tester", "Water Chemist"],
+    createdAt: "2026-01-07T11:00:00Z"
+  },
+  student_amit: {
+    id: "student-amit",
+    fullName: "Amit Verma (Student)",
+    phone: "+91 93341 88990",
+    email: "amit.mech@bitmesra.ac.in",
+    role: "student",
+    roleTitle: "Mechanical CAD & Fabrication Engineer",
+    organizationName: "Birla Institute of Technology, Mesra",
+    department: "Mechanical Engineering (3rd Year)",
+    district: "Ranchi",
+    aadhaarVerified: true,
+    reputationPoints: 460,
+    badges: ["CAD Designer", "CNC Fabricator"],
+    createdAt: "2026-01-08T12:00:00Z"
+  },
+  hei_iit_dhanbad: {
+    id: "user-nodal-iit",
+    fullName: "Prof. S. K. Roy",
+    phone: "+91 94311 22334",
+    email: "nodal.rnd@iitism.ac.in",
+    role: "hei_nodal",
+    roleTitle: "Nodal Officer (IIT ISM Dhanbad)",
+    organizationName: "IIT (ISM) Dhanbad",
+    department: "Centre of Mining Innovation & Tech",
+    district: "Dhanbad",
+    aadhaarVerified: true,
+    reputationPoints: 1600,
+    badges: ["Mining Tech Nodal", "Geo Specialist"],
+    createdAt: "2025-10-01T08:00:00Z"
+  },
+  hei_aiims_deoghar: {
+    id: "user-nodal-aiims",
+    fullName: "Dr. A. K. Mishra",
+    phone: "+91 94301 88776",
+    email: "nodal.medtech@aiimsdeoghar.edu.in",
+    role: "hei_nodal",
+    roleTitle: "Nodal Officer (AIIMS Deoghar / MedTech)",
+    organizationName: "AIIMS Deoghar",
+    department: "Centre for Community Medicine & MedTech",
+    district: "Deoghar",
+    aadhaarVerified: true,
+    reputationPoints: 1450,
+    badges: ["MedTech Nodal", "Public Health Director"],
+    createdAt: "2025-09-15T08:00:00Z"
+  },
+  hei_bau_ranchi: {
+    id: "user-nodal-bau",
+    fullName: "Dr. Manoj Tiwary",
+    phone: "+91 94311 55443",
+    email: "nodal.agri@bauranchi.org",
+    role: "hei_nodal",
+    roleTitle: "Nodal Officer (Birsa Agricultural University)",
+    organizationName: "Birsa Agricultural University (BAU Kanke)",
+    department: "Directorate of Extension & Farm Innovation",
+    district: "Ranchi",
+    aadhaarVerified: true,
+    reputationPoints: 1380,
+    badges: ["AgriTech Lead", "Tribal Livelihoods"],
+    createdAt: "2025-09-20T08:00:00Z"
   },
   industry: {
     id: "industry-tatasteel",
@@ -148,7 +243,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const isAuthenticated = currentUser !== null;
   const currentRole = currentUser ? currentUser.role : null;
 
-  const loginAsRole = (role: UserRole) => {
+  const loginAsRole = (role: UserRole | string) => {
     const user = DEMO_STAKEHOLDERS[role] || DEMO_STAKEHOLDERS.citizen;
     setCurrentUser(user);
     localStorage.setItem("jsicp_active_user", JSON.stringify(user));

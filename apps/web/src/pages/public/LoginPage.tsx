@@ -83,33 +83,72 @@ export const LoginPage: React.FC = () => {
         </div>
 
         {/* Right Column: 1-Click Demo Stakeholder Switcher for Judges */}
-        <div className="md:col-span-6 bg-[#f8fafc] p-6 rounded-lg border border-slate-200 space-y-3">
+        <div className="md:col-span-6 bg-[#f8fafc] p-6 rounded-lg border border-slate-200 space-y-4 max-h-[620px] overflow-y-auto">
           <div className="border-b border-slate-200 pb-2">
             <span className="font-bold text-slate-800 text-xs uppercase tracking-wider block">
-              Evaluation & Demo Role Switcher
+              Evaluation & Multi-Actor Role Switcher
             </span>
             <p className="text-[11px] text-slate-500 mt-0.5">
-              Click any verified stakeholder below to instantly enter that actor isolated workspace:
+              Click any verified stakeholder below to instantly authenticate into their isolated workspace:
             </p>
           </div>
 
-          <div className="space-y-2">
-            {Object.entries(demoUsers).map(([roleKey, u]) => (
-              <button
-                key={roleKey}
-                onClick={() => handleRoleQuickLogin(roleKey as any)}
-                className="w-full text-left p-2.5 bg-white hover:bg-blue-50/50 border border-slate-200 rounded transition flex items-center justify-between"
-              >
-                <div>
-                  <span className="font-bold text-slate-900 block">{u.fullName}</span>
-                  <span className="text-[11px] text-slate-500">{u.roleTitle}</span>
-                </div>
-                <span className="text-[10px] bg-slate-100 text-slate-700 font-mono font-semibold px-2 py-0.5 rounded uppercase">
-                  {roleKey.replace("_", " ")} &rarr;
-                </span>
-              </button>
-            ))}
-          </div>
+          {/* Categorized Groups */}
+          {[
+            {
+              category: "💡 Multidisciplinary Student Innovators",
+              keys: ["student", "student_priya", "student_sneha", "student_amit"]
+            },
+            {
+              category: "🔬 Faculty Mentors & Research Guides",
+              keys: ["faculty"]
+            },
+            {
+              category: "🎓 University Nodal Innovation Desks",
+              keys: ["hei_nodal", "hei_iit_dhanbad", "hei_aiims_deoghar", "hei_bau_ranchi"]
+            },
+            {
+              category: "🏭 Industry & CSR Co-Funding Anchors",
+              keys: ["industry"]
+            },
+            {
+              category: "🏛️ State Apex Command & District Administration",
+              keys: ["govt_admin"]
+            },
+            {
+              category: "👥 Grassroots Citizens & Panchayati Raj (PRI)",
+              keys: ["citizen", "pri"]
+            }
+          ].map((group) => (
+            <div key={group.category} className="space-y-1.5">
+              <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">
+                {group.category}
+              </span>
+              <div className="space-y-1.5">
+                {group.keys.map((k) => {
+                  const u = demoUsers[k];
+                  if (!u) return null;
+                  return (
+                    <button
+                      key={k}
+                      onClick={() => handleRoleQuickLogin(k)}
+                      className="w-full text-left p-2 bg-white hover:bg-blue-50/60 border border-slate-200 rounded transition flex items-center justify-between group shadow-2xs"
+                    >
+                      <div>
+                        <span className="font-bold text-slate-900 group-hover:text-[#0f2942] block text-xs">
+                          {u.fullName}
+                        </span>
+                        <span className="text-[10px] text-slate-500 block truncate max-w-xs">{u.roleTitle}</span>
+                      </div>
+                      <span className="text-[9px] bg-slate-100 group-hover:bg-[#0f2942] group-hover:text-white text-slate-700 font-mono font-semibold px-2 py-0.5 rounded transition shrink-0 ml-2">
+                        Enter Workspace &rarr;
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     </div>

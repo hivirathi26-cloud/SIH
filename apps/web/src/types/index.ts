@@ -159,7 +159,7 @@ export interface Team {
   createdAt: string;
 }
 
-export type ProposalStatus = "draft" | "submitted" | "under_review" | "approved" | "funded" | "rejected";
+export type ProposalStatus = "draft" | "submitted" | "under_review" | "open_for_funding" | "approved" | "funded" | "rejected";
 
 export interface Proposal {
   id: string;
@@ -306,4 +306,27 @@ export interface LeaderboardUser {
   problemsSubmitted: number;
   solutionsImplemented: number;
   badges: string[];
+}
+
+
+export interface StudentDeliverableTask {
+  id: string;
+  proposalId: string;
+  proposalTitle: string;
+  milestoneId: string;
+  milestoneName: string;
+  title: string;
+  description: string;
+  assignedStudentId: string;
+  assignedStudentName: string;
+  studentDiscipline: string;
+  progressPercent: number;
+  pdfUrl?: string;
+  submissionNotes?: string;
+  assignedAt?: string;
+  submittedAt?: string;
+  status: "assigned" | "in_progress" | "in_review_by_faculty" | "approved_by_faculty" | "revision_requested";
+  facultyFeedback?: string;
+  facultySignedAt?: string;
+  facultySignedBy?: string;
 }

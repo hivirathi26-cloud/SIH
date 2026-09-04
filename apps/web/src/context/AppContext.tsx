@@ -15,7 +15,8 @@ import {
   DistrictGeoData,
   ProblemStatus,
   MilestoneStatus,
-  DocumentVaultItem
+  DocumentVaultItem,
+  StudentDeliverableTask
 } from "../types";
 import {
   MOCK_USERS,
@@ -62,6 +63,10 @@ export interface AppContextType {
   approveMilestoneGovt: (milestoneId: string, approverName: string) => void;
   uploadMilestoneDocument: (milestoneId: string, doc: Omit<DocumentVaultItem, "id" | "uploadedAt">) => void;
   
+  studentDeliverables: StudentDeliverableTask[];
+  assignStudentTask: (task: Omit<StudentDeliverableTask, "id">) => void;
+  submitStudentDeliverable: (taskId: string, progressPercent: number, notes: string, pdfUrl?: string) => void;
+  reviewStudentDeliverable: (taskId: string, decision: "accept" | "reject", feedback: string, approverName: string) => void;
   kanbanTasks: KanbanTask[];
   updateTaskStatus: (taskId: string, newStatus: KanbanTask["status"]) => void;
   createTask: (task: Omit<KanbanTask, "id">) => void;
@@ -92,6 +97,78 @@ export interface AppContextType {
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
+
+
+const INITIAL_STUDENT_DELIVERABLES: StudentDeliverableTask[] = [
+  {
+    id: "dt-001",
+    proposalId: "prop-001",
+    proposalTitle: "JalShuddhi: Solar-Powered Nano-Adsorptive Fluoride Filter",
+    milestoneId: "ms-002",
+    milestoneName: "Milestone 2: Prototype Fabrication & Lab Bench Testing",
+    title: "ESP32 Embedded Firmware & LoRaWAN Node Assembly",
+    description: "Program ESP32 to read optical turbidity & conductivity sensors and transmit every 15 mins.",
+    assignedStudentId: "student-rahul",
+    assignedStudentName: "Rahul Kumar (Team Lead)",
+    studentDiscipline: "Electronics & IoT Engineering",
+    progressPercent: 85,
+    status: "in_progress",
+    submissionNotes: "Bench prototype breadboard completed, working on waterproof housing."
+  },
+  {
+    id: "dt-002",
+    proposalId: "prop-001",
+    proposalTitle: "JalShuddhi: Solar-Powered Nano-Adsorptive Fluoride Filter",
+    milestoneId: "ms-002",
+    milestoneName: "Milestone 2: Prototype Fabrication & Lab Bench Testing",
+    title: "MQTT Cloud Broker & Real-Time Dashboard Integration",
+    description: "Build state dashboard ingestion stream with automatic alert triggers when fluoride > 1.0 ppm.",
+    assignedStudentId: "student-priya",
+    assignedStudentName: "Priya Sharma (Student)",
+    studentDiscipline: "Computer Science & Engineering",
+    progressPercent: 100,
+    status: "in_review_by_faculty",
+    pdfUrl: "/vault/mqtt_cloud_telemetry_report.pdf",
+    submissionNotes: "AWS IoT core hooked up to JSICP database. 100% packets received in 48-hr stress test.",
+    submittedAt: "2026-03-02T14:30:00Z"
+  },
+  {
+    id: "dt-003",
+    proposalId: "prop-001",
+    proposalTitle: "JalShuddhi: Solar-Powered Nano-Adsorptive Fluoride Filter",
+    milestoneId: "ms-003",
+    milestoneName: "Milestone 3: Field Testing & Pilot Calibration in District",
+    title: "14-Day NABL Laboratory Water Fluoride Stress Test",
+    description: "Continuous flow testing of activated alumina nano-adsorbent cartridge matrix using Angara borewell samples.",
+    assignedStudentId: "student-sneha",
+    assignedStudentName: "Sneha Soren (Student)",
+    studentDiscipline: "Chemical & Environmental Engineering",
+    progressPercent: 100,
+    status: "in_review_by_faculty",
+    pdfUrl: "/vault/nabl_certified_water_fluoride_titration_sheet.pdf",
+    submissionNotes: "Fluoride level dropped from 6.8 ppm down to 0.42 ppm (well within BIS 10500 standard of 1.0 ppm). NABL certified report attached.",
+    submittedAt: "2026-03-03T11:00:00Z"
+  },
+  {
+    id: "dt-004",
+    proposalId: "prop-001",
+    proposalTitle: "JalShuddhi: Solar-Powered Nano-Adsorptive Fluoride Filter",
+    milestoneId: "ms-001",
+    milestoneName: "Milestone 1: Research, Chemical Formulation & 3D CAD Design",
+    title: "Dual-Cartridge Modular Chamber 3D CAD Blueprint",
+    description: "CAD mechanical design of quick-swap cartridge housing compatible with standard Mark-II handpumps.",
+    assignedStudentId: "student-amit",
+    assignedStudentName: "Amit Verma (Student)",
+    studentDiscipline: "Mechanical Engineering",
+    progressPercent: 100,
+    status: "approved_by_faculty",
+    pdfUrl: "/vault/mark2_handpump_cartridge_cad_blueprint.pdf",
+    submissionNotes: "3D CAD model stress-analyzed for 15 bar pressure. Passed mechanical safety guidelines.",
+    facultyFeedback: "Excellent dimensional tolerance and ergonomic latch design. Approved for lab CNC milling.",
+    facultySignedAt: "2026-02-20T16:00:00Z",
+    facultySignedBy: "Prof. Ananya Sen"
+  }
+];
 
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   // Load state or fallback to mocks
@@ -126,6 +203,14 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     return saved ? JSON.parse(saved) : MOCK_MILESTONES;
   });
 
+  const [studentDeliverables, setStudentDeliverables] = useState<StudentDeliverableTask[]>(() => {
+    const saved = localStorage.getItem("jsicp_student_deliverables");
+    return saved ? JSON.parse(saved) : INITIAL_STUDENT_DELIVERABLES;
+  });
+
+  useEffect(() => {
+    localStorage.setItem("jsicp_student_deliverables", JSON.stringify(studentDeliverables));
+  }, [studentDeliverables]);
   const [kanbanTasks, setKanbanTasks] = useState<KanbanTask[]>(() => {
     const saved = localStorage.getItem("jsicp_kanban_tasks");
     return saved ? JSON.parse(saved) : MOCK_KANBAN_TASKS;
@@ -389,11 +474,13 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   // 3. Proposals
   const createProposal = (proposalData: Omit<Proposal, "id" | "submittedAt">): Proposal => {
+    const propStatus: Proposal["status"] = proposalData.needsIndustrySupport ? "open_for_funding" : "approved";
     const prop: Proposal = {
       ...proposalData,
       id: `prop-${Date.now()}`,
       submittedAt: new Date().toISOString(),
-      status: "submitted",
+      status: propStatus,
+      approvedAt: !proposalData.needsIndustrySupport ? new Date().toISOString() : undefined,
       startupIncubationEligible: proposalData.estimatedBudget > 300000 || proposalData.needsIndustrySupport
     };
 
@@ -469,6 +556,79 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     ];
 
     setMilestones((prev) => [...newMilestones, ...prev]);
+
+    // If direct academic research (no industry funding needed), immediately seed active sprint tasks & student deliverables
+    if (!proposalData.needsIndustrySupport) {
+      const task1: StudentDeliverableTask = {
+        id: `dt-${Date.now()}-1`,
+        proposalId: prop.id,
+        proposalTitle: prop.title,
+        milestoneId: newMilestones[0].id,
+        milestoneName: newMilestones[0].displayName,
+        title: `[${prop.title.slice(0, 32)}] Literature Review & 3D Schematics`,
+        description: "Background research, mathematical modeling, and initial CAD drawings.",
+        assignedStudentId: "student-rahul",
+        assignedStudentName: "Rahul Kumar (Team Lead)",
+        studentDiscipline: "Electronics & IoT Engineering",
+        progressPercent: 20,
+        status: "in_progress",
+        assignedAt: new Date().toISOString()
+      };
+      const task2: StudentDeliverableTask = {
+        id: `dt-${Date.now()}-2`,
+        proposalId: prop.id,
+        proposalTitle: prop.title,
+        milestoneId: newMilestones[0].id,
+        milestoneName: newMilestones[0].displayName,
+        title: `[${prop.title.slice(0, 32)}] Firmware & IoT Telemetry Architecture`,
+        description: "Set up ESP32 LoRaWAN gateway and cloud data ingestion pipeline.",
+        assignedStudentId: "student-priya",
+        assignedStudentName: "Priya Sharma (Student)",
+        studentDiscipline: "Computer Science & Engineering",
+        progressPercent: 10,
+        status: "assigned",
+        assignedAt: new Date().toISOString()
+      };
+      setStudentDeliverables((prev) => [task1, task2, ...prev]);
+
+      const k1: KanbanTask = {
+        id: `task-${Date.now()}-1`,
+        teamId: "all",
+        title: task1.title,
+        description: task1.description,
+        assignedTo: task1.assignedStudentId,
+        assignedName: task1.assignedStudentName,
+        status: "in_progress",
+        priority: "high",
+        milestoneName: "research_design",
+        dueDate: "2026-03-30"
+      };
+      const k2: KanbanTask = {
+        id: `task-${Date.now()}-2`,
+        teamId: "all",
+        title: task2.title,
+        description: task2.description,
+        assignedTo: task2.assignedStudentId,
+        assignedName: task2.assignedStudentName,
+        status: "backlog",
+        priority: "medium",
+        milestoneName: "research_design",
+        dueDate: "2026-03-30"
+      };
+      setKanbanTasks((prev) => [k1, k2, ...prev]);
+    }
+
+    triggerNotification({
+      userId: currentUser.id,
+      channel: "email",
+      eventType: "PROPOSAL_SUBMITTED",
+      title: proposalData.needsIndustrySupport ? "🏢 Proposal Routed to Industry Marketplace" : "🎓 Academic Proposal Activated",
+      message: proposalData.needsIndustrySupport
+        ? `Proposal "${prop.title.slice(0, 40)}..." is listed for CSR co-funding. Student workspace unlocks upon MoU execution.`
+        : `Proposal "${prop.title.slice(0, 40)}..." is approved for internal academic research. Student workspace unlocked!`,
+      status: "delivered",
+      linkUrl: proposalData.needsIndustrySupport ? "/industry/marketplace" : "/portal/student"
+    });
 
     updateProblemStatus(prop.problemId, "in_progress");
 
@@ -765,6 +925,90 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setOfflineQueue([]);
   };
 
+  const assignStudentTask = (taskData: Omit<StudentDeliverableTask, "id">) => {
+    const newTask: StudentDeliverableTask = {
+      ...taskData,
+      id: `dt-${Date.now()}`
+    };
+    setStudentDeliverables((prev) => [newTask, ...prev]);
+
+    // Also mirror into kanban tasks
+    createTask({
+      teamId: "all",
+      title: newTask.title,
+      description: newTask.description,
+      assignedTo: newTask.assignedStudentId,
+      assignedName: newTask.assignedStudentName,
+      status: "in_progress",
+      priority: "high",
+      milestoneName: "prototype_build",
+      dueDate: "2026-04-30"
+    });
+  };
+
+  const submitStudentDeliverable = (taskId: string, progressPercent: number, notes: string, pdfUrl?: string) => {
+    let taskName = "";
+    setStudentDeliverables((prev) =>
+      prev.map((t) => {
+        if (t.id === taskId) {
+          taskName = t.title;
+          const isComplete = progressPercent >= 100;
+          return {
+            ...t,
+            progressPercent,
+            submissionNotes: notes,
+            pdfUrl: pdfUrl || t.pdfUrl || `/vault/${t.title.toLowerCase().replace(/ /g, "_")}.pdf`,
+            status: isComplete ? "in_review_by_faculty" : "in_progress",
+            submittedAt: isComplete ? new Date().toISOString() : t.submittedAt
+          };
+        }
+        return t;
+      })
+    );
+
+    triggerNotification({
+      userId: "faculty-ananya",
+      channel: "email",
+      eventType: "DELIVERABLE_SUBMITTED",
+      title: "📑 Student Deliverable Submitted for Inspection",
+      message: `Deliverable  has been submitted with progress ${progressPercent}% and attached laboratory report. Ready for faculty review.`,
+      status: "delivered",
+      linkUrl: "/portal/faculty"
+    });
+  };
+
+  const reviewStudentDeliverable = (taskId: string, decision: "accept" | "reject", feedback: string, approverName: string) => {
+    let targetMilestoneId = "";
+    setStudentDeliverables((prev) =>
+      prev.map((t) => {
+        if (t.id === taskId) {
+          targetMilestoneId = t.milestoneId;
+          if (decision === "accept") {
+            return {
+              ...t,
+              status: "approved_by_faculty",
+              progressPercent: 100,
+              facultyFeedback: feedback,
+              facultySignedAt: new Date().toISOString(),
+              facultySignedBy: approverName
+            };
+          } else {
+            return {
+              ...t,
+              status: "revision_requested",
+              facultyFeedback: feedback
+            };
+          }
+        }
+        return t;
+      })
+    );
+
+    if (decision === "accept" && targetMilestoneId) {
+      approveMilestoneFaculty(targetMilestoneId, approverName);
+    }
+  };
+
   return (
     <AppContext.Provider
       value={{
@@ -792,6 +1036,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         approveMilestoneFaculty,
         approveMilestoneGovt,
         uploadMilestoneDocument,
+        studentDeliverables,
+        assignStudentTask,
+        submitStudentDeliverable,
+        reviewStudentDeliverable,
         kanbanTasks,
         updateTaskStatus,
         createTask,

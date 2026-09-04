@@ -222,30 +222,67 @@ export const GovtHeader: React.FC = () => {
                         </p>
                       </div>
 
-                      <div className="py-1 divide-y divide-slate-100 max-h-72 overflow-y-auto">
-                        {Object.entries(demoUsers).map(([roleKey, u]) => (
-                          <button
-                            key={roleKey}
-                            onClick={() => handleRoleSwitch(roleKey as any)}
-                            className={`w-full text-left px-3.5 py-2 hover:bg-slate-50 transition flex items-start space-x-2.5 ${
-                              currentUser.role === roleKey ? "bg-blue-50/70 border-l-2 border-[#0f2942]" : ""
-                            }`}
-                          >
-                            <div className="w-6 h-6 rounded bg-slate-200 text-slate-700 flex items-center justify-center text-[10px] font-bold shrink-0 mt-0.5">
-                              {u.fullName[0]}
-                            </div>
-                            <div className="min-w-0 flex-1">
-                              <div className="flex items-center justify-between">
-                                <span className="font-bold text-slate-900 text-xs truncate">
-                                  {u.fullName}
-                                </span>
-                                <span className="text-[9px] bg-slate-100 text-slate-600 px-1 rounded uppercase font-mono">
-                                  {roleKey.replace("_", " ")}
-                                </span>
-                              </div>
-                              <p className="text-[10px] text-slate-500 truncate">{u.roleTitle}</p>
-                            </div>
-                          </button>
+                      <div className="py-1 max-h-80 overflow-y-auto divide-y divide-slate-100">
+                        {[
+                          {
+                            category: "💡 Student Innovators",
+                            keys: ["student", "student_priya", "student_sneha", "student_amit"]
+                          },
+                          {
+                            category: "🔬 Faculty Mentors",
+                            keys: ["faculty"]
+                          },
+                          {
+                            category: "🎓 University Nodal Desks",
+                            keys: ["hei_nodal", "hei_iit_dhanbad", "hei_aiims_deoghar", "hei_bau_ranchi"]
+                          },
+                          {
+                            category: "🏭 Industry & CSR",
+                            keys: ["industry"]
+                          },
+                          {
+                            category: "🏛️ State Apex & District",
+                            keys: ["govt_admin"]
+                          },
+                          {
+                            category: "👥 Citizens & PRIs",
+                            keys: ["citizen", "pri"]
+                          }
+                        ].map((grp) => (
+                          <div key={grp.category} className="py-1">
+                            <span className="px-3.5 py-0.5 text-[9px] font-bold text-slate-400 uppercase tracking-wider block bg-slate-50/70">
+                              {grp.category}
+                            </span>
+                            {grp.keys.map((roleKey) => {
+                              const u = demoUsers[roleKey];
+                              if (!u) return null;
+                              const isActive = currentUser.id === u.id;
+                              return (
+                                <button
+                                  key={roleKey}
+                                  onClick={() => handleRoleSwitch(roleKey as any)}
+                                  className={`w-full text-left px-3.5 py-1.5 hover:bg-blue-50/60 transition flex items-center space-x-2 ${
+                                    isActive ? "bg-blue-50 font-bold border-l-2 border-[#0f2942]" : ""
+                                  }`}
+                                >
+                                  <div className="w-5 h-5 rounded bg-slate-200 text-slate-700 flex items-center justify-center text-[9px] font-bold shrink-0">
+                                    {u.fullName[0]}
+                                  </div>
+                                  <div className="min-w-0 flex-1">
+                                    <div className="flex items-center justify-between">
+                                      <span className="text-xs font-semibold text-slate-900 truncate">
+                                        {u.fullName}
+                                      </span>
+                                      <span className="text-[8px] bg-slate-100 text-slate-500 font-mono px-1 rounded uppercase">
+                                        {roleKey.replace("student_", "").replace("hei_", "")}
+                                      </span>
+                                    </div>
+                                    <p className="text-[10px] text-slate-500 truncate">{u.roleTitle}</p>
+                                  </div>
+                                </button>
+                              );
+                            })}
+                          </div>
                         ))}
                       </div>
 
