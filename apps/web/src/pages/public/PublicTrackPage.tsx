@@ -88,11 +88,18 @@ export const PublicTrackPage: React.FC = () => {
             </div>
             <div>
               <span className="text-slate-500 block text-[11px]">Allocated HEI</span>
-              <span className="font-bold text-slate-800">{searchedProblem.assignedUniversityName || "BIT Mesra, Ranchi"}</span>
+              <span className="font-bold text-slate-800">
+                {searchedProblem.assignedUniversityName ||
+                  searchedProblem.aiExplanation?.suggestedUniversities?.[0]?.universityName ||
+                  "Pending Nodal Routing"}
+              </span>
             </div>
             <div>
               <span className="text-slate-500 block text-[11px]">Assigned Mentor</span>
-              <span className="font-bold text-slate-800">{searchedProblem.assignedFacultyName || "Prof. Ananya Sen"}</span>
+              <span className="font-bold text-slate-800">
+                {searchedProblem.assignedFacultyName ||
+                  (searchedProblem.assignedUniversityName ? "Faculty Assignment in Progress" : "Pending Allocation")}
+              </span>
             </div>
           </div>
 

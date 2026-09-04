@@ -990,7 +990,7 @@ export const FacultyPortalPage: React.FC = () => {
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2 border-b border-slate-100">
                     <div>
                       <span className="font-mono text-slate-500 text-[11px] block">
-                        Project: {targetProp?.title || "BIT Mesra Research Cohort"}
+                        Project: {targetProp?.title || (eco?.shortName ? `${eco.shortName} Research Cohort` : "University Research Cohort")}
                       </span>
                       <h4 className="font-heading font-bold text-slate-900 text-sm mt-0.5">
                         {m.displayName}

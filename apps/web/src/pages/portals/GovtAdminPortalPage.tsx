@@ -7,6 +7,7 @@ import { AnalyticsCharts } from "../../components/analytics/AnalyticsCharts";
 import { ExplainableAIModal } from "../../components/ai/ExplainableAIModal";
 import { BlockchainLedgerModal } from "../../components/lifecycle/BlockchainLedgerModal";
 import { StatusPill } from "../../components/common/StatusPill";
+import { getAiRoutingRecommendations, UNIVERSITY_ECOSYSTEMS } from "../../data/universityEcosystems";
 import {
   BarChart3,
   ShieldCheck,
@@ -161,41 +162,82 @@ export const GovtAdminPortalPage: React.FC = () => {
           </div>
 
           <div className="space-y-3">
-            {pendingValidation.map((p) => (
-              <div key={p.id} className="bg-white p-5 rounded-lg border border-slate-200 shadow-xs space-y-3">
-                <div className="flex justify-between items-start pb-2 border-b border-slate-100">
-                  <div className="flex items-center space-x-2">
-                    <span className="font-mono font-bold text-slate-700 bg-slate-100 px-2 py-0.5 rounded">{p.ticketNumber}</span>
-                    <StatusPill status={p.status} />
-                    <span className="text-slate-500">District: {p.district}</span>
+            {pendingValidation.map((p) => {
+              const recs = getAiRoutingRecommendations(p.category, p.title, p.description, p.district);
+              const isHealth =
+                p.category === "Healthcare & MedTech" ||
+                `${p.title} ${p.description}`.toLowerCase().includes("fever") ||
+                `${p.title} ${p.description}`.toLowerCase().includes("flew") ||
+                `${p.title} ${p.description}`.toLowerCase().includes("flu") ||
+                `${p.title} ${p.description}`.toLowerCase().includes("virus");
+
+              const isMining =
+                p.category === "Environment & Mining Remediation" ||
+                `${p.title} ${p.description}`.toLowerCase().includes("coal") ||
+                `${p.title} ${p.description}`.toLowerCase().includes("mining");
+
+              const topMatch = (() => {
+                if (p.aiExplanation?.suggestedUniversities && p.aiExplanation.suggestedUniversities.length > 0) {
+                  const existingTop = p.aiExplanation.suggestedUniversities[0];
+                  if (isHealth && existingTop.universityId !== "univ-aiims-deoghar") {
+                    return recs[0];
+                  }
+                  if (isMining && existingTop.universityId !== "univ-iit-dhanbad") {
+                    return recs[0];
+                  }
+                  return existingTop;
+                }
+                return recs[0];
+              })();
+
+              const domainBadge =
+                UNIVERSITY_ECOSYSTEMS[topMatch.universityId]?.domainName || p.category;
+
+              const matchPct = Math.round(topMatch.score > 1 ? topMatch.score : topMatch.score * 100);
+
+              return (
+                <div key={p.id} className="bg-white p-5 rounded-lg border border-slate-200 shadow-xs space-y-3">
+                  <div className="flex justify-between items-start pb-2 border-b border-slate-100">
+                    <div className="flex items-center space-x-2">
+                      <span className="font-mono font-bold text-slate-700 bg-slate-100 px-2 py-0.5 rounded">{p.ticketNumber}</span>
+                      <StatusPill status={p.status} />
+                      <span className="text-slate-500">District: {p.district}</span>
+                    </div>
+
+                    <span className="font-mono font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded border border-amber-200">
+                      AI Priority: {p.priorityScore}/100
+                    </span>
                   </div>
 
-                  <span className="font-mono font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded border border-amber-200">
-                    AI Priority: {p.priorityScore}/100
-                  </span>
-                </div>
-
-                <div>
-                  <h4 className="font-heading font-bold text-sm text-slate-900">{p.title}</h4>
-                  <p className="text-slate-600 mt-1 leading-relaxed">{p.description}</p>
-                </div>
-
-                <div className="bg-blue-50/60 p-3 rounded border border-blue-100 flex items-center justify-between">
                   <div>
-                    <span className="font-bold text-blue-950 block">AI Recommended Academic Routing:</span>
-                    <span className="text-blue-900">#1 BIT Mesra, Ranchi (96% Match) • Environmental Engg</span>
+                    <h4 className="font-heading font-bold text-sm text-slate-900">{p.title}</h4>
+                    <p className="text-slate-600 mt-1 leading-relaxed">{p.description}</p>
                   </div>
 
-                  <button
-                    onClick={() => setSelectedProbForXAI(p)}
-                    className="px-3 py-1.5 bg-[#0f2942] text-white rounded font-semibold flex items-center space-x-1"
-                  >
-                    <BrainCircuit className="w-3.5 h-3.5" />
-                    <span>Inspect Explainable AI & Confirm &rarr;</span>
-                  </button>
+                  <div className="bg-blue-50/60 p-3 rounded border border-blue-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div>
+                      <div className="flex items-center space-x-2">
+                        <span className="font-bold text-blue-950 text-xs">AI Recommended Academic Routing:</span>
+                        <span className="bg-blue-100 text-blue-800 text-[10px] font-bold px-1.5 py-0.5 rounded">
+                          AI Best Match ({matchPct}% Fit)
+                        </span>
+                      </div>
+                      <span className="text-blue-900 font-semibold text-xs mt-0.5 block">
+                        #{topMatch.rank || 1} {topMatch.universityName} ({matchPct}% Match) • {domainBadge}
+                      </span>
+                    </div>
+
+                    <button
+                      onClick={() => setSelectedProbForXAI(p)}
+                      className="px-3 py-1.5 bg-[#0f2942] text-white rounded font-semibold flex items-center space-x-1 shrink-0 text-xs"
+                    >
+                      <BrainCircuit className="w-3.5 h-3.5" />
+                      <span>Inspect Explainable AI & Confirm &rarr;</span>
+                    </button>
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       )}
@@ -227,7 +269,7 @@ export const GovtAdminPortalPage: React.FC = () => {
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2 border-b border-slate-100">
                     <div>
                       <span className="font-mono text-slate-500 text-[11px] block">
-                        Project: {targetProp?.title || "Active Research Cohort"} ({targetProp?.universityName || "BIT Mesra"})
+                        Project: {targetProp?.title || "Active Research Cohort"} ({targetProp?.universityName || "Participating HEI"})
                       </span>
                       <h4 className="font-heading font-bold text-slate-900 text-sm mt-0.5">
                         {m.displayName}

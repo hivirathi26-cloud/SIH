@@ -521,7 +521,7 @@ export const CitizenPortalPage: React.FC = () => {
                     <div className="bg-emerald-50/70 border border-emerald-300 p-3 rounded text-xs flex items-center space-x-2.5">
                       <Briefcase className="w-4 h-4 text-emerald-800 shrink-0" />
                       <div className="text-emerald-950">
-                        <strong>Milestone Update:</strong> Bilateral MoU executed with <strong>Tata Steel CSR Foundation</strong>. R&D grant funds committed. Multi-disciplinary student team active in BIT Mesra laboratory prototyping.
+                        <strong>Milestone Update:</strong> Bilateral MoU executed with <strong>Tata Steel CSR Foundation</strong>. R&D grant funds committed. Multi-disciplinary student team active in {p.assignedUniversityName || "partner university"} laboratory prototyping.
                       </div>
                     </div>
                   )}
