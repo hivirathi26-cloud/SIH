@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { Problem } from "../../types";
 import { useApp } from "../../context/AppContext";
+import { getAiRoutingRecommendations } from "../../data/universityEcosystems";
 import {
   Sparkles,
   CheckCircle2,
@@ -23,33 +24,84 @@ export const ExplainableAIModal: React.FC<{
   onClose: () => void;
 }> = ({ problem, onClose }) => {
   const { updateProblemStatus, currentUser } = useApp();
+
+  const dynamicRecommendations = useMemo(() => {
+    if (!problem) return [];
+    return getAiRoutingRecommendations(
+      problem.category,
+      problem.title,
+      problem.description,
+      problem.district
+    );
+  }, [problem]);
+
+  const explanation = useMemo(() => {
+    if (!problem) return null;
+
+    const isHealth =
+      problem.category === "Healthcare & MedTech" ||
+      `${problem.title} ${problem.description}`.toLowerCase().includes("fever") ||
+      `${problem.title} ${problem.description}`.toLowerCase().includes("flew") ||
+      `${problem.title} ${problem.description}`.toLowerCase().includes("flu") ||
+      `${problem.title} ${problem.description}`.toLowerCase().includes("virus");
+
+    const isMining =
+      problem.category === "Environment & Mining Remediation" ||
+      `${problem.title} ${problem.description}`.toLowerCase().includes("coal") ||
+      `${problem.title} ${problem.description}`.toLowerCase().includes("mining");
+
+    const defaultExp = problem.aiExplanation || {
+      nlpKeywords: isHealth
+        ? ["fever", "epidemic", "viral_outbreak", "public_health", problem.district || "Ranchi"]
+        : isMining
+        ? ["coal_seam", "methane", "subsidence", "Jharia", problem.district || "Dhanbad"]
+        : ["water", "fluoride", "remediation", "Angara"],
+      cvSceneTags: isHealth
+        ? ["clinical anomaly", "patient surge", "syndromic cluster"]
+        : isMining
+        ? ["ground fissure", "smoke plume", "mine dump"]
+        : ["handpump", "turbid water", "contamination"],
+      duplicateCheckResult: "Zero duplicates found in 5km radius",
+      priorityBreakdown: {
+        severityWeight: 38.0,
+        affectedPopulationEstimate: 24.5,
+        locationVulnerabilityIndex: 18.0,
+        sdgImpactScore: 14.0
+      },
+      suggestedUniversities: dynamicRecommendations
+    };
+
+    // Ensure Healthcare & MedTech problems always have AIIMS Deoghar as #1 recommendation
+    const shouldOverride =
+      !defaultExp.suggestedUniversities ||
+      defaultExp.suggestedUniversities.length === 0 ||
+      (isHealth && defaultExp.suggestedUniversities[0]?.universityId !== "univ-aiims-deoghar") ||
+      (isMining && defaultExp.suggestedUniversities[0]?.universityId !== "univ-iit-dhanbad");
+
+    return {
+      ...defaultExp,
+      nlpKeywords: isHealth
+        ? ["fever", "epidemic", "viral_outbreak", "public_health", problem.district || "Ranchi"]
+        : defaultExp.nlpKeywords,
+      cvSceneTags: isHealth
+        ? ["clinical anomaly", "patient surge", "syndromic cluster"]
+        : defaultExp.cvSceneTags,
+      suggestedUniversities: shouldOverride ? dynamicRecommendations : defaultExp.suggestedUniversities
+    };
+  }, [problem, dynamicRecommendations]);
+
   const [selectedUnivId, setSelectedUnivId] = useState<string>(
-    problem?.aiExplanation?.suggestedUniversities[0]?.universityId || "univ-bit-mesra"
+    explanation?.suggestedUniversities[0]?.universityId || "univ-aiims-deoghar"
   );
   const [justApproved, setJustApproved] = useState(false);
 
-  if (!problem) return null;
+  useEffect(() => {
+    if (explanation?.suggestedUniversities[0]?.universityId) {
+      setSelectedUnivId(explanation.suggestedUniversities[0].universityId);
+    }
+  }, [explanation]);
 
-  const explanation = problem.aiExplanation || {
-    nlpKeywords: ["water", "fluoride", "remediation", "Angara"],
-    cvSceneTags: ["handpump", "turbid water", "contamination"],
-    duplicateCheckResult: "Zero duplicates found in 5km radius",
-    priorityBreakdown: {
-      severityWeight: 38.0,
-      affectedPopulationEstimate: 24.5,
-      locationVulnerabilityIndex: 18.0,
-      sdgImpactScore: 14.0
-    },
-    suggestedUniversities: [
-      {
-        universityId: "univ-bit-mesra",
-        universityName: "BIT Mesra, Ranchi",
-        score: 0.96,
-        rank: 1,
-        reason: "Environmental & Chemical Engg Labs + Proximity to site (18km)"
-      }
-    ]
-  };
+  if (!problem || !explanation) return null;
 
   const handleApproveAndRoute = () => {
     updateProblemStatus(problem.id, "routed", selectedUnivId);
@@ -185,15 +237,15 @@ export const ExplainableAIModal: React.FC<{
                   Unique (100%)
                 </span>
               </div>
-              <p className="text-[11px] text-slate-600 leading-snug">
-                {explanation.duplicateCheckResult}
+              <p className="text-[11px] text-slate-500">
+                Zero duplicates detected within 3km geo-radius.
               </p>
-              <span className="text-[10px] text-slate-400 block font-mono">
+              <span className="text-[10px] bg-sky-50 text-sky-700 px-2 py-0.5 rounded border border-sky-200 font-mono inline-block">
                 all-MiniLM-L6-v2 Embeddings + PostGIS 2km Filter
               </span>
             </div>
 
-            {/* Pillar 4: XGBoost Priority Formula Breakdown */}
+            {/* Pillar 4: Priority Formula Breakdown */}
             <div className="bg-white p-4 rounded-xl border border-amber-100 shadow-sm space-y-2">
               <div className="flex items-center justify-between">
                 <span className="flex items-center space-x-1.5 text-xs font-bold text-amber-900">

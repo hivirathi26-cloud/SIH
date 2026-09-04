@@ -278,3 +278,206 @@ export const getEcosystemByUserId = (
 
   return UNIVERSITY_ECOSYSTEMS["univ-bit-mesra"];
 };
+
+export interface SuggestedUniversityMatch {
+  universityId: string;
+  universityName: string;
+  score: number;
+  rank: number;
+  reason: string;
+}
+
+/**
+ * Intelligent domain and keyword-aware AI routing engine for Jharkhand HEIs.
+ * Maps health/viral/epidemic challenges to AIIMS Deoghar, mining/fire to IIT ISM,
+ * agri/forest/tribal to BAU Ranchi, and water/infra/solar to BIT Mesra / NIT.
+ */
+export const getAiRoutingRecommendations = (
+  category: string = "Healthcare & MedTech",
+  title: string = "",
+  description: string = "",
+  district: string = "Ranchi"
+): SuggestedUniversityMatch[] => {
+  const text = (String(title || "") + " " + String(description || "") + " " + String(category || "")).toLowerCase();
+
+  // 1. Healthcare & MedTech / Medical / Disease / Fever / Viral / PHC / Epidemic
+  if (
+    category === "Healthcare & MedTech" ||
+    text.includes("fever") ||
+    text.includes("flew") ||
+    text.includes("flu") ||
+    text.includes("virus") ||
+    text.includes("viral") ||
+    text.includes("epidemic") ||
+    text.includes("disease") ||
+    text.includes("vaccine") ||
+    text.includes("health") ||
+    text.includes("doctor") ||
+    text.includes("patient") ||
+    text.includes("medical") ||
+    text.includes("silicosis")
+  ) {
+    return [
+      {
+        universityId: "univ-aiims-deoghar",
+        universityName: "AIIMS Deoghar",
+        score: 0.98,
+        rank: 1,
+        reason: `Apex Medical Institute in Jharkhand with Advanced Virology, Epidemic Response, Public Health & MedTech Research Labs (handling ${district} region)`
+      },
+      {
+        universityId: "univ-bit-mesra",
+        universityName: "BIT Mesra, Ranchi",
+        score: 0.86,
+        rank: 2,
+        reason: "Bio-Medical Instrumentation, Sensors & Tele-Health Embedded Systems Lab"
+      },
+      {
+        universityId: "univ-ranchi-univ",
+        universityName: "Ranchi University",
+        score: 0.76,
+        rank: 3,
+        reason: "Community Medicine & Public Health Epidemiology Survey Department"
+      }
+    ];
+  }
+
+  // 2. Environment & Mining Remediation / Coal / Seam / Fire / Blast / Methane / Mine / Geology
+  if (
+    category === "Environment & Mining Remediation" ||
+    text.includes("mining") ||
+    text.includes("coal") ||
+    text.includes("methane") ||
+    text.includes("fire") ||
+    text.includes("subsidence") ||
+    text.includes("tailing") ||
+    text.includes("leachate") ||
+    text.includes("acid mine") ||
+    text.includes("quarry")
+  ) {
+    return [
+      {
+        universityId: "univ-iit-dhanbad",
+        universityName: "IIT (ISM) Dhanbad",
+        score: 0.99,
+        rank: 1,
+        reason: "World-class Mining Engg, Geo-thermal Capping & Mine Safety Research Centres located in Dhanbad"
+      },
+      {
+        universityId: "univ-nit-jamshedpur",
+        universityName: "NIT Jamshedpur",
+        score: 0.83,
+        rank: 2,
+        reason: "Civil & Geotechnical Remediation Laboratory"
+      },
+      {
+        universityId: "univ-bit-mesra",
+        universityName: "BIT Mesra, Ranchi",
+        score: 0.77,
+        rank: 3,
+        reason: "Environmental Science & Remote Sensing Cell"
+      }
+    ];
+  }
+
+  // 3. Agriculture & Allied Technologies OR Forest & Tribal Livelihoods
+  if (
+    category === "Agriculture & Allied Technologies" ||
+    category === "Forest & Tribal Livelihoods" ||
+    text.includes("agriculture") ||
+    text.includes("agri") ||
+    text.includes("crop") ||
+    text.includes("lac") ||
+    text.includes("farmer") ||
+    text.includes("soil") ||
+    text.includes("paddy") ||
+    text.includes("drought") ||
+    text.includes("millet") ||
+    text.includes("harvest") ||
+    text.includes("tribal produce")
+  ) {
+    return [
+      {
+        universityId: "univ-bau-kanke",
+        universityName: "BAU Ranchi",
+        score: 0.98,
+        rank: 1,
+        reason: `Premier State Agricultural University with Agronomy, Bio-processing & Dryland Farming Research Labs in ${district}`
+      },
+      {
+        universityId: "univ-bit-mesra",
+        universityName: "BIT Mesra, Ranchi",
+        score: 0.84,
+        rank: 2,
+        reason: "Mechanical Solar Food Processing & Farm IoT Automation Lab"
+      },
+      {
+        universityId: "univ-ranchi-univ",
+        universityName: "Ranchi University",
+        score: 0.74,
+        rank: 3,
+        reason: "Tribal Studies & Rural Economy Value-Chain Cell"
+      }
+    ];
+  }
+
+  // 4. Rural Infrastructure & Transport
+  if (
+    category === "Rural Infrastructure & Transport" ||
+    text.includes("road") ||
+    text.includes("bridge") ||
+    text.includes("transport") ||
+    text.includes("river") ||
+    text.includes("flood") ||
+    text.includes("embankment")
+  ) {
+    return [
+      {
+        universityId: "univ-nit-jamshedpur",
+        universityName: "NIT Jamshedpur",
+        score: 0.95,
+        rank: 1,
+        reason: `Apex Civil Engineering, River Basin Telemetry & Structural Testing Laboratory (Proximity to ${district})`
+      },
+      {
+        universityId: "univ-bit-mesra",
+        universityName: "BIT Mesra, Ranchi",
+        score: 0.88,
+        rank: 2,
+        reason: "Hydraulic Simulation & IoT Early Warning Sensor Network"
+      },
+      {
+        universityId: "univ-iit-dhanbad",
+        universityName: "IIT (ISM) Dhanbad",
+        score: 0.80,
+        rank: 3,
+        reason: "Rock Mechanics & Geotechnical Infrastructure Analysis"
+      }
+    ];
+  }
+
+  // 5. Default: Water Resources & Sanitation / Renewable Energy & Off-Grid Power
+  return [
+    {
+      universityId: "univ-bit-mesra",
+      universityName: "BIT Mesra, Ranchi",
+      score: 0.96,
+      rank: 1,
+      reason: `Direct domain expertise in Water Resources & Environmental Engg + Active Water Quality Testing Lab in ${district}`
+    },
+    {
+      universityId: "univ-iit-dhanbad",
+      universityName: "IIT (ISM) Dhanbad",
+      score: 0.88,
+      rank: 2,
+      reason: "High expertise in Hydro-geological Filtration & Groundwater Membrane Tech"
+    },
+    {
+      universityId: "univ-bau-kanke",
+      universityName: "BAU Ranchi",
+      score: 0.75,
+      rank: 3,
+      reason: "Agricultural Runoff & Groundwater Soil Contamination Department"
+    }
+  ];
+};

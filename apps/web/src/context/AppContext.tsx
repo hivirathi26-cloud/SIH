@@ -19,6 +19,7 @@ import {
   StudentDeliverableTask
 } from "../types";
 import { useAuth } from "./AuthContext";
+import { getAiRoutingRecommendations } from "../data/universityEcosystems";
 import {
   MOCK_USERS,
   MOCK_PROBLEMS,
@@ -355,6 +356,36 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [inspectingProblem, setInspectingProblem] = useState<Problem | null>(null);
   const [chatbotOpen, setChatbotOpen] = useState<boolean>(false);
 
+
+  // Self-heal any existing or persisted problems in state so Healthcare/fever problems route to AIIMS Deoghar
+  useEffect(() => {
+    setProblems((prev) =>
+      prev.map((p) => {
+        const text = `${p.title} ${p.description} ${p.category}`.toLowerCase();
+        const isHealth =
+          p.category === "Healthcare & MedTech" ||
+          text.includes("fever") ||
+          text.includes("flew") ||
+          text.includes("flu") ||
+          text.includes("virus");
+
+        if (isHealth && p.aiExplanation?.suggestedUniversities?.[0]?.universityId !== "univ-aiims-deoghar") {
+          const recs = getAiRoutingRecommendations("Healthcare & MedTech", p.title, p.description, p.district);
+          return {
+            ...p,
+            category: "Healthcare & MedTech",
+            aiExplanation: {
+              ...p.aiExplanation,
+              nlpKeywords: ["fever", "epidemic", "viral_outbreak", "public_health", p.district || "Ranchi"],
+              cvSceneTags: ["clinical anomaly", "patient surge", "syndromic cluster"],
+              suggestedUniversities: recs
+            } as any
+          };
+        }
+        return p;
+      })
+    );
+  }, []);
   // Sync to local storage
   useEffect(() => {
     localStorage.setItem("jsicp_problems", JSON.stringify(problems));
@@ -409,7 +440,47 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   // 1. Submit Problem (Runs simulated AI classification, CV validation, dedup check, priority scoring, routing recommendations)
   const submitProblem = (newProb: Partial<Problem>): Problem => {
     const ticketId = `JSICP-2026-${Math.floor(1000 + Math.random() * 9000)}`;
-    const category: any = newProb.category || "Water Resources & Sanitation";
+    
+    // Auto-detect if problem is health/medical related
+    const textToCheck = `${newProb.title || ""} ${newProb.description || ""}`.toLowerCase();
+    const isHealthDetected =
+      newProb.category === "Healthcare & MedTech" ||
+      textToCheck.includes("fever") ||
+      textToCheck.includes("flew") ||
+      textToCheck.includes("flu") ||
+      textToCheck.includes("virus") ||
+      textToCheck.includes("disease") ||
+      textToCheck.includes("hospital");
+
+    const category: any = isHealthDetected
+      ? "Healthcare & MedTech"
+      : newProb.category || "Water Resources & Sanitation";
+
+    const aiRecs = getAiRoutingRecommendations(
+      category,
+      newProb.title || "",
+      newProb.description || "",
+      newProb.district || currentUser.district || "Ranchi"
+    );
+
+    const isMining = category === "Environment & Mining Remediation";
+    const isAgri = category === "Agriculture & Allied Technologies" || category === "Forest & Tribal Livelihoods";
+
+    const nlpKeywords = isHealthDetected
+      ? ["fever", "epidemic", "viral_outbreak", "public_health", newProb.district || "Ranchi"]
+      : isMining
+      ? ["mining", "coal", "methane", "subsidence", newProb.district || "Dhanbad"]
+      : isAgri
+      ? ["agriculture", "soil", "crop_yield", "tribal_produce", newProb.district || "Khunti"]
+      : ["infrastructure", "community", "remediation", "Jharkhand", newProb.district || "Ranchi"];
+
+    const cvSceneTags = isHealthDetected
+      ? ["clinical anomaly", "patient surge", "syndromic cluster"]
+      : isMining
+      ? ["smoke vents", "ground fissure", "mine dump"]
+      : isAgri
+      ? ["crop inspection", "soil moisture", "harvest anomaly"]
+      : ["infrastructure defect", "public utility", "anomaly"];
     
     // Simulate AI pipeline
     const prob: Problem = {
@@ -424,7 +495,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       detectedLanguage: currentLanguage === "hi" ? "Hindi (hi)" : currentLanguage === "nagpuri" ? "Nagpuri (nag)" : "English (en)",
       category: category,
       subCategory: newProb.subCategory || "Community Scale Intervention",
-      categoryConfidence: 0.94,
+      categoryConfidence: 0.96,
       priorityScore: Math.round((75 + Math.random() * 23) * 10) / 10,
       status: "pending_nodal_review",
       district: newProb.district || currentUser.district || "Ranchi",
@@ -435,7 +506,13 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       isDuplicateOf: null,
       citizenSupportCount: 1,
       sdgTags: [
-        category.includes("Water") ? "SDG 6: Clean Water" : category.includes("Agri") ? "SDG 2: Zero Hunger" : "SDG 11: Sustainable Cities",
+        category.includes("Health")
+          ? "SDG 3: Good Health & Well-Being"
+          : category.includes("Water")
+          ? "SDG 6: Clean Water"
+          : category.includes("Agri")
+          ? "SDG 2: Zero Hunger"
+          : "SDG 11: Sustainable Cities",
         "SDG 9: Innovation & Infrastructure"
       ],
       media: newProb.media || [
@@ -443,50 +520,32 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           id: `med-${Date.now()}`,
           problemId: `prob-${Date.now()}`,
           mediaType: "image",
-          storageUrl: "https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?w=600&auto=format&fit=crop&q=80",
-          cvValidationLabel: "Verified Civic Infrastructure Anomaly (93% confidence)",
-          cvValidationConfidence: 0.93
+          storageUrl: "https://images.unsplash.com/photo-1584820927498-cfe5211fd8bf?w=600&auto=format&fit=crop&q=80",
+          cvValidationLabel: isHealthDetected
+            ? "Verified Clinical / Public Health Anomaly (95% confidence)"
+            : "Verified Civic Infrastructure Anomaly (93% confidence)",
+          cvValidationConfidence: 0.95
         }
       ],
       aiExplanation: {
-        nlpKeywords: ["infrastructure", "community", "remediation", "Jharkhand", newProb.district || "Ranchi"],
-        cvSceneTags: ["infrastructure defect", "public utility", "anomaly"],
-        duplicateCheckResult: "Zero duplicates detected within 3km geo-radius.",
+        nlpKeywords,
+        cvSceneTags,
+        duplicateCheckResult: isHealthDetected
+          ? "Zero duplicates in 5km radius. Priority public health outbreak alert routed to AIIMS Deoghar."
+          : "Zero duplicates detected within 3km geo-radius.",
         priorityBreakdown: {
-          severityWeight: 35.0,
+          severityWeight: isHealthDetected ? 38.0 : 35.0,
           affectedPopulationEstimate: 25.0,
           locationVulnerabilityIndex: 18.0,
           sdgImpactScore: 14.0
         },
-        suggestedUniversities: [
-          {
-            universityId: "univ-bit-mesra",
-            universityName: "BIT Mesra, Ranchi",
-            score: 0.94,
-            rank: 1,
-            reason: `Top ranked HEI for ${category} with active research lab in ${newProb.district || "Ranchi"}`
-          },
-          {
-            universityId: "univ-iit-dhanbad",
-            universityName: "IIT (ISM) Dhanbad",
-            score: 0.87,
-            rank: 2,
-            reason: "High technological capability & prototyping laboratory"
-          },
-          {
-            universityId: "univ-nit-jamshedpur",
-            universityName: "NIT Jamshedpur",
-            score: 0.81,
-            rank: 3,
-            reason: "Civil & multidisciplinary engineering center"
-          }
-        ]
+        suggestedUniversities: aiRecs
       },
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString()
     };
 
-    setProblems((prev) => [prob, ...prev]);
+        setProblems((prev) => [prob, ...prev]);
 
     // Record on Blockchain Ledger
     addBlockchainBlock({
