@@ -521,6 +521,49 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       updateProblemStatus(targetProp.problemId, "in_progress");
     }
 
+    // Auto-generate active sprint tasks for the student team on this funded project!
+    const propTitle = agreementData.proposalTitle || "Active Innovation Project";
+    const newSprintTasks: KanbanTask[] = [
+      {
+        id: `task-${Date.now()}-1`,
+        teamId: "all",
+        title: `[${propTitle.slice(0, 32)}] Laboratory Fabrication & Sensor Assembly`,
+        description: `Fabricate prototype hardware using committed ₹${agreementData.amount.toLocaleString("en-IN")} CSR grant from ${agreementData.industryPartnerName}.`,
+        assignedTo: "student-rahul",
+        assignedName: "Rahul Kumar (Lead)",
+        status: "in_progress",
+        priority: "high",
+        milestoneName: "prototype_build",
+        dueDate: "2026-04-15"
+      },
+      {
+        id: `task-${Date.now()}-2`,
+        teamId: "all",
+        title: `[${propTitle.slice(0, 32)}] Continuous Telemetry & NABL Lab Stress Testing`,
+        description: `Execute 14-day continuous stress tests and log telemetry data in Document Vault for Faculty verification.`,
+        assignedTo: "student-sneha",
+        assignedName: "Sneha Soren",
+        status: "review",
+        priority: "high",
+        milestoneName: "testing_validation",
+        dueDate: "2026-05-10"
+      },
+      {
+        id: `task-${Date.now()}-3`,
+        teamId: "all",
+        title: `[${propTitle.slice(0, 32)}] Field Trial Deployment & Pilot Foundation`,
+        description: `Install beta unit at designated community site and prepare for Faculty & Govt Dual Sign-off.`,
+        assignedTo: "student-priya",
+        assignedName: "Priya Sharma",
+        status: "backlog",
+        priority: "medium",
+        milestoneName: "pilot_deployment",
+        dueDate: "2026-06-05"
+      }
+    ];
+
+    setKanbanTasks((prev) => [...newSprintTasks, ...prev]);
+
     // Blockchain block
     addBlockchainBlock({
       eventType: "MOU_SIGNED",
