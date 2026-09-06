@@ -15,7 +15,7 @@ import {
 } from "lucide-react";
 
 export const JharkhandSahayakChatbot: React.FC = () => {
-  const { chatbotOpen, setChatbotOpen, problems, currentUser } = useApp();
+  const { chatbotOpen, setChatbotOpen, problems, currentUser, t } = useApp();
   const [inputMessage, setInputMessage] = useState("");
   const [messages, setMessages] = useState<
     { sender: "bot" | "user"; text: string; timestamp: string; actionLink?: string }[]
@@ -156,19 +156,19 @@ export const JharkhandSahayakChatbot: React.FC = () => {
           onClick={() => handleSend("Track ticket JSICP-2026-0841")}
           className="whitespace-nowrap px-2.5 py-1 rounded-full bg-slate-100 hover:bg-emerald-50 hover:text-emerald-700 text-slate-600 transition"
         >
-          Track #0841
+          {t("Track #0841")}
         </button>
         <button
           onClick={() => handleSend("How to submit a civic problem?")}
           className="whitespace-nowrap px-2.5 py-1 rounded-full bg-slate-100 hover:bg-emerald-50 hover:text-emerald-700 text-slate-600 transition"
         >
-          How to submit?
+          {t("How to submit?")}
         </button>
         <button
           onClick={() => handleSend("Tell me about CSR funding")}
           className="whitespace-nowrap px-2.5 py-1 rounded-full bg-slate-100 hover:bg-emerald-50 hover:text-emerald-700 text-slate-600 transition"
         >
-          CSR Funding
+          {t("CSR Funding")}
         </button>
       </div>
 
@@ -184,7 +184,7 @@ export const JharkhandSahayakChatbot: React.FC = () => {
           type="text"
           value={inputMessage}
           onChange={(e) => setInputMessage(e.target.value)}
-          placeholder="Ask a question or enter Ticket ID..."
+          placeholder={t("Ask a question or enter Ticket ID...")}
           className="flex-1 text-xs px-3 py-2 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500"
         />
         <button

@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from "react";
+import React, { createContext, useContext, useState, useEffect, useCallback } from "react";
 import {
   User,
   UserRole,
@@ -20,6 +20,8 @@ import {
 } from "../types";
 import { useAuth } from "./AuthContext";
 import { getAiRoutingRecommendations } from "../data/universityEcosystems";
+import { translate } from "../i18n/translator";
+import { setupI18nObserver } from "../i18n/i18nObserver";
 import {
   MOCK_USERS,
   MOCK_PROBLEMS,
@@ -86,6 +88,7 @@ export interface AppContextType {
   
   currentLanguage: "en" | "hi" | "nagpuri" | "santali";
   setCurrentLanguage: (lang: "en" | "hi" | "nagpuri" | "santali") => void;
+  t: (text: string) => string;
   
   isOnline: boolean;
   offlineQueue: any[];
@@ -96,7 +99,23 @@ export interface AppContextType {
   
   chatbotOpen: boolean;
   setChatbotOpen: (open: boolean) => void;
+
+  fontSizeStep: number;
+  increaseFontSize: () => void;
+  decreaseFontSize: () => void;
+  resetFontSize: () => void;
+  setFontSizeStep: (step: number) => void;
+
+  theme: "light" | "dark";
+  toggleTheme: () => void;
+
+  activeHeaderPanel: "none" | "notifications" | "role" | "language";
+  setActiveHeaderPanel: (panel: "none" | "notifications" | "role" | "language") => void;
+  toggleHeaderPanel: (panel: "none" | "notifications" | "role" | "language") => void;
+  closeAllPanels: () => void;
 }
+
+export type HeaderPanelType = "none" | "notifications" | "role" | "language";
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
@@ -294,6 +313,85 @@ const INITIAL_STUDENT_DELIVERABLES: StudentDeliverableTask[] = [
 
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { currentUser: authUser } = useAuth();
+
+  // Global Font Size Scaling (from -10 to +10 steps, each step = 10% change, up to 200% WCAG AAA)
+  const [fontSizeStep, setFontSizeStep] = useState<number>(() => {
+    try {
+      const saved = localStorage.getItem("jsicp_font_size_step");
+      if (saved !== null) {
+        const parsed = parseInt(saved, 10);
+        if (!isNaN(parsed) && parsed >= -10 && parsed <= 10) {
+          return parsed;
+        }
+      }
+    } catch {
+      // ignore
+    }
+    return 0;
+  });
+
+  const increaseFontSize = () => {
+    setFontSizeStep((prev) => Math.min(10, prev + 1));
+  };
+
+  const decreaseFontSize = () => {
+    setFontSizeStep((prev) => Math.max(-10, prev - 1));
+  };
+
+  const resetFontSize = () => {
+    setFontSizeStep(0);
+  };
+
+  useEffect(() => {
+    try {
+      localStorage.setItem("jsicp_font_size_step", fontSizeStep.toString());
+    } catch {
+      // ignore
+    }
+
+    // Step 0 = 100% (1.00)
+    // Step +10 = 200% (2.00, increased 10 times by 10% each)
+    // Step -10 = 60% (0.60, decreased down to minimum readable size)
+    const scale = fontSizeStep >= 0 
+      ? 1 + fontSizeStep * 0.10 
+      : 1 + fontSizeStep * 0.04;
+    const roundedScale = Math.round(scale * 100) / 100;
+
+    if (typeof document !== "undefined") {
+      // Apply zoom to document.documentElement (scales entire portal layout, text, tables, headers, components uniformly)
+      (document.documentElement.style as any).zoom = `${roundedScale}`;
+      document.documentElement.style.setProperty("--portal-font-scale", `${roundedScale}`);
+      
+      // Fallback for browsers that do not support zoom
+      if (typeof CSS === "undefined" || !CSS.supports || !CSS.supports("zoom", "1.1")) {
+        document.documentElement.style.fontSize = `${Math.round(roundedScale * 100)}%`;
+      }
+    }
+  }, [fontSizeStep]);
+
+  const [theme, setTheme] = useState<"light" | "dark">(() => {
+    try {
+      const saved = localStorage.getItem("jsicp_theme");
+      if (saved === "dark") return "dark";
+    } catch {}
+    return "light";
+  });
+
+  const toggleTheme = () => {
+    setTheme(prev => prev === "light" ? "dark" : "light");
+  };
+
+  useEffect(() => {
+    try {
+      localStorage.setItem("jsicp_theme", theme);
+    } catch {}
+    if (theme === "dark") {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+    }
+  }, [theme]);
+
   // Load state or fallback to mocks
   const [currentUser, setCurrentUser] = useState<User>(() => {
     if (authUser) return authUser;
@@ -350,11 +448,47 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [blockchainLedger, setBlockchainLedger] = useState<BlockchainLedgerBlock[]>(MOCK_BLOCKCHAIN_LEDGER);
   const [districts] = useState<DistrictGeoData[]>(JHARKHAND_DISTRICTS);
   const [selectedDistrict, setSelectedDistrict] = useState<string>("all");
-  const [currentLanguage, setCurrentLanguage] = useState<"en" | "hi" | "nagpuri" | "santali">("en");
+  const [currentLanguage, setCurrentLanguage] = useState<"en" | "hi" | "nagpuri" | "santali">(() => {
+    try {
+      const saved = localStorage.getItem("jsicp_current_language");
+      if (saved && ["en", "hi", "nagpuri", "santali"].includes(saved)) {
+        return saved as any;
+      }
+    } catch {}
+    return "en";
+  });
+
+  useEffect(() => {
+    try {
+      localStorage.setItem("jsicp_current_language", currentLanguage);
+    } catch {}
+    const cleanup = setupI18nObserver(currentLanguage);
+    return cleanup;
+  }, [currentLanguage]);
+
+  const t = (text: string): string => {
+    return translate(text, currentLanguage);
+  };
   const [isOnline, setIsOnline] = useState<boolean>(navigator.onLine);
   const [offlineQueue, setOfflineQueue] = useState<any[]>([]);
   const [inspectingProblem, setInspectingProblem] = useState<Problem | null>(null);
   const [chatbotOpen, setChatbotOpen] = useState<boolean>(false);
+  const [activeHeaderPanel, setActiveHeaderPanel] = useState<HeaderPanelType>("none");
+
+  const closeAllPanels = useCallback(() => {
+    setActiveHeaderPanel("none");
+  }, []);
+
+  const toggleHeaderPanel = useCallback((panel: HeaderPanelType) => {
+    setActiveHeaderPanel((prev) => (prev === panel ? "none" : panel));
+  }, []);
+
+  const handleSetChatbotOpen = useCallback((open: boolean) => {
+    if (open) {
+      setActiveHeaderPanel("none");
+    }
+    setChatbotOpen(open);
+  }, []);
 
 
   // Self-heal any existing or persisted problems in state so Healthcare/fever problems route to AIIMS Deoghar
@@ -1241,13 +1375,25 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         setSelectedDistrict,
         currentLanguage,
         setCurrentLanguage,
+        t,
         isOnline,
         offlineQueue,
         syncOfflineQueue,
         inspectingProblem,
         setInspectingProblem,
         chatbotOpen,
-        setChatbotOpen
+        setChatbotOpen: handleSetChatbotOpen,
+        fontSizeStep,
+        increaseFontSize,
+        decreaseFontSize,
+        resetFontSize,
+        setFontSizeStep,
+        theme,
+        toggleTheme,
+        activeHeaderPanel,
+        setActiveHeaderPanel,
+        toggleHeaderPanel,
+        closeAllPanels
       }}
     >
       {children}

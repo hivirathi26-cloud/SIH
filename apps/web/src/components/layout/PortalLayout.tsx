@@ -39,6 +39,7 @@ export const PortalLayout: React.FC<{
   children: React.ReactNode;
 }> = ({ portalTitle, portalSubtitle, navItems, activeTab, setActiveTab, children }) => {
   const { currentUser, currentRole } = useAuth();
+  const { t } = useApp();
   const location = useLocation();
 
   return (
@@ -49,24 +50,24 @@ export const PortalLayout: React.FC<{
           <div className="flex items-center space-x-2 text-slate-500">
             <Link to="/" className="hover:text-slate-800 flex items-center space-x-1">
               <Home className="w-3.5 h-3.5" />
-              <span>Home</span>
+              <span>{t("Home")}</span>
             </Link>
             <span>&rarr;</span>
-            <span className="text-slate-800 font-semibold">{portalTitle}</span>
+            <span className="text-slate-800 font-semibold">{t(portalTitle)}</span>
           </div>
 
           {currentUser && (
             <div className="flex items-center space-x-3 text-[11px] text-slate-600">
               <span className="flex items-center space-x-1">
                 <MapPin className="w-3 h-3 text-emerald-700" />
-                <span>District: <strong>{currentUser.district}</strong></span>
+                <span>{t("District")}: <strong>{currentUser.district}</strong></span>
               </span>
               <span className="text-slate-300">|</span>
               <span>{currentUser.organizationName || currentUser.roleTitle}</span>
               {currentUser.aadhaarVerified && (
                 <span className="bg-emerald-50 text-emerald-800 font-bold px-1.5 py-0.5 rounded border border-emerald-200 text-[9px] flex items-center space-x-1">
                   <ShieldCheck className="w-3 h-3" />
-                  <span>eKYC Verified</span>
+                  <span>{t("eKYC Verified")}</span>
                 </span>
               )}
             </div>
@@ -82,10 +83,10 @@ export const PortalLayout: React.FC<{
             <div className="bg-white rounded-lg border border-slate-200 shadow-xs overflow-hidden">
               <div className="bg-[#0f2942] text-white p-3.5 border-b border-[#163b5f]">
                 <h2 className="font-heading font-bold text-xs uppercase tracking-wider text-slate-200">
-                  {portalTitle}
+                  {t(portalTitle)}
                 </h2>
                 <p className="text-[11px] text-slate-300 mt-0.5 font-normal">
-                  {portalSubtitle}
+                  {t(portalSubtitle)}
                 </p>
               </div>
 
@@ -105,7 +106,7 @@ export const PortalLayout: React.FC<{
                     >
                       <div className="flex items-center space-x-2.5 truncate">
                         <Icon className={`w-4 h-4 shrink-0 ${isActive ? "text-amber-400" : "text-slate-500"}`} />
-                        <span className="truncate">{item.label}</span>
+                        <span className="truncate">{t(item.label)}</span>
                       </div>
                       {item.badge !== undefined && (
                         <span

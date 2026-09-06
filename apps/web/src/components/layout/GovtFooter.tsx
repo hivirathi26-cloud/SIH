@@ -1,6 +1,8 @@
 import React from "react";
+import { useApp } from "../../context/AppContext";
 
 export const GovtFooter: React.FC = () => {
+  const { t } = useApp();
   return (
     <footer className="bg-[#0b1d33] text-slate-400 text-xs border-t border-[#163b5f] mt-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
@@ -26,7 +28,7 @@ export const GovtFooter: React.FC = () => {
           {/* Col 2 */}
           <div className="space-y-2">
             <h4 className="font-semibold text-slate-200 text-xs uppercase tracking-wider">
-              Participating Institutions
+              {t("Participating Institutions")}
             </h4>
             <ul className="space-y-1 text-[11px] text-slate-400">
               <li>Birla Institute of Technology (BIT Mesra, Ranchi)</li>
@@ -40,7 +42,7 @@ export const GovtFooter: React.FC = () => {
           {/* Col 3 */}
           <div className="space-y-2">
             <h4 className="font-semibold text-slate-200 text-xs uppercase tracking-wider">
-              Mandates & Compliance
+              {t("Mandates & Compliance")}
             </h4>
             <ul className="space-y-1 text-[11px] text-slate-400">
               <li>• NEP 2020 Experiential Learning Framework</li>
@@ -54,7 +56,7 @@ export const GovtFooter: React.FC = () => {
           {/* Col 4 */}
           <div className="space-y-2">
             <h4 className="font-semibold text-slate-200 text-xs uppercase tracking-wider">
-              Helpdesk & Nodal Contact
+              {t("Helpdesk & Nodal Contact")}
             </h4>
             <p className="text-[11px] text-slate-400">
               State Project Directorate, Higher Education Department, Nepal House, Doranda, Ranchi - 834002.

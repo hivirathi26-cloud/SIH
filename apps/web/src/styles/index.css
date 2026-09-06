@@ -2,14 +2,31 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --portal-font-scale: 1;
+}
+
+html {
+  transition: font-size 0.15s ease-out;
+}
+
 @layer base {
   body {
     @apply font-sans bg-[#f8fafc] text-slate-900 antialiased;
     color: #1e293b;
   }
   
+  .dark body {
+    @apply bg-slate-950 text-slate-100;
+    color: #f8fafc;
+  }
+
   h1, h2, h3, h4, h5, h6 {
     @apply font-heading tracking-tight text-slate-900;
+  }
+  
+  .dark h1, .dark h2, .dark h3, .dark h4, .dark h5, .dark h6 {
+    @apply text-slate-100;
   }
 }
 
@@ -31,6 +48,11 @@
   border-bottom: 1px solid #cbd5e1;
   text-align: left;
 }
+.dark .gov-table th {
+  background-color: #1e293b;
+  color: #cbd5e1;
+  border-bottom-color: #334155;
+}
 
 .gov-table td {
   padding: 0.75rem 1rem;
@@ -38,9 +60,16 @@
   color: #1e293b;
   vertical-align: middle;
 }
+.dark .gov-table td {
+  border-bottom-color: #334155;
+  color: #f1f5f9;
+}
 
 .gov-table tr:hover td {
   background-color: #f8fafc;
+}
+.dark .gov-table tr:hover td {
+  background-color: #0f172a;
 }
 
 /* Subtle Government Scrollbar */
@@ -51,12 +80,21 @@
 ::-webkit-scrollbar-track {
   background: #f1f5f9;
 }
+.dark ::-webkit-scrollbar-track {
+  background: #0f172a;
+}
 ::-webkit-scrollbar-thumb {
   background: #cbd5e1;
   border-radius: 3px;
 }
+.dark ::-webkit-scrollbar-thumb {
+  background: #334155;
+}
 ::-webkit-scrollbar-thumb:hover {
   background: #94a3b8;
+}
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: #475569;
 }
 
 /* Formal badge */
@@ -69,3 +107,129 @@
   font-weight: 600;
   letter-spacing: 0.025em;
 }
+
+/* Global Dark Mode Overrides for Tailwind Light Classes */
+.dark,
+.dark body {
+  color-scheme: dark;
+  background-color: #0b1329 !important;
+  color: #f1f5f9 !important;
+}
+
+.dark .bg-white {
+  background-color: #0f172a !important;
+}
+
+.dark .bg-\[\#f8fafc\],
+.dark .bg-slate-50, 
+.dark .bg-gray-50 {
+  background-color: #0b1329 !important;
+}
+
+.dark .bg-slate-100,
+.dark .bg-gray-100,
+.dark .bg-\[\#f1f5f9\] {
+  background-color: #1e293b !important;
+}
+
+.dark .bg-slate-200, 
+.dark .bg-gray-200,
+.dark .bg-emerald-50 {
+  background-color: #1e293b !important;
+}
+
+.dark .text-slate-800, 
+.dark .text-slate-900,
+.dark .text-gray-900,
+.dark .text-gray-800 {
+  color: #f8fafc !important;
+}
+
+.dark .text-\[\#0f2942\] {
+  color: #38bdf8 !important;
+}
+
+.dark .text-slate-600, 
+.dark .text-slate-700,
+.dark .text-gray-600,
+.dark .text-gray-700 {
+  color: #cbd5e1 !important;
+}
+
+.dark .text-slate-500,
+.dark .text-gray-500 {
+  color: #94a3b8 !important;
+}
+
+.dark .border-slate-100,
+.dark .border-slate-200, 
+.dark .border-gray-200 {
+  border-color: #1e293b !important;
+}
+
+.dark .border-slate-300,
+.dark .border-gray-300 {
+  border-color: #334155 !important;
+}
+
+.dark input, 
+.dark select, 
+.dark textarea {
+  background-color: #1e293b !important;
+  color: #f8fafc !important;
+  border-color: #334155 !important;
+}
+
+.dark input::placeholder,
+.dark textarea::placeholder {
+  color: #64748b !important;
+}
+
+.dark .hover\:bg-slate-50:hover,
+.dark .hover\:bg-slate-100:hover,
+.dark .hover\:bg-gray-50:hover,
+.dark .hover\:bg-gray-100:hover {
+  background-color: #1e293b !important;
+}
+
+.dark .divide-slate-100 > :not([hidden]) ~ :not([hidden]),
+.dark .divide-slate-200 > :not([hidden]) ~ :not([hidden]) {
+  border-color: #1e293b !important;
+}
+
+.dark .bg-white\/95 {
+  background-color: rgba(15, 23, 42, 0.95) !important;
+}
+.dark .bg-white\/90 {
+  background-color: rgba(15, 23, 42, 0.90) !important;
+}
+.dark .bg-white\/80 {
+  background-color: rgba(15, 23, 42, 0.80) !important;
+}
+.dark .shadow-sm, 
+.dark .shadow-md, 
+.dark .shadow-lg, 
+.dark .shadow-xl, 
+.dark .shadow-2xl {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5), 0 2px 4px -1px rgba(0, 0, 0, 0.3) !important;
+}
+
+/* Global Dropdown & Panel Animation */
+@keyframes panelSlideFadeIn {
+  0% {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.97);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.panel-animate-enter {
+  animation: panelSlideFadeIn 0.18s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  transform-origin: top right;
+  will-change: transform, opacity;
+}
+
+
