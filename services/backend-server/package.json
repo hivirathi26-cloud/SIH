@@ -1,0 +1,17 @@
+{
+  "name": "jsicp-backend-server",
+  "version": "1.0.0",
+  "description": "JSICP SIH 2026 Core Express Backend Server (Pure JavaScript)",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "db:migrate": "node scripts/migrate.js"
+  },
+  "dependencies": {
+    "@neondatabase/serverless": "^1.1.0",
+    "pg": "^8.23.0",
+    "ws": "^8.21.3"
+  }
+}

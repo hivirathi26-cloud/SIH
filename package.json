@@ -3,14 +3,19 @@
   "version": "1.0.0",
   "private": true,
   "description": "Jharkhand Societal Innovation Collaboration Portal (SIH 2026)",
+  "type": "module",
   "workspaces": [
     "apps/*",
     "packages/*",
     "services/*"
   ],
   "scripts": {
-    "dev": "npm run dev --workspace=apps/web",
+    "dev": "node scripts/dev.js",
+    "start": "node services/backend-server/server.js",
+    "frontend": "npm run dev --workspace=apps/web",
+    "backend": "node services/backend-server/server.js",
     "build": "npm run build --workspace=apps/web",
-    "preview": "npm run preview --workspace=apps/web"
+    "preview": "npm run preview --workspace=apps/web",
+    "db:migrate": "npm run db:migrate --workspace=services/backend-server"
   }
 }
