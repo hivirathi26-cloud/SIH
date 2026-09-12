@@ -1058,5 +1058,30 @@ export const TRANSLATIONS: TranslationMap = {
     hi: "शिकायत ट्रैक करें",
     nagpuri: "शिकायत जांचू",
     santali: "ᱮᱴᱠᱮᱴᱚᱬᱮ ᱯᱟᱸᱡᱟ"
+  },
+  "Theme": {
+    hi: "थीम",
+    nagpuri: "रंग-रूप / थीम",
+    santali: "ᱛᱷᱤᱢ (Theme)"
+  },
+  "Dark Mode": {
+    hi: "डार्क मोड",
+    nagpuri: "अंधरिया मोड (Dark)",
+    santali: "ᱧᱩᱛ ᱢᱳᱰ (Dark)"
+  },
+  "Light Mode": {
+    hi: "लाइट मोड",
+    nagpuri: "उजरिया मोड (Light)",
+    santali: "ᱢᱟᱨᱥᱟᱞ ᱢᱳᱰ (Light)"
+  },
+  "Switch to Dark Mode": {
+    hi: "डार्क मोड में बदलें",
+    nagpuri: "अंधरिया मोड में बदलू",
+    santali: "ᱧᱩᱛ ᱢᱳᱰ ᱛᱮ ᱵᱚᱫᱚᱞ"
+  },
+  "Switch to Light Mode": {
+    hi: "लाइट मोड में बदलें",
+    nagpuri: "उजरिया मोड में बदलू",
+    santali: "ᱢᱟᱨᱥᱟᱞ ᱢᱳᱰ ᱛᱮ ᱵᱚᱫᱚᱞ"
   }
 };

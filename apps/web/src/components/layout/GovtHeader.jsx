@@ -2,10 +2,10 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth, getPortalPath } from "../../context/AuthContext";
 import { useApp } from "../../context/AppContext";
-import { ShieldCheck, User as UserIcon, LogOut, ChevronDown, Globe, Bell, FileCheck } from "lucide-react";
+import { ShieldCheck, User as UserIcon, LogOut, ChevronDown, Globe, Bell, FileCheck, Sun, Moon } from "lucide-react";
 export const GovtHeader = () => {
     const { currentUser, isAuthenticated, logout, loginAsRole, demoUsers } = useAuth();
-    const { currentLanguage, setCurrentLanguage, notifications, markNotificationAsRead } = useApp();
+    const { currentLanguage, setCurrentLanguage, notifications, markNotificationAsRead, theme, toggleTheme } = useApp();
     const [roleDropdownOpen, setRoleDropdownOpen] = useState(false);
     const [notifDropdownOpen, setNotifDropdownOpen] = useState(false);
     const [langDropdownOpen, setLangDropdownOpen] = useState(false);
@@ -78,6 +78,29 @@ export const GovtHeader = () => {
               A+
             </button>
           </div>
+
+          <span className="text-slate-600 hidden sm:inline">|</span>
+
+          {/* Dark / Light Theme Toggle */}
+          <button 
+            onClick={toggleTheme} 
+            data-no-translate="true"
+            className="flex items-center space-x-1.5 px-2 py-0.5 rounded text-slate-200 hover:bg-slate-800 text-[10px] font-medium border border-slate-700 bg-slate-800/60 transition"
+            title={theme === "dark" ? "Switch to Light Mode" : "Switch to Dark Mode"}
+            aria-label="Toggle Dark / Light Theme"
+          >
+            {theme === "dark" ? (
+              <>
+                <Sun className="w-3 h-3 text-amber-300" />
+                <span className="font-semibold text-amber-200">Light</span>
+              </>
+            ) : (
+              <>
+                <Moon className="w-3 h-3 text-sky-300" />
+                <span className="font-semibold text-slate-200">Dark</span>
+              </>
+            )}
+          </button>
 
           <span className="text-slate-600 hidden sm:inline">|</span>
 

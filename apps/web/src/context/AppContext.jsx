@@ -256,6 +256,27 @@ export const AppProvider = ({ children }) => {
         };
     }, [currentLanguage]);
 
+    const [theme, setTheme] = useState(() => {
+        return localStorage.getItem("jsicp_theme") || "light";
+    });
+
+    useEffect(() => {
+        try {
+            localStorage.setItem("jsicp_theme", theme);
+            if (theme === "dark") {
+                document.documentElement.classList.add("dark");
+            } else {
+                document.documentElement.classList.remove("dark");
+            }
+        } catch (e) {
+            console.error("Theme toggle error:", e);
+        }
+    }, [theme]);
+
+    const toggleTheme = () => {
+        setTheme((prev) => (prev === "dark" ? "light" : "dark"));
+    };
+
     const [isOnline, setIsOnline] = useState(navigator.onLine);
     const [offlineQueue, setOfflineQueue] = useState([]);
     const [inspectingProblem, setInspectingProblem] = useState(null);
@@ -1156,7 +1177,10 @@ export const AppProvider = ({ children }) => {
             inspectingProblem,
             setInspectingProblem,
             chatbotOpen,
-            setChatbotOpen
+            setChatbotOpen,
+            theme,
+            setTheme,
+            toggleTheme
         }}>
       {children}
     </AppContext.Provider>);
