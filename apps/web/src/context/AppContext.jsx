@@ -3,6 +3,7 @@ import { useAuth } from "./AuthContext";
 import { getAiRoutingRecommendations, inferCategoryAndAllocation, isDepartmentExcludedFromUniversity, getDepartmentResolutionDetails } from "../data/universityEcosystems";
 import { MOCK_USERS, MOCK_PROBLEMS, MOCK_UNIVERSITIES, MOCK_TEAMS, MOCK_PROPOSALS, MOCK_AGREEMENTS, MOCK_MILESTONES, MOCK_KANBAN_TASKS, MOCK_NOTIFICATIONS, MOCK_BLOCKCHAIN_LEDGER, JHARKHAND_DISTRICTS } from "../data/mockData";
 import { api } from "../services/api";
+import { setupI18nObserver } from "../i18n/i18nObserver";
 const AppContext = createContext(undefined);
 const INITIAL_STUDENT_DELIVERABLES = [
     {
@@ -242,7 +243,19 @@ export const AppProvider = ({ children }) => {
     const [blockchainLedger, setBlockchainLedger] = useState(MOCK_BLOCKCHAIN_LEDGER);
     const [districts] = useState(JHARKHAND_DISTRICTS);
     const [selectedDistrict, setSelectedDistrict] = useState("all");
-    const [currentLanguage, setCurrentLanguage] = useState("en");
+    const [currentLanguage, setCurrentLanguage] = useState(() => {
+        return localStorage.getItem("jsicp_language") || "en";
+    });
+
+    // Synchronize i18n DOM observer whenever language changes
+    useEffect(() => {
+        localStorage.setItem("jsicp_language", currentLanguage);
+        const cleanup = setupI18nObserver(currentLanguage);
+        return () => {
+            if (cleanup) cleanup();
+        };
+    }, [currentLanguage]);
+
     const [isOnline, setIsOnline] = useState(navigator.onLine);
     const [offlineQueue, setOfflineQueue] = useState([]);
     const [inspectingProblem, setInspectingProblem] = useState(null);
@@ -373,13 +386,25 @@ export const AppProvider = ({ children }) => {
         const ticketId = `JSICP-2026-${Math.floor(1000 + Math.random() * 9000)}`;
         const district = newProb.district || currentUser.district || "Ranchi";
         
-        // Auto-Infer category and routing from NLP analysis of title & description
+        // Auto-Infer category and routing from NLP analysis of title & description if not already provided
         const aiInferred = inferCategoryAndAllocation(newProb.title || "", newProb.description || "", district);
         
-        const category = aiInferred.category;
-        const subCategory = newProb.subCategory || aiInferred.subCategory;
-        const isExcluded = !aiInferred.isRoutableToUniversity;
-        const aiRecs = aiInferred.suggestedUniversities;
+        // Preserve category if detected by AI or passed by user; do NOT overwrite with unclassified
+        const category = (newProb.category && newProb.category !== "Unclassified Submission")
+            ? newProb.category
+            : aiInferred.category;
+
+        const isUnclassified = category === "Unclassified Submission";
+        const isExcluded = !isUnclassified && isDepartmentExcludedFromUniversity(category, newProb.title, newProb.description);
+        const resolutionDetails = isExcluded ? getDepartmentResolutionDetails(category, newProb.title, newProb.description) : null;
+        
+        const subCategory = newProb.subCategory || (isUnclassified ? "Human review required" : (category === aiInferred.category ? aiInferred.subCategory : "General Civic Intervention"));
+        
+        const aiRecs = isExcluded || isUnclassified
+            ? []
+            : (newProb.suggestedUniversities && newProb.suggestedUniversities.length > 0
+                ? newProb.suggestedUniversities
+                : getAiRoutingRecommendations(category, newProb.title, newProb.description, district));
         
         const isHealth = category.includes("Health");
         const isWater = category.includes("Water");
@@ -419,8 +444,8 @@ export const AppProvider = ({ children }) => {
             detectedLanguage: currentLanguage === "hi" ? "Hindi (hi)" : currentLanguage === "nagpuri" ? "Nagpuri (nag)" : "English (en)",
             category: category,
             subCategory: subCategory,
-            categoryConfidence: aiInferred.confidence || 0.96,
-            priorityScore: newProb.priorityScore || aiInferred.priorityScore || Math.round((75 + Math.random() * 23) * 10) / 10,
+            categoryConfidence: newProb.categoryConfidence !== undefined ? newProb.categoryConfidence : (isUnclassified ? 0.0 : (aiInferred.confidence || 0.96)),
+            priorityScore: newProb.priorityScore || aiInferred.priorityScore || (isUnclassified ? 70.0 : Math.round((75 + Math.random() * 23) * 10) / 10),
             status: "pending_nodal_review",
             district: district,
             block: newProb.block || "Sadar Block",
@@ -428,9 +453,13 @@ export const AppProvider = ({ children }) => {
             latitude: newProb.latitude || 23.3441,
             longitude: newProb.longitude || 85.3096,
             isDuplicateOf: null,
-            isUniversityRoutable: !isExcluded,
-            departmentType: aiInferred.departmentType,
-            assignedAuthority: aiInferred.assignedAuthority,
+            isUniversityRoutable: !isExcluded && !isUnclassified,
+            departmentType: isUnclassified
+                ? "Unclassified Submission (Human Review Required)"
+                : (isExcluded ? resolutionDetails?.departmentType : "Academic Research & Innovation HEI"),
+            assignedAuthority: isUnclassified
+                ? "JSICP Nodal Review Desk"
+                : (isExcluded ? resolutionDetails?.assignedAuthority : (aiRecs[0]?.universityName || "Participating University")),
             citizenSupportCount: 1,
             sdgTags: newProb.sdgTags || [
                 category.includes("Health")
@@ -459,9 +488,11 @@ export const AppProvider = ({ children }) => {
             aiExplanation: {
                 nlpKeywords,
                 cvSceneTags,
-                duplicateCheckResult: isExcluded
-                    ? `Routed directly to Government Line Department (${isHealth ? "Health Department" : "DWSD"}). Excluded from university allocation.`
-                    : "Zero duplicates detected within 3km geo-radius.",
+                duplicateCheckResult: isUnclassified
+                    ? "Pending Human Triage. No duplicates detected in geo-radius."
+                    : (isExcluded
+                        ? `Routed directly to Government Line Department (${isHealth ? "Health Department" : "DWSD"}). Excluded from university allocation.`
+                        : "Zero duplicates detected within 3km geo-radius."),
                 priorityBreakdown: {
                     severityWeight: isHealth ? 38.0 : 35.0,
                     affectedPopulationEstimate: 25.0,
@@ -505,16 +536,29 @@ export const AppProvider = ({ children }) => {
         }));
         api.problems.upvote(problemId).catch((e) => console.info("[JSICP Web] Upvote synced locally:", e.message));
     };
-    const updateProblemStatus = (problemId, newStatus, assignedUnivId, assignedFacultyId) => {
+    const updateProblemStatus = (problemId, newStatus, assignedUnivId, assignedFacultyId, categoryOverride) => {
         setProblems((prev) => prev.map((p) => {
             if (p.id === problemId) {
+                const finalCategory = categoryOverride || p.category;
+                const isExcluded = isDepartmentExcludedFromUniversity(finalCategory, p.title, p.description);
+                const deptDetails = isExcluded ? getDepartmentResolutionDetails(finalCategory, p.title, p.description) : null;
+                const updatedRecs = isExcluded ? [] : getAiRoutingRecommendations(finalCategory, p.title, p.description, p.district);
                 const univ = assignedUnivId ? universities.find((u) => u.id === assignedUnivId) : null;
+                
                 return {
                     ...p,
+                    category: finalCategory,
                     status: newStatus,
-                    assignedUniversityId: assignedUnivId || p.assignedUniversityId,
-                    assignedUniversityName: univ ? univ.name : p.assignedUniversityName,
+                    isUniversityRoutable: !isExcluded,
+                    departmentType: isExcluded ? deptDetails?.departmentType : "Academic Research & Innovation HEI",
+                    assignedAuthority: isExcluded ? deptDetails?.assignedAuthority : (univ ? univ.name : p.assignedAuthority),
+                    assignedUniversityId: isExcluded ? null : (assignedUnivId || p.assignedUniversityId),
+                    assignedUniversityName: isExcluded ? null : (univ ? univ.name : p.assignedUniversityName),
                     assignedFacultyId: assignedFacultyId || p.assignedFacultyId,
+                    aiExplanation: {
+                        ...p.aiExplanation,
+                        suggestedUniversities: updatedRecs.length > 0 ? updatedRecs : p.aiExplanation?.suggestedUniversities
+                    },
                     updatedAt: new Date().toISOString()
                 };
             }
@@ -523,7 +567,8 @@ export const AppProvider = ({ children }) => {
         api.problems.updateStatus(problemId, {
             status: newStatus,
             assignedUniversityId: assignedUnivId,
-            assignedFacultyId: assignedFacultyId
+            assignedFacultyId: assignedFacultyId,
+            category: categoryOverride
         }).catch((e) => console.info("[JSICP Web] Status synced locally:", e.message));
 
         // If approved by Nodal Officer, log on blockchain

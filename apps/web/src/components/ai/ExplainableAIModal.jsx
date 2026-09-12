@@ -1,41 +1,54 @@
 import React, { useState, useMemo, useEffect } from "react";
 import { useApp } from "../../context/AppContext";
 import { getAiRoutingRecommendations, isDepartmentExcludedFromUniversity, getDepartmentResolutionDetails } from "../../data/universityEcosystems";
-import { CheckCircle2, TrendingUp, BrainCircuit, Eye, CopyCheck, Building2, ShieldCheck, X, AlertTriangle, Landmark } from "lucide-react";
+import { CheckCircle2, TrendingUp, BrainCircuit, Eye, CopyCheck, Building2, ShieldCheck, X, AlertTriangle, Landmark, RotateCcw } from "lucide-react";
 import confetti from "canvas-confetti";
 
 export const ExplainableAIModal = ({ problem, onClose }) => {
     const { updateProblemStatus, currentUser } = useApp();
+    const [selectedCategory, setSelectedCategory] = useState(problem?.category || "Unclassified Submission");
+    const [isOverridden, setIsOverridden] = useState(false);
+    const [justApproved, setJustApproved] = useState(false);
+
+    // Sync whenever problem changes
+    useEffect(() => {
+        if (problem) {
+            setSelectedCategory(problem.category || "Unclassified Submission");
+            setIsOverridden(false);
+            setJustApproved(false);
+        }
+    }, [problem]);
     
     const isExcluded = useMemo(() => {
-        if (!problem) return false;
-        return isDepartmentExcludedFromUniversity(problem.category, problem.title, problem.description);
-    }, [problem]);
+        if (!problem || selectedCategory === "Unclassified Submission") return false;
+        return isDepartmentExcludedFromUniversity(selectedCategory, problem.title, problem.description);
+    }, [problem, selectedCategory]);
 
     const deptDetails = useMemo(() => {
         if (!problem || !isExcluded) return null;
-        return getDepartmentResolutionDetails(problem.category, problem.title, problem.description);
-    }, [problem, isExcluded]);
+        return getDepartmentResolutionDetails(selectedCategory, problem.title, problem.description);
+    }, [problem, isExcluded, selectedCategory]);
 
     const dynamicRecommendations = useMemo(() => {
-        if (!problem || isExcluded)
+        if (!problem || isExcluded || selectedCategory === "Unclassified Submission")
             return [];
-        return getAiRoutingRecommendations(problem.category, problem.title, problem.description, problem.district);
-    }, [problem, isExcluded]);
+        return getAiRoutingRecommendations(selectedCategory, problem.title, problem.description, problem.district);
+    }, [problem, isExcluded, selectedCategory]);
 
     const explanation = useMemo(() => {
         if (!problem)
             return null;
-        const isHealth = problem.category === "Healthcare & MedTech" ||
+        const isHealth = selectedCategory === "Healthcare & MedTech" ||
             `${problem.title} ${problem.description}`.toLowerCase().includes("fever") ||
             `${problem.title} ${problem.description}`.toLowerCase().includes("flu") ||
-            `${problem.title} ${problem.description}`.toLowerCase().includes("hospital");
+            `${problem.title} ${problem.description}`.toLowerCase().includes("hospital") ||
+            `${problem.title} ${problem.description}`.toLowerCase().includes("vaccin");
         
-        const isWater = problem.category === "Water Resources & Sanitation" ||
+        const isWater = selectedCategory === "Water Resources & Sanitation" ||
             `${problem.title} ${problem.description}`.toLowerCase().includes("handpump") ||
             `${problem.title} ${problem.description}`.toLowerCase().includes("water");
 
-        const isMining = problem.category === "Environment & Mining Remediation" ||
+        const isMining = selectedCategory === "Environment & Mining Remediation" ||
             `${problem.title} ${problem.description}`.toLowerCase().includes("coal") ||
             `${problem.title} ${problem.description}`.toLowerCase().includes("mining");
 
@@ -46,7 +59,7 @@ export const ExplainableAIModal = ({ problem, onClose }) => {
                     ? ["drinking_water", "municipal_utility", "dwsd_line_dept", problem.district || "Ranchi"]
                     : isMining
                         ? ["coal_seam", "methane", "subsidence", "Jharia", problem.district || "Dhanbad"]
-                        : ["agriculture", "soil", "crop_yield", "Jharkhand"],
+                        : ["rural_infrastructure", "civil_engineering", "jharkhand"],
             cvSceneTags: isHealth
                 ? ["clinical anomaly", "patient surge", "syndromic cluster"]
                 : isWater
@@ -66,14 +79,19 @@ export const ExplainableAIModal = ({ problem, onClose }) => {
             suggestedUniversities: isExcluded ? [] : dynamicRecommendations
         };
 
+        const universitiesToUse = isExcluded
+            ? []
+            : (isOverridden || !problem.aiExplanation?.suggestedUniversities?.length
+                ? dynamicRecommendations
+                : problem.aiExplanation.suggestedUniversities);
+
         return {
             ...defaultExp,
-            suggestedUniversities: isExcluded ? [] : (dynamicRecommendations.length > 0 ? dynamicRecommendations : (defaultExp.suggestedUniversities || []))
+            suggestedUniversities: universitiesToUse
         };
-    }, [problem, dynamicRecommendations, isExcluded]);
+    }, [problem, dynamicRecommendations, isExcluded, selectedCategory, isOverridden]);
 
     const [selectedUnivId, setSelectedUnivId] = useState(explanation?.suggestedUniversities?.[0]?.universityId || "univ-iit-dhanbad");
-    const [justApproved, setJustApproved] = useState(false);
 
     useEffect(() => {
         if (explanation?.suggestedUniversities?.[0]?.universityId) {
@@ -81,14 +99,22 @@ export const ExplainableAIModal = ({ problem, onClose }) => {
         }
     }, [explanation]);
 
+    const selectedUnivName = useMemo(() => {
+        const found = explanation?.suggestedUniversities?.find(u => u.universityId === selectedUnivId);
+        return found ? found.universityName : (explanation?.suggestedUniversities?.[0]?.universityName || "Assigned University");
+    }, [explanation, selectedUnivId]);
+
     if (!problem || !explanation)
         return null;
 
     const handleApproveAndRoute = () => {
+        if (selectedCategory === "Unclassified Submission") {
+            return;
+        }
         if (isExcluded) {
-            updateProblemStatus(problem.id, "routed_to_line_department");
+            updateProblemStatus(problem.id, "routed_to_line_department", null, null, selectedCategory);
         } else {
-            updateProblemStatus(problem.id, "routed", selectedUnivId);
+            updateProblemStatus(problem.id, "routed", selectedUnivId, null, selectedCategory);
         }
         setJustApproved(true);
         confetti({
@@ -104,6 +130,11 @@ export const ExplainableAIModal = ({ problem, onClose }) => {
     const handleReject = () => {
         updateProblemStatus(problem.id, "rejected");
         onClose();
+    };
+
+    const handleCategoryChange = (newCat) => {
+        setSelectedCategory(newCat);
+        setIsOverridden(newCat !== problem.category);
     };
 
     return (<div className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
@@ -137,30 +168,99 @@ export const ExplainableAIModal = ({ problem, onClose }) => {
         <div className="p-6 space-y-6 max-h-[75vh] overflow-y-auto">
           {/* Problem Brief */}
           <div className="bg-slate-50 p-4 rounded-xl border border-slate-200">
-            <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block">
-              Civic Challenge Under Review
-            </span>
+            <div className="flex items-center justify-between">
+              <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block">
+                Civic Challenge Under Review
+              </span>
+              <div className="flex items-center space-x-2 text-xs">
+                <span className="bg-slate-200 text-slate-700 px-2 py-0.5 rounded font-mono text-[11px]">
+                  Geo: ({problem.latitude?.toFixed(4)}, {problem.longitude?.toFixed(4)})
+                </span>
+                <span className="bg-amber-100 text-amber-900 px-2 py-0.5 rounded font-bold text-[11px]">
+                  Priority: {problem.priorityScore}/100
+                </span>
+              </div>
+            </div>
             <h4 className="font-heading font-bold text-base text-slate-900 mt-1">
               {problem.title}
             </h4>
             <p className="text-xs text-slate-600 mt-1 leading-relaxed">
               {problem.description}
             </p>
-            <div className="mt-3 flex flex-wrap items-center gap-2 text-xs">
-              <span className={`px-2.5 py-1 rounded font-medium border ${isExcluded ? "bg-amber-100 text-amber-900 border-amber-300" : "bg-emerald-100 text-emerald-800 border-emerald-300"}`}>
-                Domain: {problem.category}
-              </span>
-              <span className="bg-slate-200 text-slate-700 px-2.5 py-1 rounded font-mono">
-                Geo: ({problem.latitude?.toFixed(4)}, {problem.longitude?.toFixed(4)})
-              </span>
-              <span className="bg-amber-100 text-amber-900 px-2.5 py-1 rounded font-bold">
-                Priority: {problem.priorityScore}/100
-              </span>
-              {isExcluded && (
-                <span className="bg-blue-100 text-blue-900 px-2.5 py-1 rounded font-bold text-[11px] border border-blue-300">
-                  Direct Line Department (Non-HEI)
-                </span>
-              )}
+          </div>
+
+          {/* Domain Status & Officer Override Control Bar */}
+          <div className={`p-3.5 rounded-xl border transition ${
+            selectedCategory === "Unclassified Submission"
+              ? "bg-amber-50/80 border-amber-300"
+              : isOverridden
+              ? "bg-purple-50/80 border-purple-200"
+              : "bg-emerald-50/80 border-emerald-200"
+          }`}>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div className="space-y-1">
+                <div className="flex flex-wrap items-center gap-2">
+                  {selectedCategory === "Unclassified Submission" ? (
+                    <span className="bg-amber-500 text-white text-[10px] font-bold px-2 py-0.5 rounded flex items-center space-x-1">
+                      <AlertTriangle className="w-3 h-3 inline mr-1"/>
+                      <span>AI Low Confidence</span>
+                    </span>
+                  ) : isOverridden ? (
+                    <span className="bg-purple-600 text-white text-[10px] font-bold px-2 py-0.5 rounded flex items-center space-x-1">
+                      <RotateCcw className="w-3 h-3 inline mr-1"/>
+                      <span>Officer Override Active</span>
+                    </span>
+                  ) : (
+                    <span className="bg-emerald-600 text-white text-[10px] font-bold px-2 py-0.5 rounded flex items-center space-x-1">
+                      <CheckCircle2 className="w-3 h-3 inline mr-1"/>
+                      <span>AI Auto-Detected Domain</span>
+                    </span>
+                  )}
+
+                  <span className="font-heading font-bold text-sm text-slate-900">
+                    {selectedCategory}
+                  </span>
+
+                  {selectedCategory !== "Unclassified Submission" && !isOverridden && (
+                    <span className="text-[11px] font-mono text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded font-semibold">
+                      {((problem.categoryConfidence || 0.96) * 100).toFixed(0)}% Confidence
+                    </span>
+                  )}
+                </div>
+
+                <p className="text-xs text-slate-600">
+                  {selectedCategory === "Unclassified Submission"
+                    ? "Domain could not be determined automatically. State Nodal Officer must assign domain below."
+                    : isOverridden
+                    ? "Domain modified by Nodal Officer. Target institutions and routing updated dynamically."
+                    : isExcluded
+                    ? "Routine civic issue auto-assigned to Municipal & Public Health Line Department."
+                    : "R&D innovation challenge auto-matched with top Jharkhand academic institutions."
+                  }
+                </p>
+              </div>
+
+              {/* Quick Override Dropdown */}
+              <div className="flex items-center space-x-2 shrink-0">
+                <label className="text-xs font-bold text-slate-700 whitespace-nowrap">
+                  Change Domain:
+                </label>
+                <select
+                  value={selectedCategory}
+                  onChange={(e) => handleCategoryChange(e.target.value)}
+                  className="bg-white border border-slate-300 rounded-lg px-2.5 py-1.5 text-xs font-semibold text-slate-800 hover:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-400 cursor-pointer shadow-xs"
+                >
+                  <option value="Unclassified Submission">⚠️ Unclassified Submission</option>
+                  <option value="Healthcare & MedTech">Healthcare & MedTech (स्वास्थ्य एवं चिकित्सा)</option>
+                  <option value="Water Resources & Sanitation">Water Resources & Sanitation (पेयजल एवं स्वच्छता)</option>
+                  <option value="Environment & Mining Remediation">Environment & Mining Remediation (पर्यावरण एवं खनन)</option>
+                  <option value="Agriculture & Allied Technologies">Agriculture & Allied Technologies (कृषि एवं संबद्ध)</option>
+                  <option value="Rural Infrastructure & Transport">Rural Infrastructure & Transport (सड़क एवं अवसंरचना)</option>
+                  <option value="Renewable Energy & Off-Grid Power">Renewable Energy & Off-Grid Power (सौर ऊर्जा)</option>
+                  <option value="Education & Smart Learning">Education & Smart Learning (शिक्षा एवं डिजिटल लर्निंग)</option>
+                  <option value="Forest & Tribal Livelihoods">Forest & Tribal Livelihoods (वन एवं जनजातीय आजीविका)</option>
+                </select>
+              </div>
             </div>
           </div>
 
@@ -174,11 +274,17 @@ export const ExplainableAIModal = ({ problem, onClose }) => {
                   <span>1. NLP Text Classification</span>
                 </span>
                 <span className="text-xs font-bold text-indigo-600 font-mono">
-                  {((problem.categoryConfidence || 0.96) * 100).toFixed(0)}% Confidence
+                  {selectedCategory === "Unclassified Submission" ? "Review Required" : `${((problem.categoryConfidence || 0.96) * 100).toFixed(0)}% Confidence`}
                 </span>
               </div>
               <p className="text-[11px] text-slate-600">
-                Classified into <strong>{problem.category}</strong> using JSICP text model.
+                {selectedCategory === "Unclassified Submission" ? (
+                  <span className="text-amber-700 font-medium">
+                    ⚠️ Low confidence / ambiguous text. Human Nodal Officer must assign the domain.
+                  </span>
+                ) : (
+                  <>Classified / Validated into <strong>{selectedCategory}</strong>.</>
+                )}
               </p>
               <div className="flex flex-wrap gap-1 mt-1">
                 {(explanation.nlpKeywords || []).map((kw, i) => (
@@ -205,8 +311,9 @@ export const ExplainableAIModal = ({ problem, onClose }) => {
               </p>
               <div className="flex flex-wrap gap-1 mt-1">
                 {(explanation.cvSceneTags || []).map((tag, i) => (
-                  <span key={i} className="bg-teal-50 text-teal-700 text-[10px] px-2 py-0.5 rounded">
-                    ✓ {tag}
+                  <span key={i} className="bg-teal-50 text-teal-700 text-[10px] px-2 py-0.5 rounded font-medium flex items-center space-x-1">
+                    <span>✓</span>
+                    <span>{tag}</span>
                   </span>
                 ))}
               </div>
@@ -260,8 +367,46 @@ export const ExplainableAIModal = ({ problem, onClose }) => {
             </div>
           </div>
 
-          {/* Allocation Section: Direct Line Department vs Smart University Routing */}
-          {isExcluded ? (
+          {/* Allocation Section: Direct Line Department vs Smart University Routing vs Unclassified Assignment */}
+          {selectedCategory === "Unclassified Submission" ? (
+            /* UNCLASSIFIED ACTION CARD: Human-in-the-Loop Officer Triage */
+            <div className="bg-gradient-to-br from-amber-50 to-orange-50 border-2 border-amber-400 p-5 rounded-2xl space-y-3">
+              <div className="flex items-center space-x-2 text-amber-950 font-heading font-bold text-sm">
+                <AlertTriangle className="w-5 h-5 text-amber-600 shrink-0"/>
+                <span>Human-in-the-Loop Action Required: Assign Civic Domain & Routing Theme</span>
+              </div>
+              <p className="text-xs text-amber-900 leading-relaxed">
+                The AI classification engine flagged this submission with low confidence. As the State Nodal Officer, please select the target domain to enable automatic routing to the relevant Higher Education Institution or Municipal Department.
+              </p>
+              <div className="bg-white p-4 rounded-xl border border-amber-300 space-y-2">
+                <label className="text-xs font-bold text-slate-800 block">
+                  Click a Department / Domain to Assign:
+                </label>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  {[
+                    { id: "Healthcare & MedTech", label: "Healthcare & MedTech (स्वास्थ्य एवं चिकित्सा)", type: "Line Dept" },
+                    { id: "Water Resources & Sanitation", label: "Water Resources & Sanitation (पेयजल एवं स्वच्छता)", type: "Line Dept" },
+                    { id: "Environment & Mining Remediation", label: "Environment & Mining (पर्यावरण एवं खनन)", type: "University HEI" },
+                    { id: "Agriculture & Allied Technologies", label: "Agriculture & Allied Technologies (कृषि एवं संबद्ध)", type: "University HEI" },
+                    { id: "Rural Infrastructure & Transport", label: "Rural Infra & Roads (सड़क एवं अवसंरचना)", type: "University HEI" },
+                    { id: "Renewable Energy & Off-Grid Power", label: "Renewable Energy & Solar (सौर ऊर्जा)", type: "University HEI" },
+                    { id: "Education & Smart Learning", label: "Education & Smart Learning (शिक्षा)", type: "University HEI" },
+                    { id: "Forest & Tribal Livelihoods", label: "Forest & Tribal Livelihoods (वन एवं जनजाति)", type: "University HEI" }
+                  ].map((dept) => (
+                    <button
+                      key={dept.id}
+                      type="button"
+                      onClick={() => handleCategoryChange(dept.id)}
+                      className="text-left p-2.5 rounded-lg border border-slate-200 hover:border-indigo-500 hover:bg-indigo-50/60 transition group cursor-pointer"
+                    >
+                      <span className="font-bold text-xs text-slate-900 group-hover:text-indigo-900 block">{dept.label}</span>
+                      <span className="text-[10px] text-slate-500 font-mono">Routes to: {dept.type}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          ) : isExcluded ? (
             /* EXCLUDED DEPARTMENTS: Healthcare & Water direct departmental dispatch */
             <div className="bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-200 p-5 rounded-2xl space-y-3">
               <div className="flex items-center space-x-2 text-blue-950 font-heading font-bold text-sm">
@@ -283,7 +428,7 @@ export const ExplainableAIModal = ({ problem, onClose }) => {
                 <div className="flex items-center justify-between">
                   <span className="text-slate-500 font-semibold">Allocation Status:</span>
                   <span className="bg-blue-100 text-blue-800 font-bold px-2 py-0.5 rounded text-[10px]">
-                    Direct Municipal & Health Execution (Non-HEI)
+                    Direct Municipal & Health Execution Desk Pre-Selected
                   </span>
                 </div>
               </div>
@@ -295,7 +440,7 @@ export const ExplainableAIModal = ({ problem, onClose }) => {
                 <div>
                   <h5 className="font-heading font-bold text-sm text-slate-900 flex items-center space-x-1.5">
                     <Building2 className="w-4 h-4 text-emerald-600"/>
-                    <span>ML-Powered Academic Routing Recommendations (Top 3 Match)</span>
+                    <span>ML-Powered Academic Routing Recommendations (Top Match Pre-Selected for {selectedCategory})</span>
                   </h5>
                   <p className="text-xs text-slate-500">
                     Allocated to Jharkhand Higher Education Institutions (HEIs) via domain expertise matching:
@@ -315,7 +460,7 @@ export const ExplainableAIModal = ({ problem, onClose }) => {
                             #{item.rank} {item.universityName}
                           </span>
                           {item.rank === 1 && (<span className="text-[10px] bg-emerald-600 text-white font-bold px-1.5 py-0.2 rounded">
-                              AI Best Match
+                              AI Best Match (Pre-Selected)
                             </span>)}
                         </div>
                         <p className="text-xs text-slate-600 mt-0.5">{item.reason}</p>
@@ -324,7 +469,7 @@ export const ExplainableAIModal = ({ problem, onClose }) => {
 
                     <div className="text-right shrink-0">
                       <span className="text-xs font-bold text-emerald-700 font-mono">
-                        {(item.score * 100).toFixed(0)}% Fit
+                        {(item.score > 1 ? item.score : item.score * 100).toFixed(0)}% Fit
                       </span>
                       <span className="text-[10px] text-slate-400 block">ML Domain Score</span>
                     </div>
@@ -340,7 +485,7 @@ export const ExplainableAIModal = ({ problem, onClose }) => {
               <strong>Governance Requirement:</strong> The State Officer acts as the human-in-the-loop validator.
               {isExcluded
                 ? " Approving will dispatch this challenge directly to the District Line Department for immediate municipal/health resolution."
-                : " Approving will dispatch this challenge to the assigned Higher Education Institution (HEI) Nodal Desk for research team formulation."}
+                : ` Approving will dispatch this challenge to ${selectedUnivName} Nodal Desk for research team formulation.`}
             </p>
           </div>
         </div>
@@ -355,14 +500,36 @@ export const ExplainableAIModal = ({ problem, onClose }) => {
             <button onClick={onClose} className="px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-200 rounded-xl transition">
               Cancel
             </button>
-            <button onClick={handleApproveAndRoute} disabled={justApproved} className="flex items-center space-x-1.5 px-5 py-2.5 text-xs font-bold text-white bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 rounded-xl shadow-md shadow-emerald-600/20 transition hover:scale-105">
-              {justApproved ? (<>
+            <button
+              onClick={handleApproveAndRoute}
+              disabled={justApproved || selectedCategory === "Unclassified Submission"}
+              className={`flex items-center space-x-1.5 px-5 py-2.5 text-xs font-bold text-white rounded-xl shadow-md transition ${
+                selectedCategory === "Unclassified Submission"
+                  ? "bg-slate-400 cursor-not-allowed opacity-60"
+                  : "bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 shadow-emerald-600/20 hover:scale-105 cursor-pointer"
+              }`}
+            >
+              {justApproved ? (
+                <>
                   <CheckCircle2 className="w-4 h-4"/>
                   <span>{isExcluded ? "Dispatched to Line Dept!" : "Approved & Routed!"}</span>
-                </>) : (<>
+                </>
+              ) : selectedCategory === "Unclassified Submission" ? (
+                <>
+                  <AlertTriangle className="w-4 h-4"/>
+                  <span>Select Domain Above to Confirm & Route →</span>
+                </>
+              ) : isExcluded ? (
+                <>
                   <CheckCircle2 className="w-4 h-4"/>
-                  <span>{isExcluded ? "Confirm & Route to State Line Department →" : "Confirm & Route to University →"}</span>
-                </>)}
+                  <span>Confirm & Route to State Line Department →</span>
+                </>
+              ) : (
+                <>
+                  <CheckCircle2 className="w-4 h-4"/>
+                  <span>Confirm & Route to {selectedUnivName} →</span>
+                </>
+              )}
             </button>
           </div>
         </div>

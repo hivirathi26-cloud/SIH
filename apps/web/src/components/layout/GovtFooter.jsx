@@ -5,10 +5,12 @@ export const GovtFooter = () => {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Col 1 */}
           <div className="space-y-3">
-            <div className="flex items-center space-x-2">
-              <div className="w-7 h-7 rounded bg-[#0f2942] border border-[#1e3a5f] text-amber-400 flex items-center justify-center font-bold text-xs">
-                JH
-              </div>
+            <div className="flex items-center space-x-2.5">
+              <img 
+                src="/jharkhand_seal_hd.png" 
+                alt="Government of Jharkhand Emblem" 
+                className="w-9 h-9 object-contain shrink-0" 
+              />
               <span className="font-heading font-bold text-sm text-slate-100">
                 JSICP — झारखंड सरकार
               </span>

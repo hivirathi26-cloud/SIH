@@ -18,6 +18,9 @@ Object.keys(TRANSLATIONS).forEach((key) => {
   lowerCaseMap.set(key.toLowerCase().trim(), key);
 });
 
+// Pre-sort keys by descending length for greedy substring replacement
+const sortedKeys = Object.keys(TRANSLATIONS).sort((a, b) => b.length - a.length);
+
 /**
  * Translates a given text to the target language.
  * Follows the rule that text originally written in Hindi remains untouched.
@@ -57,10 +60,13 @@ export const translate = (text: string, lang: SupportedLanguage): string => {
   let result = text;
   let replaced = false;
 
-  for (const [key, transObj] of Object.entries(TRANSLATIONS)) {
-    if (key.length > 3 && result.includes(key)) {
-      result = result.split(key).join(transObj[lang]);
-      replaced = true;
+  for (const key of sortedKeys) {
+    if (key.length > 2 && result.includes(key)) {
+      const transObj = TRANSLATIONS[key];
+      if (transObj && transObj[lang]) {
+        result = result.split(key).join(transObj[lang]);
+        replaced = true;
+      }
     }
   }
 

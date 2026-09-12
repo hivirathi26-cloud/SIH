@@ -113,7 +113,7 @@ export const api = {
   },
   ai: {
     getStatus: () => request("/ai/status"),
-    transcribe: (audioBase64, mimeType, languageCode) => request("/ai/transcribe", { method: "POST", body: { audioBase64, mimeType, languageCode } }),
+    transcribe: (audioBase64, mimeType, languageCode, dialect) => request("/ai/transcribe", { method: "POST", body: { audioBase64, mimeType, languageCode, dialect } }),
     processComplaint: (data) => request("/ai/process-complaint", { method: "POST", body: data }),
     preprocess: (text) => request("/ai/preprocess", { method: "POST", body: { text } }),
     classify: (text) => request("/ai/classify", { method: "POST", body: { text } }),

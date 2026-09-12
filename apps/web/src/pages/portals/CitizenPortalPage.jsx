@@ -131,7 +131,10 @@ export const CitizenPortalPage = () => {
                 description,
                 descriptionOriginalLang,
                 category: triage.category,
-                subCategory: triage.subCategory || "Community Scale Challenge",
+                subCategory: triage.subCategory || triage.sub_category || "Community Scale Challenge",
+                categoryConfidence: triage.confidence,
+                priorityScore: triage.priority_score || triage.priorityScore,
+                suggestedUniversities: triage.suggested_universities || triage.suggestedUniversities,
                 district,
                 block: block || "Sadar Block",
                 village: village || "Gram Panchayat",
@@ -326,20 +329,56 @@ export const CitizenPortalPage = () => {
                       AI Issue Assessment (स्वचालित एआई विश्लेषण)
                     </span>
                   </div>
-                  <span className="bg-emerald-900/80 text-emerald-300 text-[10px] px-2 py-0.5 rounded border border-emerald-500/30 font-mono">
-                    {isAiClassifying ? "⚡ Analyzing..." : "✓ Auto-Assigned"}
+                  <span className={`${aiTriage.category === "Unclassified Submission" ? "bg-amber-900/80 text-amber-300 border-amber-500/30" : "bg-emerald-900/80 text-emerald-300 border-emerald-500/30"} text-[10px] px-2 py-0.5 rounded border font-mono`}>
+                    {isAiClassifying ? "⚡ Analyzing..." : (aiTriage.category === "Unclassified Submission" ? "⚠️ Needs More Details" : "✓ Auto-Assigned")}
                   </span>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   {/* Assigned Department */}
-                  <div className="bg-slate-800/80 p-2.5 rounded border border-slate-700 space-y-0.5">
+                  <div className="bg-slate-800/80 p-2.5 rounded border border-slate-700 space-y-1">
                     <span className="text-[10px] uppercase text-slate-400 font-bold tracking-wider flex items-center space-x-1">
                       <Tag className="w-3 h-3 text-teal-400"/>
                       <span>Assigned Department</span>
                     </span>
-                    <p className="font-semibold text-white text-xs truncate">{aiTriage.category}</p>
-                    <p className="text-[10px] text-teal-300 truncate">{aiTriage.sub_category || aiTriage.subCategory}</p>
+                    {aiTriage.category === "Unclassified Submission" ? (
+                      <div>
+                        <p className="font-semibold text-amber-300 text-xs mb-1">Human Review Required (or select manually):</p>
+                        <select
+                          value=""
+                          onChange={(e) => {
+                            const chosen = e.target.value;
+                            if (chosen) {
+                              setAiTriage(prev => ({
+                                ...prev,
+                                category: chosen,
+                                sub_category: "Citizen Designated Redressal",
+                                subCategory: "Citizen Designated Redressal",
+                                priority_score: 88.0,
+                                priorityScore: 88.0,
+                                is_routable_to_university: !chosen.includes("Health") && !chosen.includes("Water")
+                              }));
+                            }
+                          }}
+                          className="w-full bg-slate-900 border border-teal-500/50 text-white text-[11px] p-1.5 rounded focus:outline-none focus:border-teal-400"
+                        >
+                          <option value="">-- Choose Department Manually --</option>
+                          <option value="Healthcare & MedTech">Healthcare & MedTech (स्वास्थ्य एवं चिकित्सा)</option>
+                          <option value="Water Resources & Sanitation">Water Resources & Sanitation (पेयजल एवं स्वच्छता)</option>
+                          <option value="Environment & Mining Remediation">Environment & Mining Remediation (पर्यावरण एवं खनन)</option>
+                          <option value="Agriculture & Allied Technologies">Agriculture & Allied Technologies (कृषि एवं संबद्ध)</option>
+                          <option value="Rural Infrastructure & Transport">Rural Infrastructure & Transport (सड़क एवं ग्रामीण अवसंरचना)</option>
+                          <option value="Renewable Energy & Off-Grid Power">Renewable Energy & Off-Grid Power (सौर एवं नवीकरणीय ऊर्जा)</option>
+                          <option value="Education & Smart Learning">Education & Smart Learning (शिक्षा एवं डिजिटल लर्निंग)</option>
+                          <option value="Forest & Tribal Livelihoods">Forest & Tribal Livelihoods (वन एवं जनजातीय आजीविका)</option>
+                        </select>
+                      </div>
+                    ) : (
+                      <>
+                        <p className="font-semibold text-white text-xs truncate">{aiTriage.category}</p>
+                        <p className="text-[10px] text-teal-300 truncate">{aiTriage.sub_category || aiTriage.subCategory}</p>
+                      </>
+                    )}
                   </div>
 
                   {/* Priority Urgency */}
@@ -350,7 +389,7 @@ export const CitizenPortalPage = () => {
                     </span>
                     <div className="flex items-baseline space-x-1">
                       <span className="font-mono text-sm font-bold text-amber-400">
-                        {aiTriage.priority_score || aiTriage.priorityScore || 85.0}
+                        {aiTriage.priority_score || aiTriage.priorityScore || (aiTriage.category === "Unclassified Submission" ? 75.0 : 85.0)}
                       </span>
                       <span className="text-[10px] text-slate-400">/ 100</span>
                     </div>
@@ -363,7 +402,9 @@ export const CitizenPortalPage = () => {
                 <div className="text-[11px] text-slate-400 flex items-center space-x-1 pt-1 border-t border-slate-800">
                   <ShieldCheck className="w-3.5 h-3.5 text-emerald-400 shrink-0"/>
                   <span>
-                    You do not need to choose a department or institution. The system assigns your report to the appropriate team automatically.
+                    {aiTriage.category === "Unclassified Submission"
+                      ? "💡 Tip: Add 2-3 words in Detailed Description for automatic AI routing, or select department manually above."
+                      : "You do not need to choose a department or institution. The system assigns your report to the appropriate team automatically."}
                   </span>
                 </div>
               </div>

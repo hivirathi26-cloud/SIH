@@ -71,7 +71,7 @@ export const VoiceRecorderModal = ({ isOpen, onClose, onTranscriptionComplete })
                 reader.onerror = reject;
                 reader.readAsDataURL(recording);
             });
-            const response = await api.ai.transcribe(audioBase64, recording.type || "audio/webm", DIALECT_LOCALES[selectedDialect]);
+            const response = await api.ai.transcribe(audioBase64, recording.type || "audio/webm", DIALECT_LOCALES[selectedDialect], selectedDialect);
             const completedTranscript = response?.data?.transcript?.trim();
             if (!response?.success || !completedTranscript) {
                 throw new Error(response?.error || "No speech was detected in this recording.");

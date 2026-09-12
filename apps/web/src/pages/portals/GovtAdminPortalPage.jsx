@@ -7,7 +7,7 @@ import { ExplainableAIModal } from "../../components/ai/ExplainableAIModal";
 import { BlockchainLedgerModal } from "../../components/lifecycle/BlockchainLedgerModal";
 import { StatusPill } from "../../components/common/StatusPill";
 import { getAiRoutingRecommendations, UNIVERSITY_ECOSYSTEMS, isDepartmentExcludedFromUniversity, getDepartmentResolutionDetails } from "../../data/universityEcosystems";
-import { BarChart3, ShieldCheck, CheckCircle2, BrainCircuit, MapPin, Download, FileSpreadsheet, Layers } from "lucide-react";
+import { BarChart3, ShieldCheck, CheckCircle2, BrainCircuit, MapPin, Download, FileSpreadsheet, Layers, AlertTriangle } from "lucide-react";
 import confetti from "canvas-confetti";
 export const GovtAdminPortalPage = () => {
     const { problems, universities, agreements, proposals, milestones, approveMilestoneGovt, currentUser, selectedDistrict, setSelectedDistrict } = useApp();
@@ -121,16 +121,17 @@ export const GovtAdminPortalPage = () => {
 
           <div className="space-y-3">
             {pendingValidation.map((p) => {
-                const isExcluded = isDepartmentExcludedFromUniversity(p.category, p.title, p.description);
+                const isUnclassified = !p.category || p.category === "Unclassified Submission";
+                const isExcluded = !isUnclassified && isDepartmentExcludedFromUniversity(p.category, p.title, p.description);
                 const deptDetails = isExcluded ? getDepartmentResolutionDetails(p.category, p.title, p.description) : null;
-                const recs = isExcluded ? [] : getAiRoutingRecommendations(p.category, p.title, p.description, p.district);
+                const recs = (isExcluded || isUnclassified) ? [] : getAiRoutingRecommendations(p.category, p.title, p.description, p.district);
                 
                 const topMatch = (() => {
-                    if (isExcluded) return null;
+                    if (isExcluded || isUnclassified) return null;
                     if (p.aiExplanation?.suggestedUniversities && p.aiExplanation.suggestedUniversities.length > 0) {
                         return p.aiExplanation.suggestedUniversities[0];
                     }
-                    return recs[0] || { universityName: "IIT (ISM) Dhanbad", universityId: "univ-iit-dhanbad", score: 0.95, rank: 1 };
+                    return recs[0] || null;
                 })();
                 
                 const domainBadge = topMatch ? (UNIVERSITY_ECOSYSTEMS[topMatch.universityId]?.domainName || p.category) : p.category;
@@ -142,15 +143,24 @@ export const GovtAdminPortalPage = () => {
                       <span className="font-mono font-bold text-slate-700 bg-slate-100 px-2 py-0.5 rounded">{p.ticketNumber}</span>
                       <StatusPill status={p.status}/>
                       <span className="text-slate-500">District: {p.district}</span>
-                      {isExcluded && (
-                        <span className="bg-amber-50 text-amber-800 border border-amber-200 text-[10px] font-bold px-2 py-0.5 rounded">
-                          Direct Line Dept (Non-HEI)
+                      {isUnclassified ? (
+                        <span className="bg-amber-100 text-amber-900 border border-amber-300 text-[10px] font-bold px-2 py-0.5 rounded flex items-center space-x-1">
+                          <AlertTriangle className="w-3 h-3 text-amber-700 inline mr-1"/>
+                          <span>AI Unclassified • Triage Required</span>
+                        </span>
+                      ) : isExcluded ? (
+                        <span className="bg-blue-100 text-blue-900 border border-blue-200 text-[10px] font-bold px-2 py-0.5 rounded">
+                          AI Auto-Detected: {p.category} (Line Dept)
+                        </span>
+                      ) : (
+                        <span className="bg-emerald-100 text-emerald-900 border border-emerald-200 text-[10px] font-bold px-2 py-0.5 rounded">
+                          AI Auto-Detected: {p.category}
                         </span>
                       )}
                     </div>
 
                     <span className="font-mono font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded border border-amber-200">
-                      AI Priority: {p.priorityScore}/100
+                      {isUnclassified ? "Confidence: Low" : `AI Priority: ${p.priorityScore}/100`}
                     </span>
                   </div>
 
@@ -159,8 +169,27 @@ export const GovtAdminPortalPage = () => {
                     <p className="text-slate-600 mt-1 leading-relaxed">{p.description}</p>
                   </div>
 
-                  {isExcluded ? (
-                    <div className="bg-blue-50/60 p-3 rounded border border-blue-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                  {isUnclassified ? (
+                    <div className="bg-amber-50/70 p-3 rounded-lg border border-amber-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                      <div>
+                        <div className="flex items-center space-x-2">
+                          <span className="font-bold text-amber-950 text-xs">Human-in-the-Loop Action Required:</span>
+                          <span className="bg-amber-200 text-amber-900 text-[10px] font-bold px-1.5 py-0.5 rounded">
+                            Unclassified Submission
+                          </span>
+                        </div>
+                        <span className="text-amber-800 text-xs mt-0.5 block">
+                          AI classification could not identify domain with high confidence. Click to assign domain and trigger HEI / department routing.
+                        </span>
+                      </div>
+
+                      <button onClick={() => setSelectedProbForXAI(p)} className="px-3.5 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-lg font-semibold flex items-center space-x-1.5 shrink-0 text-xs shadow-sm transition">
+                        <AlertTriangle className="w-3.5 h-3.5"/>
+                        <span>Human Triage: Assign Domain & Route &rarr;</span>
+                      </button>
+                    </div>
+                  ) : isExcluded ? (
+                    <div className="bg-blue-50/60 p-3 rounded-lg border border-blue-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                       <div>
                         <div className="flex items-center space-x-2">
                           <span className="font-bold text-blue-950 text-xs">Direct State Line Department Redressal:</span>
@@ -169,17 +198,17 @@ export const GovtAdminPortalPage = () => {
                           </span>
                         </div>
                         <span className="text-blue-900 font-semibold text-xs mt-0.5 block">
-                          Assigned to: {deptDetails?.assignedAuthority} ({deptDetails?.subOffice})
+                          Pre-Assigned to: {deptDetails?.assignedAuthority} ({deptDetails?.subOffice})
                         </span>
                       </div>
 
-                      <button onClick={() => setSelectedProbForXAI(p)} className="px-3 py-1.5 bg-[#0f2942] text-white rounded font-semibold flex items-center space-x-1 shrink-0 text-xs">
+                      <button onClick={() => setSelectedProbForXAI(p)} className="px-3.5 py-2 bg-[#0f2942] hover:bg-blue-950 text-white rounded-lg font-semibold flex items-center space-x-1.5 shrink-0 text-xs shadow-sm transition">
                         <BrainCircuit className="w-3.5 h-3.5"/>
-                        <span>Inspect AI & Route to Line Dept &rarr;</span>
+                        <span>Review AI & Confirm Route &rarr;</span>
                       </button>
                     </div>
                   ) : (
-                    <div className="bg-emerald-50/60 p-3 rounded border border-emerald-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div className="bg-emerald-50/60 p-3 rounded-lg border border-emerald-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                       <div>
                         <div className="flex items-center space-x-2">
                           <span className="font-bold text-emerald-950 text-xs">AI Recommended Academic Routing:</span>
@@ -188,13 +217,13 @@ export const GovtAdminPortalPage = () => {
                           </span>
                         </div>
                         <span className="text-emerald-900 font-semibold text-xs mt-0.5 block">
-                          #{topMatch.rank || 1} {topMatch.universityName} ({matchPct}% Match) • {domainBadge}
+                          Pre-Selected: #{topMatch?.rank || 1} {topMatch?.universityName || "Jharkhand HEI"} ({matchPct}% Match) • {domainBadge}
                         </span>
                       </div>
 
-                      <button onClick={() => setSelectedProbForXAI(p)} className="px-3 py-1.5 bg-[#0f2942] text-white rounded font-semibold flex items-center space-x-1 shrink-0 text-xs">
+                      <button onClick={() => setSelectedProbForXAI(p)} className="px-3.5 py-2 bg-[#0f2942] hover:bg-slate-800 text-white rounded-lg font-semibold flex items-center space-x-1.5 shrink-0 text-xs shadow-sm transition">
                         <BrainCircuit className="w-3.5 h-3.5"/>
-                        <span>Inspect Explainable AI & Confirm &rarr;</span>
+                        <span>Review AI & Confirm Route &rarr;</span>
                       </button>
                     </div>
                   )}

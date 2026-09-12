@@ -23,7 +23,7 @@ export const ML_TO_PORTAL_CATEGORY_MAP = {
   certificates: "Rural Infrastructure & Transport",
   public_safety: "Rural Infrastructure & Transport",
   housing: "Rural Infrastructure & Transport",
-  other: "Water Resources & Sanitation"
+  other: "Unclassified Submission"
 };
 
 export const PORTAL_SUBCATEGORY_SUGGESTIONS = {
@@ -144,13 +144,15 @@ export const aiClient = {
    * Full end-to-end AI complaint processing
    */
   async processComplaint(payload) {
-    const text = payload.text || payload.description || "";
+    const text = payload.text || `${payload.title || ""} ${payload.description || ""}`.trim();
     try {
       const res = await fetchWithTimeout(`${AI_SERVICE_URL}/api/ai/process-complaint`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           text,
+          title: payload.title || "",
+          description: payload.description || "",
           latitude: payload.latitude || payload.lat,
           longitude: payload.longitude || payload.lng,
           affected_population: payload.affected_population || payload.affectedPopulation || 100,
@@ -162,13 +164,14 @@ export const aiClient = {
 
       if (res.ok) {
         const mlData = await res.json();
-        const rawCat = mlData.classification?.category || "water";
-        const portalCat = ML_TO_PORTAL_CATEGORY_MAP[rawCat] || "Water Resources & Sanitation";
-        const subCat = PORTAL_SUBCATEGORY_SUGGESTIONS[portalCat] || "Civic Technology";
+        const rawCat = mlData.classification?.category || "other";
+        const portalCat = mlData.classification?.portal_category || ML_TO_PORTAL_CATEGORY_MAP[rawCat] || "Unclassified Submission";
+        const isUnclassified = portalCat === "Unclassified Submission";
+        const subCat = isUnclassified ? "Human review required" : (PORTAL_SUBCATEGORY_SUGGESTIONS[portalCat] || "Civic Technology");
 
         // University routing directly from ML microservice or ecosystem mapper
         const mlRouting = mlData.university_routing || {};
-        const isRoutable = mlRouting.is_routable_to_university !== false &&
+        const isRoutable = !isUnclassified && mlRouting.is_routable_to_university !== false &&
           !portalCat.includes("Health") && !portalCat.includes("Water") &&
           rawCat !== "health" && rawCat !== "water" && rawCat !== "sanitation";
 
@@ -194,9 +197,9 @@ export const aiClient = {
           raw_category: rawCat,
           sub_category: subCat,
           is_routable_to_university: isRoutable,
-          department_type: isRoutable ? "Academic Research & Innovation HEI" : "Municipal & Public Health Line Department",
-          assigned_line_department: isRoutable ? null : (portalCat.includes("Health") ? "Department of Health, Medical Education & Family Welfare" : "Drinking Water & Sanitation Department (DWSD)"),
-          confidence: mlData.classification?.confidence || 0.95,
+          department_type: isRoutable ? "Academic Research & Innovation HEI" : (isUnclassified ? "Unclassified Submission (Human Review Required)" : "Municipal & Public Health Line Department"),
+          assigned_line_department: isRoutable || isUnclassified ? null : (portalCat.includes("Health") ? "Department of Health, Medical Education & Family Welfare" : "Drinking Water & Sanitation Department (DWSD)"),
+          confidence: mlData.classification?.confidence || (isUnclassified ? 0.0 : 0.95),
           top_predictions: (mlData.classification?.top_predictions || []).map((p) => ({
             raw_category: p.category,
             category: ML_TO_PORTAL_CATEGORY_MAP[p.category] || p.category,
@@ -311,25 +314,46 @@ export const aiClient = {
     let sub_category = "Human review required";
     let confidence = 0;
 
-    if (t.includes("fever") || t.includes("flu") || t.includes("hospital") || t.includes("doctor") || t.includes("vaccine") || t.includes("health") || t.includes("दवाई") || t.includes("अस्पताल")) {
+    const healthKeywords = ["vaccin", "tika", "teeka", "टीका", "disease", "diseases", "diseas", "illness", "fever", "flu", "hospital", "hospit", "doctor", "medicine", "medic", "health", "infection", "infect", "clinic", "patient", "epidemic", "outbreak", "dengue", "malaria", "typhoid", "cholera", "sick", "virus", "दवाई", "अस्पताल", "मरीज", "बीमारी", "इलाज", "बुखार", "रोग"];
+    const waterKeywords = ["pani", "water", "handpump", "tap", "borewell", "filter", "fluoride", "arsenic", "contamination", "drain", "drainage", "sewage", "kachra", "garbage", "waste", "pipeline", "leakage", "नल", "जल", "पानी", "चापाकल", "गंदा पानी", "कचरा"];
+    const miningKeywords = ["fire", "coal", "mine", "mining", "smoke", "methane", "gas", "leachate", "tailing", "pollution", "blast", "dust", "robot", "robotics", "drone", "sensor", "telemetry", "iot", "automation", "खदान", "कोयला", "धुआं", "आग"];
+    const agriKeywords = ["crop", "lac", "soil", "farm", "farmer", "seed", "agriculture", "drought", "millet", "irrigation", "harvest", "paddy", "किसान", "खेती", "फसल", "बीज"];
+    const infraKeywords = ["road", "bridge", "culvert", "transport", "pothole", "highway", "accident", "connectivity", "सड़क", "पुल", "गड्ढा", "रास्ता"];
+    const powerKeywords = ["solar", "electricity", "power", "grid", "bijli", "transformer", "wire", "blackout", "बिजली", "सोलर", "ट्रांसफार्मर"];
+    const eduKeywords = ["school", "teacher", "student", "education", "classroom", "book", "college", "स्कूल", "शिक्षा", "शिक्षक"];
+    const tribalKeywords = ["forest", "tribal", "ntfp", "tendu", "mahua", "livelihood", "artisan", "जंगल", "आदिवासी", "महुआ"];
+
+    if (healthKeywords.some(k => t.includes(k))) {
       category = "Healthcare & MedTech";
       sub_category = "Cold-Chain Logistics & Epidemic Telemetry";
       confidence = 0.98;
-    } else if (t.includes("fire") || t.includes("coal") || t.includes("mine") || t.includes("smoke") || t.includes("methane") || t.includes("gas") || t.includes("धुआं") || t.includes("खदान")) {
+    } else if (waterKeywords.some(k => t.includes(k))) {
+      category = "Water Resources & Sanitation";
+      sub_category = "Groundwater Quality & Fluoride Filtration";
+      confidence = 0.96;
+    } else if (miningKeywords.some(k => t.includes(k))) {
       category = "Environment & Mining Remediation";
       sub_category = "Underground Seam Thermal Containment";
       confidence = 0.95;
-    } else if (t.includes("crop") || t.includes("lac") || t.includes("soil") || t.includes("farm") || t.includes("seed") || t.includes("agriculture") || t.includes("किसान") || t.includes("खेती")) {
+    } else if (agriKeywords.some(k => t.includes(k))) {
       category = "Agriculture & Allied Technologies";
       sub_category = "Post-Harvest Processing & Deseeding";
       confidence = 0.94;
-    } else if (t.includes("road") || t.includes("bridge") || t.includes("culvert") || t.includes("transport") || t.includes("सड़क") || t.includes("गड्ढा")) {
+    } else if (infraKeywords.some(k => t.includes(k))) {
       category = "Rural Infrastructure & Transport";
       sub_category = "All-Weather Connectivity & Heavy Load Bridges";
-      confidence = 0.92;
-    } else if (t.includes("solar") || t.includes("electricity") || t.includes("power") || t.includes("grid") || t.includes("bijli") || t.includes("बिजली") || t.includes("transformer")) {
+      confidence = 0.93;
+    } else if (powerKeywords.some(k => t.includes(k))) {
       category = "Renewable Energy & Off-Grid Power";
-      sub_category = "Microgrid Solar Installation";
+      sub_category = "Microgrid Solar Installation & Storage";
+      confidence = 0.94;
+    } else if (eduKeywords.some(k => t.includes(k))) {
+      category = "Education & Smart Learning";
+      sub_category = "Digital Literacy & Smart Classrooms";
+      confidence = 0.94;
+    } else if (tribalKeywords.some(k => t.includes(k))) {
+      category = "Forest & Tribal Livelihoods";
+      sub_category = "Non-Timber Forest Produce (NTFP) Value Chain";
       confidence = 0.93;
     }
 

@@ -868,9 +868,195 @@ export const TRANSLATIONS: TranslationMap = {
     nagpuri: "कइसन जमा करल जाय?",
     santali: "ᱪᱮᱫ ᱞᱮᱠᱟ ᱥᱟᱵᱢᱤᱴᱟ?"
   },
-  "CSR Funding": {
+   "CSR Funding": {
     hi: "सीएसआर अनुदान",
     nagpuri: "CSR पैसा / अनुदान",
     santali: "CSR ᱜᱚᱲᱚ ᱴᱟᱠᱟ"
+  },
+  // --- Jharkhand At A Glance & Leadership Section ---
+  "JHARKHAND AT A GLANCE": {
+    hi: "झारखंड एक नज़र में (JHARKHAND AT A GLANCE)",
+    nagpuri: "झारखंड एक नजर में",
+    santali: "ᱡᱷᱟᱨᱠᱷᱚᱸᱰ ᱢᱤᱫ ᱱᱚᱡᱚᱨ ᱨᱮ"
+  },
+  "About Jharkhand": {
+    hi: "झारखंड के बारे में",
+    nagpuri: "झारखंड कर बारे में",
+    santali: "ᱡᱷᱟᱨᱠᱷᱚᱸᱰ ᱵᱟᱵᱚᱛ"
+  },
+  "State": {
+    hi: "राज्य",
+    nagpuri: "राइज",
+    santali: "ᱯᱚᱱᱚᱛ (State)"
+  },
+  "Governor": {
+    hi: "राज्यपाल (Governor)",
+    nagpuri: "राज्यपाल",
+    santali: "ᱨᱟᱡᱽᱭᱚᱯᱟᱞ (Governor)"
+  },
+  "Chief Minister": {
+    hi: "मुख्यमंत्री (Chief Minister)",
+    nagpuri: "मुख्यमंत्री",
+    santali: "ᱥᱤᱨᱟᱹ ᱢᱚᱱᱛᱨᱤ (CM)"
+  },
+  "Chief Secretary": {
+    hi: "मुख्य सचिव (Chief Secretary)",
+    nagpuri: "मुख्य सचिव",
+    santali: "ᱢᱩᱬᱩᱛ ᱥᱚᱪᱤᱵᱽ"
+  },
+  "Shri Santosh Kumar Gangwar": {
+    hi: "श्री संतोष कुमार गंगवार",
+    nagpuri: "श्री संतोष कुमार गंगवार",
+    santali: "ᱥᱨᱤ ᱥᱚᱱᱛᱳᱥ ᱠᱩᱢᱟᱨ ᱜᱚᱝᱜᱽᱣᱟᱨ"
+  },
+  "Shri Hemant Soren": {
+    hi: "श्री हेमन्त सोरेन",
+    nagpuri: "श्री हेमन्त सोरेन",
+    santali: "ᱥᱨᱤ ᱦᱮᱢᱚᱱᱛ ᱥᱚᱨᱮᱱ"
+  },
+  "Shri Avinash Kumar": {
+    hi: "श्री अविनाश कुमार",
+    nagpuri: "श्री अविनाश कुमार",
+    santali: "ᱥᱨᱤ ᱟᱵᱷᱤᱱᱟᱥ ᱠᱩᱢᱟᱨ"
+  },
+  "Area : 79,714 km²": {
+    hi: "क्षेत्रफल : 79,714 वर्ग किमी",
+    nagpuri: "क्षेत्रफल : 79,714 वर्ग किमी",
+    santali: "ᱡᱟᱭᱜᱟ : 79,714 km²"
+  },
+  "Capital City : Ranchi": {
+    hi: "राजधानी : राँची",
+    nagpuri: "राजधानी : राँची",
+    santali: "ᱨᱟᱡᱽᱜᱟᱲ : ᱨᱟᱺᱪᱤ"
+  },
+  "District : 24": {
+    hi: "ज़िले : 24",
+    nagpuri: "जिला मन : 24",
+    santali: "ᱡᱤᱞᱟᱹ : 24"
+  },
+  "Population : 3.3 Crores": {
+    hi: "जनसंख्या : 3.3 करोड़",
+    nagpuri: "आबादी : 3.3 करोड़",
+    santali: "ᱦᱚᱲ ᱮᱞ : 3.3 ᱠᱳᱨᱳᱰ"
+  },
+  "Download Official Photo": {
+    hi: "आधिकारिक फोटो डाउनलोड करें",
+    nagpuri: "सरकारी फोटो डाउनलोड करू",
+    santali: "ᱚᱯᱷᱤᱥᱤᱭᱟᱞ ᱯᱷᱳᱴᱳ ᱰᱟᱣᱩᱱᱞᱳᱰ"
+  },
+  "Profile": {
+    hi: "प्रोफ़ाइल",
+    nagpuri: "परिचय / प्रोफाइल",
+    santali: "ᱩᱯᱨᱩᱢ (Profile)"
+  },
+  "Official Portal": {
+    hi: "आधिकारिक पोर्टल",
+    nagpuri: "सरकारी पोर्टल",
+    santali: "ᱥᱚᱨᱠᱟᱨᱤ ᱯᱳᱨᱴᱟᱞ"
+  },
+  "Official website of the State": {
+    hi: "राज्य का आधिकारिक वेब पोर्टल",
+    nagpuri: "राइज कर सरकारी वेब पोर्टल",
+    santali: "ᱯᱚᱱᱚᱛ ᱨᱮᱱᱟᱜ ᱥᱚᱨᱠᱟᱨᱤ ᱣᱮᱵᱽᱥᱟᱭᱤᱴ"
+  },
+  "Citizen & PRI Innovation Portal": {
+    hi: "नागरिक एवं पंचायती राज नवाचार पोर्टल",
+    nagpuri: "नागरिक अउर पंचायत नवाचार चौपाल",
+    santali: "ᱱᱟᱜᱟᱨᱤᱠ ᱟᱨ ᱯᱚᱧᱪᱟᱭᱮᱛ ᱤᱱᱳᱵᱷᱮᱥᱚᱱ ᱯᱳᱨᱴᱟᱞ"
+  },
+  "Government of Jharkhand": {
+    hi: "झारखण्ड सरकार",
+    nagpuri: "झारखण्ड सरकार",
+    santali: "ᱡᱷᱟᱨᱠᱷᱚᱸᱰ ᱥᱚᱨᱠᱟᱨ"
+  },
+  "Department of Higher & Technical Education": {
+    hi: "उच्च एवं तकनीकी शिक्षा विभाग",
+    nagpuri: "उच्च अउर तकनीकी शिक्षा विभाग",
+    santali: "ᱪᱮᱛᱟᱱ ᱟᱨ ᱴᱮᱠᱱᱤᱠᱟᱞ ᱥᱮᱪᱮᱫ ᱵᱤᱵᱷᱟᱜᱽ"
+  },
+  "Dept. of Higher & Technical Education": {
+    hi: "उच्च एवं तकनीकी शिक्षा विभाग",
+    nagpuri: "उच्च अउर तकनीकी शिक्षा विभाग",
+    santali: "ᱪᱮᱛᱟᱱ ᱟᱨ ᱴᱮᱠᱱᱤᱠᱟᱞ ᱥᱮᱪᱮᱫ ᱵᱤᱵᱷᱟᱜᱽ"
+  },
+  "Hon'ble Governor of Jharkhand": {
+    hi: "माननीय राज्यपाल, झारखण्ड",
+    nagpuri: "माननीय राज्यपाल, झारखण्ड",
+    santali: "ᱢᱟᱹᱱᱟᱱ ᱨᱟᱡᱽᱭᱚᱯᱟᱞ, ᱡᱷᱟᱨᱠᱷᱚᱸᱰ"
+  },
+  "Hon'ble Chief Minister of Jharkhand": {
+    hi: "माननीय मुख्यमंत्री, झारखण्ड",
+    nagpuri: "माननीय मुख्यमंत्री, झारखण्ड",
+    santali: "ᱢᱟᱹᱱᱟᱱ ᱥᱤᱨᱟᱹ ᱢᱚᱱᱛᱨᱤ, ᱡᱷᱟᱨᱠᱷᱚᱸᱰ"
+  },
+  "Chief Secretary, Government of Jharkhand": {
+    hi: "मुख्य सचिव, झारखण्ड सरकार",
+    nagpuri: "मुख्य सचिव, झारखण्ड सरकार",
+    santali: "ᱢᱩᱬᱩᱛ ᱥᱚᱪᱤᱵᱽ, ᱡᱷᱟᱨᱠᱷᱚᱸᱰ ᱥᱚᱨᱠᱟᱨ"
+  },
+  "Hon'ble Governor": {
+    hi: "माननीय राज्यपाल",
+    nagpuri: "माननीय राज्यपाल",
+    santali: "ᱢᱟᱹᱱᱟᱱ ᱨᱟᱡᱽᱭᱚᱯᱟᱞ"
+  },
+  "Hon'ble Chief Minister": {
+    hi: "माननीय मुख्यमंत्री",
+    nagpuri: "माननीय मुख्यमंत्री",
+    santali: "ᱢᱟᱹᱱᱟᱱ ᱥᱤᱨᱟᱹ ᱢᱚᱱᱛᱨᱤ"
+  },
+  "Area": {
+    hi: "क्षेत्रफल",
+    nagpuri: "क्षेत्रफल",
+    santali: "ᱡᱟᱭᱜᱟ"
+  },
+  "Capital": {
+    hi: "राजधानी",
+    nagpuri: "राजधानी",
+    santali: "ᱨᱟᱡᱽᱜᱟᱲ"
+  },
+  "Districts": {
+    hi: "ज़िले",
+    nagpuri: "जिला मन",
+    santali: "ᱡᱤᱞᱟᱹ ᱠᱚ"
+  },
+  "Population": {
+    hi: "जनसंख्या",
+    nagpuri: "आबादी",
+    santali: "ᱦᱚᱲ ᱮᱞ"
+  },
+  "Census 2011": {
+    hi: "जनगणना 2011",
+    nagpuri: "जनगणना 2011",
+    santali: "ᱦᱚᱲ ᱞᱮᱠᱷᱟ 2011"
+  },
+  "Ranchi": {
+    hi: "राँची",
+    nagpuri: "राँची",
+    santali: "ᱨᱟᱺᱪᱤ"
+  },
+  "79,714 sq km": {
+    hi: "79,714 वर्ग किमी",
+    nagpuri: "79,714 वर्ग किमी",
+    santali: "79,714 sq km"
+  },
+  "3.3 Crores": {
+    hi: "3.3 करोड़",
+    nagpuri: "3.3 करोड़",
+    santali: "3.3 ᱠᱳᱨᱳᱰ"
+  },
+  "Jharkhand is an eastern Indian state. It is famous for its waterfalls, the elegant Jain temples of Parasnath Hill, and the elephants and tigers of Betla National Park.": {
+    hi: "झारखण्ड पूर्वी भारत का एक राज्य है। यह अपने जलप्रपातों, पारसनाथ पहाड़ी के सुरुचिपूर्ण जैन मंदिरों और बेतला राष्ट्रीय उद्यान के हाथियों और बाघों के लिए प्रसिद्ध है।",
+    nagpuri: "झारखण्ड पूरब भारत कर एगो राइज हेके। ई आपन जलप्रपात, पारसनाथ पहाड़ कर जैन मंदिर अउर बेतला पार्क कर बाघ-हाथी मन ले मशहूर हेके।",
+    santali: "ᱡᱷᱟᱨᱠᱷᱚᱸᱰ ᱫᱚ ᱥᱟᱢᱟᱝ ᱵᱷᱟᱨᱚᱛ ᱨᱮᱱᱟᱜ ᱢᱤᱫ ᱯᱚᱱᱚᱛ ᱠᱟᱱᱟ᱾ ᱱᱚᱣᱟ ᱫᱚ ᱡᱷᱟᱨᱱᱟ, ᱯᱟᱨᱚᱥᱱᱟᱛᱷ ᱵᱩᱨᱩ ᱨᱮᱱᱟᱜ ᱡᱚᱭᱱᱚ ᱢᱩᱸᱫᱽᱨᱤ ᱟᱨ ᱵᱮᱛᱞᱟ ᱡᱟᱹᱛᱤᱭᱟᱹᱨᱤ ᱵᱟᱜᱟᱱ ᱨᱮᱱᱟᱜ ᱛᱟᱹᱨᱩᱵ ᱟᱨ ᱦᱟᱹᱛᱤ ᱞᱟᱹᱜᱤᱫ ᱧᱩᱛᱩᱢᱟᱱ ᱠᱟᱱᱟ᱾"
+  },
+  "Sign In / Parichay SSO": {
+    hi: "लॉग इन / परिचय एसएसओ",
+    nagpuri: "लागिन / परिचय SSO",
+    santali: "ᱞᱟᱜᱤᱱ / ᱯᱚᱨᱤᱪᱚᱭ SSO"
+  },
+  "Track Complaint": {
+    hi: "शिकायत ट्रैक करें",
+    nagpuri: "शिकायत जांचू",
+    santali: "ᱮᱴᱠᱮᱴᱚᱬᱮ ᱯᱟᱸᱡᱟ"
   }
 };

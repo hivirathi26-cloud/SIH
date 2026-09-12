@@ -9,8 +9,32 @@ export const GovtHeader = () => {
     const [roleDropdownOpen, setRoleDropdownOpen] = useState(false);
     const [notifDropdownOpen, setNotifDropdownOpen] = useState(false);
     const [langDropdownOpen, setLangDropdownOpen] = useState(false);
-    const [fontSize, setFontSize] = useState("normal");
+    const [fontSize, setFontSize] = useState(() => {
+        return localStorage.getItem("jsicp_font_size") || "normal";
+    });
     const navigate = useNavigate();
+
+    const applyFontSize = (size) => {
+        setFontSize(size);
+        try {
+            localStorage.setItem("jsicp_font_size", size);
+            if (size === "small") {
+                document.documentElement.style.fontSize = "14px";
+            } else if (size === "larger") {
+                document.documentElement.style.fontSize = "18px";
+            } else {
+                document.documentElement.style.fontSize = "16px";
+            }
+        } catch (e) {
+            console.error("Failed to set font size:", e);
+        }
+    };
+
+    React.useEffect(() => {
+        const saved = localStorage.getItem("jsicp_font_size") || "normal";
+        applyFontSize(saved);
+    }, []);
+
     const handleRoleSwitch = (roleKey) => {
         loginAsRole(roleKey);
         setRoleDropdownOpen(false);
@@ -33,15 +57,24 @@ export const GovtHeader = () => {
 
         {/* Accessibility & Language */}
         <div className="flex items-center space-x-3">
-          <div className="hidden sm:flex items-center space-x-1 text-slate-300 text-[10px]">
-            <span>Font Size:</span>
-            <button onClick={() => setFontSize("normal")} className={`px-1 rounded hover:bg-slate-800 ${fontSize === "normal" ? "font-bold text-white bg-slate-800" : ""}`}>
+          <div className="hidden sm:flex items-center space-x-1.5 text-slate-300 text-[10px]" data-no-translate="true">
+            <span className="text-slate-400">Font:</span>
+            <button 
+              onClick={() => applyFontSize("small")} 
+              title="Decrease font size (A-)" 
+              className={`px-1.5 py-0.5 rounded transition ${fontSize === "small" ? "font-bold text-amber-300 bg-slate-800 border border-amber-400/40" : "hover:bg-slate-800 text-slate-300"}`}>
               A-
             </button>
-            <button onClick={() => setFontSize("large")} className={`px-1 rounded hover:bg-slate-800 ${fontSize === "large" ? "font-bold text-white bg-slate-800" : ""}`}>
+            <button 
+              onClick={() => applyFontSize("normal")} 
+              title="Normal font size (A)" 
+              className={`px-1.5 py-0.5 rounded transition ${fontSize === "normal" ? "font-bold text-amber-300 bg-slate-800 border border-amber-400/40" : "hover:bg-slate-800 text-slate-300"}`}>
               A
             </button>
-            <button onClick={() => setFontSize("larger")} className={`px-1 rounded hover:bg-slate-800 ${fontSize === "larger" ? "font-bold text-white bg-slate-800" : ""}`}>
+            <button 
+              onClick={() => applyFontSize("larger")} 
+              title="Increase font size (A+)" 
+              className={`px-1.5 py-0.5 rounded transition ${fontSize === "larger" ? "font-bold text-amber-300 bg-slate-800 border border-amber-400/40" : "hover:bg-slate-800 text-slate-300"}`}>
               A+
             </button>
           </div>
@@ -49,26 +82,49 @@ export const GovtHeader = () => {
           <span className="text-slate-600 hidden sm:inline">|</span>
 
           {/* Language Switcher */}
-          <div className="relative">
-            <button onClick={() => setLangDropdownOpen(!langDropdownOpen)} className="flex items-center space-x-1 px-1.5 py-0.5 rounded text-slate-200 hover:bg-slate-800 text-[10px]">
+          <div className="relative" data-no-translate="true">
+            <button 
+              onClick={() => setLangDropdownOpen(!langDropdownOpen)} 
+              className="flex items-center space-x-1.5 px-2 py-0.5 rounded text-slate-200 hover:bg-slate-800 text-[10px] font-medium border border-slate-700 bg-slate-800/60 transition"
+              title="Change Language"
+            >
               <Globe className="w-3 h-3 text-emerald-400"/>
-              <span className="uppercase font-medium">{currentLanguage}</span>
-              <ChevronDown className="w-2.5 h-2.5"/>
+              <span className="font-semibold">
+                {currentLanguage === "en" ? "English" : currentLanguage === "hi" ? "हिन्दी" : currentLanguage === "nagpuri" ? "नागपुरी" : "संताली"}
+              </span>
+              <ChevronDown className="w-2.5 h-2.5 text-slate-400"/>
             </button>
-            {langDropdownOpen && (<div className="absolute right-0 mt-1 w-32 bg-white text-slate-800 rounded shadow-lg border border-slate-200 py-1 z-50 text-[11px]">
-                <button onClick={() => { setCurrentLanguage("en"); setLangDropdownOpen(false); }} className="w-full text-left px-3 py-1 hover:bg-slate-100">
-                  English
+            {langDropdownOpen && (
+              <div className="absolute right-0 mt-1 w-36 bg-white text-slate-800 rounded shadow-xl border border-slate-200 py-1.5 z-50 text-[11px]" data-no-translate="true">
+                <div className="px-3 py-1 text-[9px] uppercase font-bold text-slate-400 border-b border-slate-100">
+                  Select Language
+                </div>
+                <button 
+                  onClick={() => { setCurrentLanguage("en"); setLangDropdownOpen(false); }} 
+                  className={`w-full text-left px-3 py-1.5 hover:bg-blue-50 flex items-center justify-between transition ${currentLanguage === "en" ? "font-bold text-blue-900 bg-blue-50" : "text-slate-700"}`}>
+                  <span>English</span>
+                  {currentLanguage === "en" && <span className="text-blue-600 font-bold">✓</span>}
                 </button>
-                <button onClick={() => { setCurrentLanguage("hi"); setLangDropdownOpen(false); }} className="w-full text-left px-3 py-1 hover:bg-slate-100">
-                  हिन्दी (Hindi)
+                <button 
+                  onClick={() => { setCurrentLanguage("hi"); setLangDropdownOpen(false); }} 
+                  className={`w-full text-left px-3 py-1.5 hover:bg-blue-50 flex items-center justify-between transition ${currentLanguage === "hi" ? "font-bold text-blue-900 bg-blue-50" : "text-slate-700"}`}>
+                  <span>हिन्दी (Hindi)</span>
+                  {currentLanguage === "hi" && <span className="text-blue-600 font-bold">✓</span>}
                 </button>
-                <button onClick={() => { setCurrentLanguage("nagpuri"); setLangDropdownOpen(false); }} className="w-full text-left px-3 py-1 hover:bg-slate-100">
-                  नागपुरी (Nagpuri)
+                <button 
+                  onClick={() => { setCurrentLanguage("nagpuri"); setLangDropdownOpen(false); }} 
+                  className={`w-full text-left px-3 py-1.5 hover:bg-blue-50 flex items-center justify-between transition ${currentLanguage === "nagpuri" ? "font-bold text-blue-900 bg-blue-50" : "text-slate-700"}`}>
+                  <span>नागपुरी (Nagpuri)</span>
+                  {currentLanguage === "nagpuri" && <span className="text-blue-600 font-bold">✓</span>}
                 </button>
-                <button onClick={() => { setCurrentLanguage("santali"); setLangDropdownOpen(false); }} className="w-full text-left px-3 py-1 hover:bg-slate-100">
-                  संताली (Santali)
+                <button 
+                  onClick={() => { setCurrentLanguage("santali"); setLangDropdownOpen(false); }} 
+                  className={`w-full text-left px-3 py-1.5 hover:bg-blue-50 flex items-center justify-between transition ${currentLanguage === "santali" ? "font-bold text-blue-900 bg-blue-50" : "text-slate-700"}`}>
+                  <span>संताली (Santali)</span>
+                  {currentLanguage === "santali" && <span className="text-blue-600 font-bold">✓</span>}
                 </button>
-              </div>)}
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -78,10 +134,11 @@ export const GovtHeader = () => {
         <div className="flex items-center justify-between">
           {/* Logo & Seal */}
           <Link to="/" className="flex items-center space-x-3.5 group">
-            <div className="w-11 h-11 rounded bg-[#0f2942] text-white flex flex-col items-center justify-center font-serif font-bold text-xs tracking-wider border border-[#1e3a5f] shrink-0">
-              <span className="text-[9px] uppercase font-sans text-amber-400 font-semibold tracking-tighter">GOVT OF</span>
-              <span className="text-sm leading-none font-bold text-white">JH</span>
-            </div>
+            <img 
+              src="/jharkhand_seal_hd.png" 
+              alt="Government of Jharkhand Official Emblem" 
+              className="w-12 h-12 object-contain drop-shadow-sm shrink-0 transition-transform group-hover:scale-105" 
+            />
             <div>
               <div className="flex items-center space-x-2">
                 <span className="font-heading font-extrabold text-base sm:text-lg text-[#0f2942] tracking-tight">

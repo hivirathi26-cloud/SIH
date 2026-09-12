@@ -31,20 +31,25 @@ freePort(3000);
 
 // 0. Start Python ML Microservice on Port 8000
 let aiService = null;
-const venvPython = path.join(aiDir, "venv/bin/python");
-const venvUvicorn = path.join(aiDir, "venv/bin/uvicorn");
+const candidateAiDirs = [
+  path.join(root, "services/ai-service"),
+  aiDir
+];
+const resolvedAiDir = candidateAiDirs.find((dir) => fs.existsSync(dir));
 
-if (fs.existsSync(aiDir)) {
+if (resolvedAiDir) {
+  const venvPython = path.join(resolvedAiDir, "venv/bin/python");
+  const venvUvicorn = path.join(resolvedAiDir, "venv/bin/uvicorn");
   const pythonCmd = fs.existsSync(venvUvicorn) ? venvUvicorn : (fs.existsSync(venvPython) ? venvPython : "python3");
   const aiArgs = fs.existsSync(venvUvicorn)
     ? ["main:app", "--host", "0.0.0.0", "--port", "8000"]
     : ["-m", "uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"];
 
-  console.log(`[AI Engine] Starting ML service from ${aiDir} on http://0.0.0.0:8000 ...`);
+  console.log(`[AI Engine] Starting ML service from ${resolvedAiDir} on http://0.0.0.0:8000 ...`);
   aiService = spawn(pythonCmd, aiArgs, {
-    cwd: aiDir,
+    cwd: resolvedAiDir,
     stdio: "inherit",
-    env: { ...process.env, PYTHONPATH: aiDir, PORT: "8000" },
+    env: { ...process.env, PYTHONPATH: resolvedAiDir, PORT: "8000" },
     detached: process.platform !== "win32"
   });
 

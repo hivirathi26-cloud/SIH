@@ -440,6 +440,242 @@
   },
   "problems": [
     {
+      "id": "prob-1789222012230",
+      "ticketNumber": "JSICP-2026-6630",
+      "submittedBy": "pri-mukhia-khunti",
+      "submitterName": "Shri Birsa Munda (Mukhia)",
+      "submitterRole": "pri",
+      "title": "infect ",
+      "description": "cruces",
+      "descriptionOriginalLang": "cruces",
+      "detectedLanguage": "English (en)",
+      "category": "Unclassified Submission",
+      "subCategory": "Human review required",
+      "categoryConfidence": 0.96,
+      "priorityScore": 75,
+      "status": "pending_nodal_review",
+      "district": "Ranchi",
+      "block": "Sadar Block",
+      "village": "Gram Panchayat",
+      "latitude": 23.3441,
+      "longitude": 85.3096,
+      "isDuplicateOf": null,
+      "citizenSupportCount": 1,
+      "sdgTags": [
+        "SDG 11"
+      ],
+      "media": [
+        {
+          "id": "med-1789222012179",
+          "problemId": "",
+          "mediaType": "image",
+          "storageUrl": "https://images.unsplash.com/photo-1584824486509-112e4181ff6b?w=600&auto=format&fit=crop&q=80",
+          "cvValidationLabel": "Verified Ground Anomaly (94% Match)",
+          "cvValidationConfidence": 0.94
+        }
+      ],
+      "aiExplanation": {
+        "nlpKeywords": [
+          "infrastructure",
+          "community",
+          "remediation",
+          "Jharkhand",
+          "Ranchi"
+        ],
+        "cvSceneTags": [
+          "infrastructure defect",
+          "public utility",
+          "anomaly"
+        ],
+        "duplicateCheckResult": "Zero duplicates detected within 3km geo-radius.",
+        "priorityBreakdown": {
+          "population_impact": 100,
+          "severity": "medium"
+        },
+        "suggestedUniversities": [],
+        "mlSource": "jsicp_ai_ml_model"
+      },
+      "createdAt": "2026-09-12T14:06:52.230Z",
+      "updatedAt": "2026-09-12T14:06:52.230Z"
+    },
+    {
+      "id": "prob-1789220831400",
+      "ticketNumber": "JSICP-2026-5436",
+      "submittedBy": "pri-mukhia-khunti",
+      "submitterName": "Shri Birsa Munda (Mukhia)",
+      "submitterRole": "pri",
+      "title": "malaria",
+      "description": "cnivfas",
+      "descriptionOriginalLang": "cnivfas",
+      "detectedLanguage": "English (en)",
+      "category": "Healthcare & MedTech",
+      "subCategory": "Community Scale Challenge",
+      "categoryConfidence": 0.98,
+      "priorityScore": 86.5,
+      "status": "routed_to_line_department",
+      "district": "Ranchi",
+      "block": "Sadar Block",
+      "village": "Gram Panchayat",
+      "latitude": 23.3441,
+      "longitude": 85.3096,
+      "isDuplicateOf": null,
+      "citizenSupportCount": 1,
+      "sdgTags": [
+        "SDG 3"
+      ],
+      "media": [
+        {
+          "id": "med-1789220831383",
+          "problemId": "",
+          "mediaType": "image",
+          "storageUrl": "https://images.unsplash.com/photo-1584824486509-112e4181ff6b?w=600&auto=format&fit=crop&q=80",
+          "cvValidationLabel": "Verified Ground Anomaly (94% Match)",
+          "cvValidationConfidence": 0.94
+        }
+      ],
+      "aiExplanation": {
+        "nlpKeywords": [
+          "fever",
+          "epidemic",
+          "viral_outbreak",
+          "public_health",
+          "Ranchi"
+        ],
+        "cvSceneTags": [
+          "clinical anomaly",
+          "patient surge",
+          "syndromic cluster"
+        ],
+        "duplicateCheckResult": "Zero duplicates detected within 3km geo-radius.",
+        "priorityBreakdown": {
+          "population_impact": 100,
+          "severity": "medium"
+        },
+        "suggestedUniversities": [],
+        "mlSource": "jsicp_ai_ml_model"
+      },
+      "createdAt": "2026-09-12T13:47:11.400Z",
+      "updatedAt": "2026-09-12T13:49:40.571Z"
+    },
+    {
+      "id": "prob-1789220790351",
+      "ticketNumber": "JSICP-2026-3083",
+      "submittedBy": "citizen-sunita",
+      "submitterName": "Smt. Sunita Devi",
+      "submitterRole": "citizen",
+      "title": "malaria ",
+      "description": "fjcoa",
+      "descriptionOriginalLang": "fjcoa",
+      "detectedLanguage": "English (en)",
+      "category": "Healthcare & MedTech",
+      "subCategory": "Community Scale Challenge",
+      "categoryConfidence": 0.98,
+      "priorityScore": 86.5,
+      "status": "pending_nodal_review",
+      "district": "Ranchi",
+      "block": "Sadar Block",
+      "village": "Gram Panchayat",
+      "latitude": 23.3441,
+      "longitude": 85.3096,
+      "isDuplicateOf": null,
+      "citizenSupportCount": 1,
+      "sdgTags": [
+        "SDG 3"
+      ],
+      "media": [
+        {
+          "id": "med-1789220790335",
+          "problemId": "",
+          "mediaType": "image",
+          "storageUrl": "https://images.unsplash.com/photo-1584824486509-112e4181ff6b?w=600&auto=format&fit=crop&q=80",
+          "cvValidationLabel": "Verified Ground Anomaly (94% Match)",
+          "cvValidationConfidence": 0.94
+        }
+      ],
+      "aiExplanation": {
+        "nlpKeywords": [
+          "fever",
+          "epidemic",
+          "viral_outbreak",
+          "public_health",
+          "Ranchi"
+        ],
+        "cvSceneTags": [
+          "clinical anomaly",
+          "patient surge",
+          "syndromic cluster"
+        ],
+        "duplicateCheckResult": "Zero duplicates detected within 3km geo-radius.",
+        "priorityBreakdown": {
+          "population_impact": 100,
+          "severity": "medium"
+        },
+        "suggestedUniversities": [],
+        "mlSource": "jsicp_ai_ml_model"
+      },
+      "createdAt": "2026-09-12T13:46:30.351Z",
+      "updatedAt": "2026-09-12T13:46:30.351Z"
+    },
+    {
+      "id": "prob-1789220649962",
+      "ticketNumber": "JSICP-2026-6957",
+      "submittedBy": "pri-mukhia-khunti",
+      "submitterName": "Shri Birsa Munda (Mukhia)",
+      "submitterRole": "pri",
+      "title": "robotics ",
+      "description": "eoncdj",
+      "descriptionOriginalLang": "eoncdj",
+      "detectedLanguage": "English (en)",
+      "category": "Water Resources & Sanitation",
+      "subCategory": "Community Scale Challenge",
+      "categoryConfidence": 0.95,
+      "priorityScore": 83.8,
+      "status": "pending_nodal_review",
+      "district": "Khunti",
+      "block": "Sadar Block",
+      "village": "Gram Panchayat",
+      "latitude": 23.3441,
+      "longitude": 85.3096,
+      "isDuplicateOf": null,
+      "citizenSupportCount": 1,
+      "sdgTags": [
+        "SDG 11"
+      ],
+      "media": [
+        {
+          "id": "med-1789220649915",
+          "problemId": "",
+          "mediaType": "image",
+          "storageUrl": "https://images.unsplash.com/photo-1584824486509-112e4181ff6b?w=600&auto=format&fit=crop&q=80",
+          "cvValidationLabel": "Verified Ground Anomaly (94% Match)",
+          "cvValidationConfidence": 0.94
+        }
+      ],
+      "aiExplanation": {
+        "nlpKeywords": [
+          "infrastructure",
+          "community",
+          "remediation",
+          "Jharkhand",
+          "Khunti"
+        ],
+        "cvSceneTags": [
+          "infrastructure defect",
+          "public utility",
+          "anomaly"
+        ],
+        "duplicateCheckResult": "Zero duplicates detected within 3km geo-radius.",
+        "priorityBreakdown": {
+          "population_impact": 100,
+          "severity": "medium"
+        },
+        "suggestedUniversities": [],
+        "mlSource": "jsicp_ai_ml_model"
+      },
+      "createdAt": "2026-09-12T13:44:09.962Z",
+      "updatedAt": "2026-09-12T13:44:09.962Z"
+    },
+    {
       "id": "prob-1788972472796",
       "ticketNumber": "JSICP-2026-9428",
       "submittedBy": "citizen-sunita",
@@ -2789,6 +3025,50 @@
   ],
   "notifications": [
     {
+      "userId": "pri-mukhia-khunti",
+      "channel": "whatsapp",
+      "eventType": "PROBLEM_SUBMITTED",
+      "title": "✅ Challenge Successfully Registered!",
+      "message": "Your challenge \"infect ...\" has been logged with ID JSICP-2026-6866. AI Engine priority: 75/100.",
+      "status": "delivered",
+      "linkUrl": "/my-problems",
+      "id": "notif-1789222012235",
+      "sentAt": "2026-09-12T14:06:52.235Z"
+    },
+    {
+      "userId": "pri-mukhia-khunti",
+      "channel": "whatsapp",
+      "eventType": "PROBLEM_SUBMITTED",
+      "title": "✅ Challenge Successfully Registered!",
+      "message": "Your challenge \"malaria...\" has been logged with ID JSICP-2026-4085. AI Engine priority: 86.5/100.",
+      "status": "delivered",
+      "linkUrl": "/my-problems",
+      "id": "notif-1789220831398",
+      "sentAt": "2026-09-12T13:47:11.398Z"
+    },
+    {
+      "userId": "citizen-sunita",
+      "channel": "whatsapp",
+      "eventType": "PROBLEM_SUBMITTED",
+      "title": "✅ Challenge Successfully Registered!",
+      "message": "Your challenge \"malaria ...\" has been logged with ID JSICP-2026-5330. AI Engine priority: 86.5/100.",
+      "status": "delivered",
+      "linkUrl": "/my-problems",
+      "id": "notif-1789220790349",
+      "sentAt": "2026-09-12T13:46:30.349Z"
+    },
+    {
+      "userId": "pri-mukhia-khunti",
+      "channel": "whatsapp",
+      "eventType": "PROBLEM_SUBMITTED",
+      "title": "✅ Challenge Successfully Registered!",
+      "message": "Your challenge \"robotics ...\" has been logged with ID JSICP-2026-5815. AI Engine priority: 83.8/100.",
+      "status": "delivered",
+      "linkUrl": "/my-problems",
+      "id": "notif-1789220649959",
+      "sentAt": "2026-09-12T13:44:09.959Z"
+    },
+    {
       "userId": "user-nodal-bit",
       "channel": "email",
       "eventType": "TEAM_FORMED",
@@ -2944,6 +3224,66 @@
     }
   ],
   "blockchainLedger": [
+    {
+      "blockNumber": 22,
+      "timestamp": "2026-09-12T14:07:41.353Z",
+      "eventType": "NODAL_APPROVAL",
+      "entityId": "prob-1789222012185",
+      "details": "Nodal review finalized. Status updated to routed. Assigned to univ-iit-dhanbad.",
+      "previousHash": "2504ddb68ee8e6f3e0105034f3530575893697a1286d0c63d1becf90d894c028",
+      "currentHash": "503c0d426f4e998eb3fc9fbbc23f4ca3139dbe1e851b92a6a033d8c3602a9457",
+      "verifiedBy": "State Nodal Officer Gateway"
+    },
+    {
+      "blockNumber": 21,
+      "timestamp": "2026-09-12T14:06:52.218Z",
+      "eventType": "PROBLEM_SUBMISSION",
+      "entityId": "prob-1789222012185",
+      "details": "Citizen Shri Birsa Munda (Mukhia) registered challenge JSICP-2026-6866 from Ranchi with priority score 75.",
+      "previousHash": "88c3a95e30c47be476aa7348fb0ec39faeae01b5c4e40d1051c38166f875000a",
+      "currentHash": "2504ddb68ee8e6f3e0105034f3530575893697a1286d0c63d1becf90d894c028",
+      "verifiedBy": "JSICP AI Gateway Node #1"
+    },
+    {
+      "blockNumber": 20,
+      "timestamp": "2026-09-12T13:47:11.393Z",
+      "eventType": "PROBLEM_SUBMISSION",
+      "entityId": "prob-1789220831383",
+      "details": "Citizen Shri Birsa Munda (Mukhia) registered challenge JSICP-2026-4085 from Ranchi with priority score 86.5.",
+      "previousHash": "a9647005bb88be92e2b743c06d1dd100ffefb228af715ad14b39fb09dd7d10d6",
+      "currentHash": "88c3a95e30c47be476aa7348fb0ec39faeae01b5c4e40d1051c38166f875000a",
+      "verifiedBy": "JSICP AI Gateway Node #1"
+    },
+    {
+      "blockNumber": 19,
+      "timestamp": "2026-09-12T13:46:30.344Z",
+      "eventType": "PROBLEM_SUBMISSION",
+      "entityId": "prob-1789220790335",
+      "details": "Citizen Smt. Sunita Devi registered challenge JSICP-2026-5330 from Ranchi with priority score 86.5.",
+      "previousHash": "c163da0d21dbcc8bc4c9102013719b6b15bb349fffe33f38d721705acfe89761",
+      "currentHash": "a9647005bb88be92e2b743c06d1dd100ffefb228af715ad14b39fb09dd7d10d6",
+      "verifiedBy": "JSICP AI Gateway Node #1"
+    },
+    {
+      "blockNumber": 18,
+      "timestamp": "2026-09-12T13:45:02.766Z",
+      "eventType": "NODAL_APPROVAL",
+      "entityId": "prob-1789220649917",
+      "details": "Nodal review finalized. Status updated to routed. Assigned to univ-iit-dhanbad.",
+      "previousHash": "af0ab966da3e16d9260517ada52707965957d5bb6ec63f28729c437c513960ad",
+      "currentHash": "c163da0d21dbcc8bc4c9102013719b6b15bb349fffe33f38d721705acfe89761",
+      "verifiedBy": "State Nodal Officer Gateway"
+    },
+    {
+      "blockNumber": 17,
+      "timestamp": "2026-09-12T13:44:09.950Z",
+      "eventType": "PROBLEM_SUBMISSION",
+      "entityId": "prob-1789220649917",
+      "details": "Citizen Shri Birsa Munda (Mukhia) registered challenge JSICP-2026-5815 from Khunti with priority score 83.8.",
+      "previousHash": "0af84f52618a32ece60dcd64df5b14e7a23120d1acc238484eb6a8d8c7ac8f89",
+      "currentHash": "af0ab966da3e16d9260517ada52707965957d5bb6ec63f28729c437c513960ad",
+      "verifiedBy": "JSICP AI Gateway Node #1"
+    },
     {
       "blockNumber": 16,
       "timestamp": "2026-09-05T13:04:28.915Z",

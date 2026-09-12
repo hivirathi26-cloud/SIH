@@ -378,26 +378,34 @@ export const inferCategoryAndAllocation = (title = "", description = "", distric
 
     // 5. Check Healthcare
     const isHealth = (
-        text.includes("hospital") ||
+        text.includes("hospit") ||
         text.includes("doctor") ||
-        text.includes("medicine") ||
+        text.includes("medic") ||
         text.includes("दवाई") ||
         text.includes("अस्पताल") ||
         text.includes("fever") ||
         text.includes("flu") ||
         text.includes("clinic") ||
-        text.includes("swasthya") ||
+        text.includes("swasth") ||
         text.includes("स्वास्थ्य") ||
-        text.includes("disease") ||
-        text.includes("vaccine") ||
+        text.includes("diseas") ||
+        text.includes("vaccin") ||
+        text.includes("tika") ||
+        text.includes("teeka") ||
+        text.includes("टीका") ||
         text.includes("dengue") ||
         text.includes("malaria") ||
-        text.includes("ambulance") ||
+        text.includes("ambul") ||
         text.includes("patient") ||
-        text.includes("medical") ||
         text.includes("epidemic") ||
-        text.includes("illness") ||
-        text.includes("infection")
+        text.includes("ill") ||
+        text.includes("infect") ||
+        text.includes("virus") ||
+        text.includes("sick") ||
+        text.includes("health") ||
+        text.includes("बीमार") ||
+        text.includes("इलाज") ||
+        text.includes("रोग")
     );
 
     // 6. Check Water & Sanitation
@@ -439,10 +447,26 @@ export const inferCategoryAndAllocation = (title = "", description = "", distric
         text.includes("learning")
     );
 
-    // Do not force arbitrary text into the default mining category.  This local
+    // 8. Check Rural Infrastructure & Roads
+    const isRoad = (
+        text.includes("road") ||
+        text.includes("bridg") ||
+        text.includes("culvert") ||
+        text.includes("pothol") ||
+        text.includes("highway") ||
+        text.includes("transport") ||
+        text.includes("traffic") ||
+        text.includes("street") ||
+        text.includes("सड़क") ||
+        text.includes("पुल") ||
+        text.includes("गड्ढा") ||
+        text.includes("रास्ता")
+    );
+
+    // Do not force arbitrary text into the default mining category. This local
     // fallback is used by the citizen submission flow, so it must behave safely
     // even while the API/ML service is unavailable.
-    if (!(isEnergy || isMining || isAgri || isForest || isHealth || isWater || isEdu)) {
+    if (!(isEnergy || isMining || isAgri || isForest || isHealth || isWater || isEdu || isRoad)) {
         return {
             category: "Unclassified Submission",
             subCategory: "Human review required",
@@ -498,6 +522,11 @@ export const inferCategoryAndAllocation = (title = "", description = "", distric
         subCategory = "Vernacular STEM & Solar Powered Digital Classrooms";
         confidence = 0.93;
         sdgTags = ["SDG 4: Quality Education", "SDG 10: Reduced Inequality"];
+    } else if (isRoad) {
+        category = "Rural Infrastructure & Transport";
+        subCategory = "All-Weather Connectivity & Heavy Load Bridges";
+        confidence = 0.94;
+        sdgTags = ["SDG 9: Industry, Innovation & Infrastructure", "SDG 11: Sustainable Cities"];
     }
 
     const isExcluded = (category === "Healthcare & MedTech" || category === "Water Resources & Sanitation");
