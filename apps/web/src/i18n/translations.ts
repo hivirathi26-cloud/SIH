@@ -198,6 +198,71 @@ export const TRANSLATIONS: TranslationMap = {
     nagpuri: "सभे कामदार मन ले अलग चौपाल",
     santali: "ᱡᱚᱛᱚ ᱠᱟᱹᱢᱤᱭᱟᱹ ᱞᱟᱹᱜᱤᱫ ᱠᱟᱹᱢᱤ ᱴᱷᱟᱶ"
   },
+  "State Innovation Indicators": {
+    hi: "राज्य नवाचार मुख्य संकेतक",
+    nagpuri: "राज्य नवाचार मुख्य संकेतक",
+    santali: "ᱯᱚᱱᱚᱛ ᱱᱟᱣᱟ ᱪᱤᱱᱦᱟᱹ"
+  },
+  "96% Verified": {
+    hi: "96% सत्यापित",
+    nagpuri: "96% सत्यापित",
+    santali: "96% ᱥᱟᱹᱨᱤ"
+  },
+  "5 Premier": {
+    hi: "5 प्रमुख",
+    nagpuri: "5 मुख्य",
+    santali: "5 ᱢᱩᱬᱩᱛ"
+  },
+  "CSR Grants": {
+    hi: "सीएसआर अनुदान",
+    nagpuri: "सीएसआर अनुदान",
+    santali: "CSR ᱜᱚᱲᱚ"
+  },
+  "Companies Act Sec. 135": {
+    hi: "कंपनी अधिनियम धारा 135",
+    nagpuri: "कंपनी कानून धारा 135",
+    santali: "ᱠᱚᱢᱯᱟᱱᱤ ᱟᱹᱭᱤᱱ ᱫᱷᱟᱨᱟ 135"
+  },
+  "Districts Coverage": {
+    hi: "जिला व्याप्ति",
+    nagpuri: "जिला फैलाव",
+    santali: "ᱡᱤᱞᱟᱹ ᱴᱚᱴᱷᱟ"
+  },
+  "260 Blocks (100% Saturation)": {
+    hi: "260 प्रखण्ड (100% कवरेज)",
+    nagpuri: "260 ब्लॉक (100% कवरेज)",
+    santali: "260 ᱵᱞᱚᱠ (100% ᱯᱩᱨᱟᱹᱣ)"
+  },
+  "What's New / Circulars": {
+    hi: "नवीनतम सूचनाएं",
+    nagpuri: "ताजा सूचना मन",
+    santali: "ᱱᱟᱣᱟ ᱵᱟᱰᱟᱭ"
+  },
+  "Notice Board": {
+    hi: "सूचना पट्ट",
+    nagpuri: "सूचना पट्टा",
+    santali: "ᱵᱟᱰᱟᱭ ᱡᱚᱝ ᱵᱳᱨᱰ"
+  },
+  "NEP 2020: Guidelines issued for HEI Capstone & Field Research across 24 districts.": {
+    hi: "NEP 2020: 24 जिलों में शैक्षणिक व कैपस्टोन अनुसंधान दिशानिर्देश जारी।",
+    nagpuri: "NEP 2020: 24 जिला म अनुसंधान दिशानिर्देश जारी।",
+    santali: "NEP 2020: 24 ᱡᱤᱞᱟᱹ ᱨᱮ ᱠᱷᱚᱸᱫᱽᱨᱚᱸᱫᱽ ᱫᱤᱥᱟᱹ-ᱩᱫᱩᱜ ᱡᱟᱹᱨᱤ ᱮᱱᱟ᱾"
+  },
+  "Call for Proposals: CSR co-funding for water conservation & agri-tech solutions.": {
+    hi: "जल संरक्षण एवं कृषि नवाचार परियोजनाओं हेतु CSR सह-अनुदान आमंत्रण।",
+    nagpuri: "जल संरक्षण अउर कृषि नवाचार खातिर CSR अनुदान आमंत्रण।",
+    santali: "ᱫᱟᱜ ᱫᱚᱦᱚ ᱟᱨ ᱪᱟᱥ ᱱᱟᱣᱟ ᱠᱟᱹᱢᱤ ᱞᱟᱹᱜᱤᱫ CSR ᱜᱚᱲᱚ ᱱᱮᱦᱚᱨ᱾"
+  },
+  "Panchayati Raj: Ground-level problem verification ongoing by PRIs.": {
+    hi: "पंचायती राज संस्थाओं (PRIs) द्वारा ग्राम स्तर पर समस्या सत्यापन जारी।",
+    nagpuri: "पंचायती राज संस्था मन द्वारा गांव स्तर पर समस्या जांच जारी।",
+    santali: "ᱯᱚᱧᱪᱟᱭᱮᱛ ᱨᱟᱡᱽ ᱛᱟᱞᱢᱟ ᱦᱚᱛᱮᱛᱮ ᱟᱹᱛᱩ ᱛᱷᱟᱨ ᱨᱮ ᱮᱴᱠᱮᱴᱚᱬᱮ ᱯᱩᱨᱟᱹᱣ ᱪᱟᱞᱟᱜ ᱠᱟᱱᱟ᱾"
+  },
+  "NIC Standards": {
+    hi: "NIC मानक",
+    nagpuri: "NIC मानक",
+    santali: "NIC ᱢᱟᱱᱚᱠ"
+  },
   "Open Portal": {
     hi: "पोर्टल खोलें",
     nagpuri: "चौपाल खोलू",

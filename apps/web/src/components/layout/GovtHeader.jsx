@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth, getPortalPath } from "../../context/AuthContext";
 import { useApp } from "../../context/AppContext";
@@ -9,10 +9,29 @@ export const GovtHeader = () => {
     const [roleDropdownOpen, setRoleDropdownOpen] = useState(false);
     const [notifDropdownOpen, setNotifDropdownOpen] = useState(false);
     const [langDropdownOpen, setLangDropdownOpen] = useState(false);
+    const notifRef = useRef(null);
+    const roleRef = useRef(null);
+    const langRef = useRef(null);
     const [fontSize, setFontSize] = useState(() => {
         return localStorage.getItem("jsicp_font_size") || "normal";
     });
     const navigate = useNavigate();
+
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (notifRef.current && !notifRef.current.contains(event.target)) {
+                setNotifDropdownOpen(false);
+            }
+            if (roleRef.current && !roleRef.current.contains(event.target)) {
+                setRoleDropdownOpen(false);
+            }
+            if (langRef.current && !langRef.current.contains(event.target)) {
+                setLangDropdownOpen(false);
+            }
+        };
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, []);
 
     const applyFontSize = (size) => {
         setFontSize(size);
@@ -102,10 +121,13 @@ export const GovtHeader = () => {
             )}
           </button>
 
-          <span className="text-slate-600 hidden sm:inline">|</span>
-
           {/* Language Switcher */}
-          <div className="relative" data-no-translate="true">
+          <div 
+            ref={langRef}
+            className="relative" 
+            data-no-translate="true"
+            onMouseLeave={() => setLangDropdownOpen(false)}
+          >
             <button 
               onClick={() => setLangDropdownOpen(!langDropdownOpen)} 
               className="flex items-center space-x-1.5 px-2 py-0.5 rounded text-slate-200 hover:bg-slate-800 text-[10px] font-medium border border-slate-700 bg-slate-800/60 transition"
@@ -168,11 +190,11 @@ export const GovtHeader = () => {
                   JSICP
                 </span>
                 <span className="bg-[#f1f5f9] text-[#0f2942] text-[10px] font-bold px-2 py-0.5 rounded border border-slate-300">
-                  झारखंड पोर्टल
+                  {currentLanguage === "en" ? "Jharkhand Portal" : "झारखंड पोर्टल"}
                 </span>
               </div>
               <p className="text-xs text-slate-700 font-medium leading-tight">
-                झारखंड सामाजिक नवाचार सहयोग पोर्टल
+                {currentLanguage === "en" ? "Jharkhand Societal Innovation Collaboration Portal" : "झारखंड सामाजिक नवाचार सहयोग पोर्टल"}
               </p>
               <p className="text-[10px] text-slate-500 hidden sm:block">
                 Jharkhand Societal Innovation Collaboration Portal • SIH 2026
@@ -184,34 +206,56 @@ export const GovtHeader = () => {
           <div className="flex items-center space-x-3">
             {isAuthenticated && currentUser ? (<>
                 {/* Notification Bell */}
-                <div className="relative">
-                  <button onClick={() => setNotifDropdownOpen(!notifDropdownOpen)} className="p-2 rounded text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition relative" title="Notifications">
+                <div 
+                  ref={notifRef}
+                  className="relative"
+                  onMouseLeave={() => setNotifDropdownOpen(false)}
+                >
+                  <button 
+                    onClick={() => setNotifDropdownOpen(!notifDropdownOpen)} 
+                    className="p-2 rounded text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition relative" 
+                    title="Notifications"
+                  >
                     <Bell className="w-4 h-4"/>
                     {unreadNotifs.length > 0 && (<span className="absolute top-1 right-1 w-3.5 h-3.5 bg-rose-600 text-white text-[9px] font-bold rounded-full flex items-center justify-center">
                         {unreadNotifs.length}
                       </span>)}
                   </button>
 
-                  {notifDropdownOpen && (<div className="absolute right-0 mt-2 w-80 bg-white rounded shadow-xl border border-slate-200 py-2 z-50 text-xs">
-                      <div className="px-3 py-2 border-b border-slate-100 font-bold text-slate-800 flex justify-between">
-                        <span>Official Alerts</span>
-                        <span className="text-slate-500 font-normal">{notifications.length} total</span>
+                  {notifDropdownOpen && (
+                    <div 
+                      className="absolute right-0 top-full pt-1 w-80 z-50 text-xs"
+                      onMouseEnter={() => setNotifDropdownOpen(true)}
+                    >
+                      <div className="bg-white rounded shadow-xl border border-slate-200 py-2">
+                        <div className="px-3 py-2 border-b border-slate-100 font-bold text-slate-800 flex justify-between">
+                          <span>Official Alerts</span>
+                          <span className="text-slate-500 font-normal">{notifications.length} total</span>
+                        </div>
+                        <div className="max-h-60 overflow-y-auto divide-y divide-slate-100">
+                          {notifications.slice(0, 4).map((n) => (<div key={n.id} onClick={() => markNotificationAsRead(n.id)} className={`p-2.5 hover:bg-slate-50 cursor-pointer ${n.status !== "read" ? "bg-amber-50/50" : ""}`}>
+                              <div className="flex justify-between text-[11px] font-semibold text-slate-900">
+                                <span>{n.title}</span>
+                                <span className="uppercase text-[9px] text-slate-500 font-mono">{n.channel}</span>
+                              </div>
+                              <p className="text-[11px] text-slate-600 mt-0.5 line-clamp-2">{n.message}</p>
+                            </div>))}
+                        </div>
                       </div>
-                      <div className="max-h-60 overflow-y-auto divide-y divide-slate-100">
-                        {notifications.slice(0, 4).map((n) => (<div key={n.id} onClick={() => markNotificationAsRead(n.id)} className={`p-2.5 hover:bg-slate-50 cursor-pointer ${n.status !== "read" ? "bg-amber-50/50" : ""}`}>
-                            <div className="flex justify-between text-[11px] font-semibold text-slate-900">
-                              <span>{n.title}</span>
-                              <span className="uppercase text-[9px] text-slate-500 font-mono">{n.channel}</span>
-                            </div>
-                            <p className="text-[11px] text-slate-600 mt-0.5 line-clamp-2">{n.message}</p>
-                          </div>))}
-                      </div>
-                    </div>)}
+                    </div>
+                  )}
                 </div>
 
                 {/* Role Switcher & User Profile */}
-                <div className="relative">
-                  <button onClick={() => setRoleDropdownOpen(!roleDropdownOpen)} className="flex items-center space-x-2 bg-[#f8fafc] hover:bg-slate-100 border border-slate-300 px-2.5 py-1.5 rounded transition">
+                <div 
+                  ref={roleRef}
+                  className="relative"
+                  onMouseLeave={() => setRoleDropdownOpen(false)}
+                >
+                  <button 
+                    onClick={() => setRoleDropdownOpen(!roleDropdownOpen)} 
+                    className="flex items-center space-x-2 bg-[#f8fafc] hover:bg-slate-100 border border-slate-300 px-2.5 py-1.5 rounded transition"
+                  >
                     <div className="w-6 h-6 rounded bg-[#0f2942] text-white flex items-center justify-center text-xs font-bold shrink-0">
                       {currentUser.fullName[0]}
                     </div>
@@ -231,87 +275,94 @@ export const GovtHeader = () => {
                     <ChevronDown className="w-3.5 h-3.5 text-slate-500"/>
                   </button>
 
-                  {roleDropdownOpen && (<div className="absolute right-0 mt-2 w-80 bg-white rounded shadow-xl border border-slate-200 py-2 z-50 text-xs">
-                      <div className="px-3.5 py-2 border-b border-slate-100 bg-slate-50 text-slate-700">
-                        <span className="font-bold text-[11px] text-slate-800 uppercase tracking-wider block">
-                          Switch Dedicated Stakeholder Portal:
-                        </span>
-                        <p className="text-[11px] text-slate-500 mt-0.5">
-                          Test the system from each actor isolated workspace:
-                        </p>
-                      </div>
+                  {roleDropdownOpen && (
+                    <div 
+                      className="absolute right-0 top-full pt-1 w-80 z-50 text-xs"
+                      onMouseEnter={() => setRoleDropdownOpen(true)}
+                    >
+                      <div className="bg-white rounded shadow-xl border border-slate-200 py-2">
+                        <div className="px-3.5 py-2 border-b border-slate-100 bg-slate-50 text-slate-700">
+                          <span className="font-bold text-[11px] text-slate-800 uppercase tracking-wider block">
+                            Switch Dedicated Stakeholder Portal:
+                          </span>
+                          <p className="text-[11px] text-slate-500 mt-0.5">
+                            Test the system from each actor isolated workspace:
+                          </p>
+                        </div>
 
-                      <div className="py-1 max-h-80 overflow-y-auto divide-y divide-slate-100">
-                        {[
-                    {
-                        category: "🏛️ BIT Mesra Ecosystem (Water, Environment & IoT)",
-                        keys: ["hei_nodal", "faculty", "student", "student_priya", "student_sneha", "student_amit"]
-                    },
-                    {
-                        category: "⛏️ IIT (ISM) Dhanbad Ecosystem (Mining Tech & Robotics)",
-                        keys: ["hei_iit_dhanbad", "faculty_iit", "student_iit_rohan", "student_iit_ananya", "student_iit_vikas"]
-                    },
-                    {
-                        category: "🏥 AIIMS Deoghar Ecosystem (MedTech & Cold-Chain)",
-                        keys: ["hei_aiims_deoghar", "faculty_aiims", "student_aiims_deepak", "student_aiims_kavita"]
-                    },
-                    {
-                        category: "🌾 Birsa Agricultural University - BAU (AgriTech & Bio-Processing)",
-                        keys: ["hei_bau_ranchi", "faculty_bau", "student_bau_birsa", "student_bau_pooja"]
-                    },
-                    {
-                        category: "🏭 Industry & CSR Co-Funding Anchors",
-                        keys: ["industry"]
-                    },
-                    {
-                        category: "🏛️ State Apex Command & District Administration",
-                        keys: ["govt_admin"]
-                    },
-                    {
-                        category: "👥 Grassroots Citizens & Panchayati Raj (PRI)",
-                        keys: ["citizen", "pri"]
-                    }
-                ].map((grp) => (<div key={grp.category} className="py-1">
-                            <span className="px-3.5 py-0.5 text-[9px] font-bold text-slate-400 uppercase tracking-wider block bg-slate-50/70">
-                              {grp.category}
-                            </span>
-                            {grp.keys.map((roleKey) => {
-                        const u = demoUsers[roleKey];
-                        if (!u)
-                            return null;
-                        const isActive = currentUser.id === u.id;
-                        return (<button key={roleKey} onClick={() => handleRoleSwitch(roleKey)} className={`w-full text-left px-3.5 py-1.5 hover:bg-blue-50/60 transition flex items-center space-x-2 ${isActive ? "bg-blue-50 font-bold border-l-2 border-[#0f2942]" : ""}`}>
-                                  <div className="w-5 h-5 rounded bg-slate-200 text-slate-700 flex items-center justify-center text-[9px] font-bold shrink-0">
-                                    {u.fullName[0]}
-                                  </div>
-                                  <div className="min-w-0 flex-1">
-                                    <div className="flex items-center justify-between">
-                                      <span className="text-xs font-semibold text-slate-900 truncate">
-                                        {u.fullName}
-                                      </span>
-                                      <span className="text-[8px] bg-slate-100 text-slate-500 font-mono px-1 rounded uppercase">
-                                        {roleKey.replace("student_", "").replace("hei_", "")}
-                                      </span>
+                        <div className="py-1 max-h-80 overflow-y-auto divide-y divide-slate-100">
+                          {[
+                      {
+                          category: "🏛️ BIT Mesra Ecosystem (Water, Environment & IoT)",
+                          keys: ["hei_nodal", "faculty", "student", "student_priya", "student_sneha", "student_amit"]
+                      },
+                      {
+                          category: "⛏️ IIT (ISM) Dhanbad Ecosystem (Mining Tech & Robotics)",
+                          keys: ["hei_iit_dhanbad", "faculty_iit", "student_iit_rohan", "student_iit_ananya", "student_iit_vikas"]
+                      },
+                      {
+                          category: "🏥 AIIMS Deoghar Ecosystem (MedTech & Cold-Chain)",
+                          keys: ["hei_aiims_deoghar", "faculty_aiims", "student_aiims_deepak", "student_aiims_kavita"]
+                      },
+                      {
+                          category: "🌾 Birsa Agricultural University - BAU (AgriTech & Bio-Processing)",
+                          keys: ["hei_bau_ranchi", "faculty_bau", "student_bau_birsa", "student_bau_pooja"]
+                      },
+                      {
+                          category: "🏭 Industry & CSR Co-Funding Anchors",
+                          keys: ["industry"]
+                      },
+                      {
+                          category: "🏛️ State Apex Command & District Administration",
+                          keys: ["govt_admin"]
+                      },
+                      {
+                          category: "👥 Grassroots Citizens & Panchayati Raj (PRI)",
+                          keys: ["citizen", "pri"]
+                      }
+                  ].map((grp) => (<div key={grp.category} className="py-1">
+                              <span className="px-3.5 py-0.5 text-[9px] font-bold text-slate-400 uppercase tracking-wider block bg-slate-50/70">
+                                {grp.category}
+                              </span>
+                              {grp.keys.map((roleKey) => {
+                          const u = demoUsers[roleKey];
+                          if (!u)
+                              return null;
+                          const isActive = currentUser.id === u.id;
+                          return (<button key={roleKey} onClick={() => handleRoleSwitch(roleKey)} className={`w-full text-left px-3.5 py-1.5 hover:bg-blue-50/60 transition flex items-center space-x-2 ${isActive ? "bg-blue-50 font-bold border-l-2 border-[#0f2942]" : ""}`}>
+                                    <div className="w-5 h-5 rounded bg-slate-200 text-slate-700 flex items-center justify-center text-[9px] font-bold shrink-0">
+                                      {u.fullName[0]}
                                     </div>
-                                    <p className="text-[10px] text-slate-500 truncate">{u.roleTitle}</p>
-                                  </div>
-                                </button>);
-                    })}
-                          </div>))}
-                      </div>
+                                    <div className="min-w-0 flex-1">
+                                      <div className="flex items-center justify-between">
+                                        <span className="text-xs font-semibold text-slate-900 truncate">
+                                          {u.fullName}
+                                        </span>
+                                        <span className="text-[8px] bg-slate-100 text-slate-500 font-mono px-1 rounded uppercase">
+                                          {roleKey.replace("student_", "").replace("hei_", "")}
+                                        </span>
+                                      </div>
+                                      <p className="text-[10px] text-slate-500 truncate">{u.roleTitle}</p>
+                                    </div>
+                                  </button>);
+                      })}
+                            </div>))}
+                        </div>
 
-                      <div className="px-3 py-2 border-t border-slate-100 flex items-center justify-between text-[11px]">
-                        <button onClick={() => {
-                    logout();
-                    navigate("/login");
-                    setRoleDropdownOpen(false);
-                }} className="flex items-center space-x-1 text-rose-700 hover:text-rose-900 font-semibold">
-                          <LogOut className="w-3.5 h-3.5"/>
-                          <span>Sign Out</span>
-                        </button>
-                        <span className="text-[10px] text-slate-400 font-mono">DigiLocker SSO</span>
+                        <div className="px-3 py-2 border-t border-slate-100 flex items-center justify-between text-[11px]">
+                          <button onClick={() => {
+                      logout();
+                      navigate("/login");
+                      setRoleDropdownOpen(false);
+                  }} className="flex items-center space-x-1 text-rose-700 hover:text-rose-900 font-semibold">
+                            <LogOut className="w-3.5 h-3.5"/>
+                            <span>Sign Out</span>
+                          </button>
+                          <span className="text-[10px] text-slate-400 font-mono">DigiLocker SSO</span>
+                        </div>
                       </div>
-                    </div>)}
+                    </div>
+                  )}
                 </div>
               </>) : (<div className="flex items-center space-x-2">
                 <Link to="/track" className="hidden sm:inline-flex items-center space-x-1 px-3 py-1.5 border border-slate-300 rounded text-xs font-semibold text-slate-700 hover:bg-slate-50">

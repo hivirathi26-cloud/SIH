@@ -5,7 +5,7 @@ import { useAuth, getPortalPath } from "../../context/AuthContext";
 import { StatusPill } from "../../components/common/StatusPill";
 import { FileCheck, GraduationCap, Briefcase, ShieldCheck, ArrowRight, Users, Download, ExternalLink, User, X } from "lucide-react";
 export const LandingPage = () => {
-    const { problems } = useApp();
+    const { problems, currentLanguage } = useApp();
     const { loginAsRole } = useAuth();
     const navigate = useNavigate();
     const [searchQuery, setSearchQuery] = useState("");
@@ -34,10 +34,14 @@ export const LandingPage = () => {
               </div>
 
               <h1 className="font-heading font-extrabold text-2xl sm:text-3xl lg:text-4xl text-[#0f2942] tracking-tight leading-tight">
-                झारखंड सामाजिक नवाचार सहयोग पोर्टल
+                {currentLanguage === "en" 
+                  ? "Jharkhand Societal Innovation Collaboration Portal" 
+                  : "झारखंड सामाजिक नवाचार सहयोग पोर्टल"}
               </h1>
               <h2 className="font-heading font-bold text-lg sm:text-xl text-slate-700">
-                Jharkhand Societal Innovation Collaboration Portal (JSICP)
+                {currentLanguage === "en" 
+                  ? "A Unified Platform for Citizens, HEIs & Industry" 
+                  : "Jharkhand Societal Innovation Collaboration Portal (JSICP)"}
               </h2>
 
               <p className="text-slate-600 text-sm leading-relaxed max-w-2xl">
@@ -61,37 +65,55 @@ export const LandingPage = () => {
             <div className="lg:col-span-4 bg-[#f8fafc] p-4 sm:p-5 rounded-lg border border-slate-200 space-y-4">
               <div className="flex items-center justify-between border-b border-slate-200 pb-2">
                 <span className="text-xs font-bold text-slate-800 uppercase tracking-wider">
-                  राज्य नवाचार मुख्य संकेतक | Indicators
+                  {currentLanguage === "en" ? "State Innovation Indicators" : "राज्य नवाचार मुख्य संकेतक | Indicators"}
                 </span>
                 <span className="text-[10px] bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded font-semibold">
-                  सत्यापित
+                  {currentLanguage === "en" ? "Verified" : "सत्यापित"}
                 </span>
               </div>
 
               {/* 4 Clean Metric Cards */}
               <div className="grid grid-cols-2 gap-3 text-xs">
                 <div className="bg-white p-2.5 rounded border border-slate-200">
-                  <span className="text-slate-500 block text-[11px]">दर्ज समस्याएं (Challenges)</span>
+                  <span className="text-slate-500 block text-[11px]">
+                    {currentLanguage === "en" ? "Civic Challenges" : "दर्ज समस्याएं (Challenges)"}
+                  </span>
                   <span className="font-mono font-bold text-lg text-slate-900 block mt-0.5">{problems.length + 580}</span>
-                  <span className="text-[10px] text-emerald-700 font-medium">96% सत्यापित</span>
+                  <span className="text-[10px] text-emerald-700 font-medium">
+                    {currentLanguage === "en" ? "96% Verified" : "96% सत्यापित"}
+                  </span>
                 </div>
 
                 <div className="bg-white p-2.5 rounded border border-slate-200">
-                  <span className="text-slate-500 block text-[11px]">संबद्ध संस्थान (HEIs)</span>
-                  <span className="font-mono font-bold text-lg text-blue-900 block mt-0.5">5 प्रमुख</span>
+                  <span className="text-slate-500 block text-[11px]">
+                    {currentLanguage === "en" ? "Partner HEIs" : "संबद्ध संस्थान (HEIs)"}
+                  </span>
+                  <span className="font-mono font-bold text-lg text-blue-900 block mt-0.5">
+                    {currentLanguage === "en" ? "5 Premier" : "5 प्रमुख"}
+                  </span>
                   <span className="text-[10px] text-slate-500">BIT • IIT • AIIMS • NIT • BAU</span>
                 </div>
 
                 <div className="bg-white p-2.5 rounded border border-slate-200">
-                  <span className="text-slate-500 block text-[11px]">सीएसआर अनुदान (CSR)</span>
-                  <span className="font-mono font-bold text-lg text-emerald-800 block mt-0.5">₹52.8 लाख</span>
-                  <span className="text-[10px] text-slate-500">कंपनी अधिनियम धारा 135</span>
+                  <span className="text-slate-500 block text-[11px]">
+                    {currentLanguage === "en" ? "CSR Grants" : "सीएसआर अनुदान (CSR)"}
+                  </span>
+                  <span className="font-mono font-bold text-lg text-emerald-800 block mt-0.5">
+                    {currentLanguage === "en" ? "₹52.8 Lakhs" : "₹52.8 लाख"}
+                  </span>
+                  <span className="text-[10px] text-slate-500">
+                    {currentLanguage === "en" ? "Companies Act Sec. 135" : "कंपनी अधिनियम धारा 135"}
+                  </span>
                 </div>
 
                 <div className="bg-white p-2.5 rounded border border-slate-200">
-                  <span className="text-slate-500 block text-[11px]">जिला व्याप्ति (Districts)</span>
+                  <span className="text-slate-500 block text-[11px]">
+                    {currentLanguage === "en" ? "Districts Coverage" : "जिला व्याप्ति (Districts)"}
+                  </span>
                   <span className="font-mono font-bold text-lg text-amber-800 block mt-0.5">24 / 24</span>
-                  <span className="text-[10px] text-slate-500">260 प्रखण्ड (100% कवरेज)</span>
+                  <span className="text-[10px] text-slate-500">
+                    {currentLanguage === "en" ? "260 Blocks (100% Saturation)" : "260 प्रखण्ड (100% कवरेज)"}
+                  </span>
                 </div>
               </div>
 
@@ -99,31 +121,43 @@ export const LandingPage = () => {
               <div className="pt-2 border-t border-slate-200 space-y-2 text-xs">
                 <div className="flex items-center justify-between">
                   <span className="text-[11px] font-bold text-slate-700 uppercase tracking-wider">
-                    नवीनतम सूचनाएं (What's New)
+                    {currentLanguage === "en" ? "What's New / Circulars" : "नवीनतम सूचनाएं (What's New)"}
                   </span>
                   <span className="text-[10px] text-blue-700 font-medium">
-                    सूचना पट्ट
+                    {currentLanguage === "en" ? "Notice Board" : "सूचना पट्ट"}
                   </span>
                 </div>
                 <ul className="space-y-1.5 text-slate-600 text-[11px]">
                   <li className="flex items-start space-x-1.5">
                     <span className="text-emerald-600 font-bold shrink-0">•</span>
-                    <span>NEP 2020: 24 जिलों में शैक्षणिक व कैपस्टोन अनुसंधान दिशानिर्देश जारी।</span>
+                    <span>
+                      {currentLanguage === "en" 
+                        ? "NEP 2020: Guidelines issued for HEI Capstone & Field Research across 24 districts." 
+                        : "NEP 2020: 24 जिलों में शैक्षणिक व कैपस्टोन अनुसंधान दिशानिर्देश जारी।"}
+                    </span>
                   </li>
                   <li className="flex items-start space-x-1.5">
                     <span className="text-emerald-600 font-bold shrink-0">•</span>
-                    <span>जल संरक्षण एवं कृषि नवाचार परियोजनाओं हेतु CSR सह-अनुदान आमंत्रण।</span>
+                    <span>
+                      {currentLanguage === "en"
+                        ? "Call for Proposals: CSR co-funding for water conservation & agri-tech solutions."
+                        : "जल संरक्षण एवं कृषि नवाचार परियोजनाओं हेतु CSR सह-अनुदान आमंत्रण।"}
+                    </span>
                   </li>
                   <li className="flex items-start space-x-1.5">
                     <span className="text-emerald-600 font-bold shrink-0">•</span>
-                    <span>पंचायती राज संस्थाओं (PRIs) द्वारा ग्राम स्तर पर समस्या सत्यापन जारी।</span>
+                    <span>
+                      {currentLanguage === "en"
+                        ? "Panchayati Raj: Ground-level problem verification ongoing by PRIs."
+                        : "पंचायती राज संस्थाओं (PRIs) द्वारा ग्राम स्तर पर समस्या सत्यापन जारी।"}
+                    </span>
                   </li>
                 </ul>
               </div>
 
               <div className="pt-2 border-t border-slate-200 text-[11px] text-slate-500 flex items-center justify-between">
-                <span>झारखंड सामाजिक नवाचार सहयोग पोर्टल</span>
-                <span className="text-slate-400">NIC स्टैंडर्ड्स</span>
+                <span>{currentLanguage === "en" ? "Jharkhand Societal Innovation Collaboration Portal" : "झारखंड सामाजिक नवाचार सहयोग पोर्टल"}</span>
+                <span className="text-slate-400">{currentLanguage === "en" ? "NIC Standards" : "NIC स्टैंडर्ड्स"}</span>
               </div>
             </div>
           </div>
