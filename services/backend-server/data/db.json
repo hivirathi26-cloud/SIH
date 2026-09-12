@@ -440,6 +440,65 @@
   },
   "problems": [
     {
+      "id": "prob-1789233770171",
+      "ticketNumber": "JSICP-2026-1072",
+      "submittedBy": "citizen-sunita",
+      "submitterName": "Smt. Sunita Devi",
+      "submitterRole": "citizen",
+      "title": "malaria disease ",
+      "description": "aftedcrtydufh",
+      "descriptionOriginalLang": "aftedcrtydufh",
+      "detectedLanguage": "English (en)",
+      "category": "Healthcare & MedTech",
+      "subCategory": "Cold-Chain Logistics & Epidemic Telemetry",
+      "categoryConfidence": 0.98,
+      "priorityScore": 92.5,
+      "status": "pending_nodal_review",
+      "district": "Ranchi",
+      "block": "ckbfvs",
+      "village": "was,fjb",
+      "latitude": 32.803169250152166,
+      "longitude": 74.89527511212172,
+      "isDuplicateOf": null,
+      "citizenSupportCount": 1,
+      "sdgTags": [
+        "SDG 3"
+      ],
+      "media": [
+        {
+          "id": "med-1789233770088",
+          "problemId": "",
+          "mediaType": "image",
+          "storageUrl": "https://images.unsplash.com/photo-1584824486509-112e4181ff6b?w=600&auto=format&fit=crop&q=80",
+          "cvValidationLabel": "Verified Ground Anomaly (94% Match)",
+          "cvValidationConfidence": 0.94
+        }
+      ],
+      "aiExplanation": {
+        "nlpKeywords": [
+          "fever",
+          "epidemic",
+          "viral_outbreak",
+          "public_health",
+          "Ranchi"
+        ],
+        "cvSceneTags": [
+          "clinical anomaly",
+          "patient surge",
+          "syndromic cluster"
+        ],
+        "duplicateCheckResult": "Zero duplicates detected within 3km geo-radius.",
+        "priorityBreakdown": {
+          "population_impact": 100,
+          "severity": "medium"
+        },
+        "suggestedUniversities": [],
+        "mlSource": "jsicp_ai_ml_model"
+      },
+      "createdAt": "2026-09-12T17:22:50.171Z",
+      "updatedAt": "2026-09-12T17:22:50.171Z"
+    },
+    {
       "id": "prob-1789222012230",
       "ticketNumber": "JSICP-2026-6630",
       "submittedBy": "pri-mukhia-khunti",
@@ -1434,7 +1493,7 @@
       "subCategory": "Acid Mine Drainage & Wetland Neutralization",
       "categoryConfidence": 0.97,
       "priorityScore": 95.1,
-      "status": "pending_nodal_review",
+      "status": "in_progress",
       "district": "Dhanbad",
       "block": "Baghmara",
       "village": "Katras",
@@ -1493,7 +1552,9 @@
         ]
       },
       "createdAt": "2026-02-28T11:00:00Z",
-      "updatedAt": "2026-02-28T11:05:00Z"
+      "updatedAt": "2026-09-12T17:28:49.785Z",
+      "assignedUniversityId": "univ-iit-dhanbad",
+      "assignedFacultyId": "faculty-iit-arvind"
     },
     {
       "id": "prob-001",
@@ -2021,6 +2082,59 @@
   ],
   "teams": [
     {
+      "problemId": "prob-008",
+      "problemTitle": "Heavy Metal Leachate & Acid Mine Drainage from Abandoned Coal Seams in Katras",
+      "universityId": "univ-iit-dhanbad",
+      "universityName": "Indian Institute of Technology (ISM) Dhanbad",
+      "facultyMentorId": "faculty-iit-arvind",
+      "facultyMentorName": "Prof. Arvind Mukhopadhyay",
+      "facultyDepartment": "Dept of Mining Engineering & Robotics",
+      "members": [
+        {
+          "studentId": "student-iit-rohan",
+          "studentName": "Rohan Deshmukh",
+          "discipline": "Mining Machinery & Robotics",
+          "yearOfStudy": "3rd Year B.Tech",
+          "role": "Team Lead",
+          "email": "rohan.mining@iitism.ac.in",
+          "id": "mem-1789234016339-0",
+          "teamId": ""
+        },
+        {
+          "studentId": "student-iit-ananya",
+          "studentName": "Ananya Sengupta",
+          "discipline": "Applied Geophysics & AI",
+          "yearOfStudy": "4th Year B.Tech",
+          "role": "Hardware Lead",
+          "email": "ananya.geo@iitism.ac.in",
+          "id": "mem-1789234016340-1",
+          "teamId": ""
+        },
+        {
+          "studentId": "student-iit-vikas",
+          "studentName": "Vikas Mahto",
+          "discipline": "Computer Science & Mining Systems",
+          "yearOfStudy": "3rd Year B.Tech",
+          "role": "Software Lead",
+          "email": "vikas.mining@iitism.ac.in",
+          "id": "mem-1789234016340-2",
+          "teamId": ""
+        },
+        {
+          "studentId": "stu-1789234005079",
+          "studentName": "ansh Sharma ",
+          "discipline": "Engineering & Prototyping",
+          "yearOfStudy": "3rd Year",
+          "role": "Design Specialist",
+          "email": "ansh.sharma.@iit-dhanbad.ac.in",
+          "id": "mem-1789234016340-3",
+          "teamId": ""
+        }
+      ],
+      "id": "team-1789234016467",
+      "createdAt": "2026-09-12T17:26:56.468Z"
+    },
+    {
       "problemId": "prob-1788614000949",
       "problemTitle": "Severe groundwater arsenic contamination in Netarhat",
       "universityId": "univ-bit-mesra",
@@ -2324,6 +2438,31 @@
   ],
   "proposals": [
     {
+      "teamId": "team-1789234016344",
+      "problemId": "prob-008",
+      "problemTitle": "Heavy Metal Leachate & Acid Mine Drainage from Abandoned Coal Seams in Katras",
+      "problemCategory": "Environment & Mining Remediation",
+      "district": "Dhanbad",
+      "universityName": "Indian Institute of Technology (ISM) Dhanbad",
+      "facultyMentorName": "Prof. Arvind Mukhopadhyay",
+      "title": "Engineering Solution: Heavy Metal Leachate & Acid Mine Drainage from Abandoned Coal Seams in Katras",
+      "summary": "Targeted research & development plan addressing: Acid mine discharge (pH 3.2) containing dissolved iron and sulfate leaching into Katras Nullah contaminating local drink.",
+      "technicalApproach": "Hardware prototype fabrication + low-power sensor mesh + automated cloud telemetry burst to JSICP gateway.",
+      "expectedOutcome": "Direct community empowerment, measurable environmental/health impact, and zero maintenance downtime.",
+      "estimatedBudget": 3200000,
+      "durationMonths": 5,
+      "needsIndustrySupport": true,
+      "supportTypeNeeded": [
+        "funding",
+        "prototyping",
+        "tech_transfer"
+      ],
+      "status": "open_for_funding",
+      "id": "prop-1789234061416",
+      "submittedAt": "2026-09-12T17:27:41.416Z",
+      "startupIncubationEligible": true
+    },
+    {
       "problemId": "prob-1788614000949",
       "teamId": "team-1788614001023",
       "problemTitle": "Severe groundwater arsenic contamination in Netarhat",
@@ -2509,6 +2648,21 @@
   ],
   "agreements": [
     {
+      "proposalId": "prop-1789234060858",
+      "proposalTitle": "Engineering Solution: Heavy Metal Leachate & Acid Mine Drainage from Abandoned Coal Seams in Katras",
+      "universityName": "Indian Institute of Technology (ISM) Dhanbad",
+      "industryPartnerId": "industry-tatasteel",
+      "industryPartnerName": "Tata Steel CSR Foundation",
+      "industryType": "startup",
+      "agreementType": "csr_grant",
+      "amount": 350000,
+      "status": "active",
+      "terms": "Formal Innovation Partnership MoU under Jharkhand State Innovation Framework. Tata Steel CSR Foundation agrees to provide INR 3,50,000 and prototyping mentorship to Indian Institute of Technology (ISM) Dhanbad.",
+      "id": "agr-1789234129691",
+      "signedAt": "2026-09-12T17:28:49.691Z",
+      "blockchainTxHash": "0xf41d99d2ac0145fdd923289ca91186f3302c85e1a2a21993558eadf27fddfe1c"
+    },
+    {
       "proposalId": "prop-1788614001044",
       "proposalTitle": "Nanofiltration & Graphene-Adsorption Arsenic Removal System",
       "universityName": "BIT Mesra",
@@ -2619,6 +2773,71 @@
     }
   ],
   "milestones": [
+    {
+      "id": "ms-1789234061416-1",
+      "proposalId": "prop-1789234061416",
+      "index": 1,
+      "name": "research_design",
+      "displayName": "Milestone 1: Research, Chemical/Hardware Formulation & 3D CAD Design",
+      "description": "Background research and CAD model simulation.",
+      "status": "in_progress",
+      "dueDate": "2026-03-30",
+      "facultyApproved": false,
+      "govtApproved": false,
+      "documents": []
+    },
+    {
+      "id": "ms-1789234061416-2",
+      "proposalId": "prop-1789234061416",
+      "index": 2,
+      "name": "prototype_build",
+      "displayName": "Milestone 2: Prototype Fabrication & Laboratory Bench Testing",
+      "description": "Bench assembly and lab sensor calibration.",
+      "status": "pending",
+      "dueDate": "2026-04-30",
+      "facultyApproved": false,
+      "govtApproved": false,
+      "documents": []
+    },
+    {
+      "id": "ms-1789234061416-3",
+      "proposalId": "prop-1789234061416",
+      "index": 3,
+      "name": "testing_validation",
+      "displayName": "Milestone 3: Field Testing & Pilot Calibration in District",
+      "description": "Field trial deployment and NABL testing.",
+      "status": "pending",
+      "dueDate": "2026-05-30",
+      "facultyApproved": false,
+      "govtApproved": false,
+      "documents": []
+    },
+    {
+      "id": "ms-1789234061416-4",
+      "proposalId": "prop-1789234061416",
+      "index": 4,
+      "name": "pilot_deployment",
+      "displayName": "Milestone 4: Community Pilot Deployment & User Training",
+      "description": "Beneficiary training and PRI handover.",
+      "status": "pending",
+      "dueDate": "2026-06-30",
+      "facultyApproved": false,
+      "govtApproved": false,
+      "documents": []
+    },
+    {
+      "id": "ms-1789234061416-5",
+      "proposalId": "prop-1789234061416",
+      "index": 5,
+      "name": "full_implementation",
+      "displayName": "Milestone 5: Impact Assessment, Patent Filing & Startup Incubation",
+      "description": "Final outcome audit and IP patent filing.",
+      "status": "pending",
+      "dueDate": "2026-07-30",
+      "facultyApproved": false,
+      "govtApproved": false,
+      "documents": []
+    },
     {
       "id": "ms-1788614001044-1",
       "proposalId": "prop-1788614001044",
@@ -3025,6 +3244,50 @@
   ],
   "notifications": [
     {
+      "userId": "industry-tatasteel",
+      "channel": "whatsapp",
+      "eventType": "MOU_SIGNED",
+      "title": "🎉 MoU Successfully Executed & Stamped!",
+      "message": "Tata Steel CSR Foundation has officially partnered with Indian Institute of Technology (ISM) Dhanbad. Funds committed: ₹3,50,000.",
+      "status": "delivered",
+      "linkUrl": "/industry/agreements",
+      "id": "notif-1789234129797",
+      "sentAt": "2026-09-12T17:28:49.797Z"
+    },
+    {
+      "userId": "faculty-iit-arvind",
+      "channel": "email",
+      "eventType": "PROPOSAL_SUBMITTED",
+      "title": "🏢 Proposal Routed to Industry Marketplace",
+      "message": "Proposal \"Engineering Solution: Heavy Metal Leacha...\" is listed for CSR co-funding. Student workspace unlocks upon MoU execution.",
+      "status": "delivered",
+      "linkUrl": "/industry/marketplace",
+      "id": "notif-1789234061528",
+      "sentAt": "2026-09-12T17:27:41.528Z"
+    },
+    {
+      "userId": "faculty-iit-arvind",
+      "channel": "email",
+      "eventType": "TEAM_FORMED",
+      "title": "👥 Multidisciplinary Team Assembled",
+      "message": "Team formed under Prof. Arvind Mukhopadhyay for problem \"Heavy Metal Leachate & Acid Mine Drainag...\". Ready for proposal drafting.",
+      "status": "delivered",
+      "linkUrl": "/hei/teams",
+      "id": "notif-1789234016584",
+      "sentAt": "2026-09-12T17:26:56.584Z"
+    },
+    {
+      "userId": "citizen-sunita",
+      "channel": "whatsapp",
+      "eventType": "PROBLEM_SUBMITTED",
+      "title": "✅ Challenge Successfully Registered!",
+      "message": "Your challenge \"malaria disease ...\" has been logged with ID JSICP-2026-5386. AI Engine priority: 92.5/100.",
+      "status": "delivered",
+      "linkUrl": "/my-problems",
+      "id": "notif-1789233770166",
+      "sentAt": "2026-09-12T17:22:50.167Z"
+    },
+    {
       "userId": "pri-mukhia-khunti",
       "channel": "whatsapp",
       "eventType": "PROBLEM_SUBMITTED",
@@ -3224,6 +3487,36 @@
     }
   ],
   "blockchainLedger": [
+    {
+      "blockNumber": 25,
+      "timestamp": "2026-09-12T17:28:49.790Z",
+      "eventType": "MOU_SIGNED",
+      "entityId": "agr-1789234129545",
+      "details": "Tata Steel CSR Foundation signed CSR_GRANT Agreement for \"Engineering Solution: Heavy Metal L...\" amounting to INR 3,50,000.",
+      "previousHash": "5deceeb30dbd63b9a6ea58a17eded6a32ef85571f334eec0dbdb1fdd804956ad",
+      "currentHash": "9292588ac9dc29a1588d8dc0ddaf2df13fa61a374ee0baa34ea5e6aaa1c912f6",
+      "verifiedBy": "Jharkhand Innovation Smart Contract Oracle"
+    },
+    {
+      "blockNumber": 24,
+      "timestamp": "2026-09-12T17:26:17.999Z",
+      "eventType": "NODAL_APPROVAL",
+      "entityId": "prob-008",
+      "details": "Nodal review finalized. Status updated to accepted_by_hei. Assigned to univ-iit-dhanbad.",
+      "previousHash": "fb5237008627900a28a95fbd8ae386c9a198b5580ace2694c87450c712fc37e9",
+      "currentHash": "5deceeb30dbd63b9a6ea58a17eded6a32ef85571f334eec0dbdb1fdd804956ad",
+      "verifiedBy": "State Nodal Officer Gateway"
+    },
+    {
+      "blockNumber": 23,
+      "timestamp": "2026-09-12T17:22:50.141Z",
+      "eventType": "PROBLEM_SUBMISSION",
+      "entityId": "prob-1789233770093",
+      "details": "Citizen Smt. Sunita Devi registered challenge JSICP-2026-5386 from Ranchi with priority score 92.5.",
+      "previousHash": "503c0d426f4e998eb3fc9fbbc23f4ca3139dbe1e851b92a6a033d8c3602a9457",
+      "currentHash": "fb5237008627900a28a95fbd8ae386c9a198b5580ace2694c87450c712fc37e9",
+      "verifiedBy": "JSICP AI Gateway Node #1"
+    },
     {
       "blockNumber": 22,
       "timestamp": "2026-09-12T14:07:41.353Z",
