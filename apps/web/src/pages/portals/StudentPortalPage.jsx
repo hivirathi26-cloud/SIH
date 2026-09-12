@@ -20,6 +20,7 @@ export const StudentPortalPage = () => {
     const [delTitle, setDelTitle] = useState("");
     const [delDesc, setDelDesc] = useState("");
     const [delStudentId, setDelStudentId] = useState(eco.students[1]?.id || eco.students[0]?.id || "student-priya");
+    const [delMilestoneName, setDelMilestoneName] = useState("Milestone 2: Prototype Fabrication & Laboratory Bench Testing");
     const [delMilestoneId, setDelMilestoneId] = useState(milestones[0]?.id || "ms-001");
     React.useEffect(() => {
         if (eco.students[1]) {
@@ -69,15 +70,16 @@ export const StudentPortalPage = () => {
     };
     const handleDelegateTask = (e) => {
         e.preventDefault();
-        if (!delTitle.trim())
+        if (!delTitle.trim() || !delMilestoneName.trim())
             return;
         const targetMilestone = milestones.find((m) => m.id === delMilestoneId) || milestones[0];
         const targetStudent = eco.students.find((s) => s.id === delStudentId) || eco.students[0];
+        const finalMilestoneName = delMilestoneName.trim();
         assignStudentTask({
             proposalId: targetMilestone?.proposalId || eco.defaultProposalId,
             proposalTitle: targetMilestone?.displayName || `${eco.shortName} Innovation Project`,
-            milestoneId: targetMilestone.id,
-            milestoneName: targetMilestone.displayName,
+            milestoneId: targetMilestone?.id || `ms-${Date.now()}`,
+            milestoneName: finalMilestoneName,
             title: delTitle,
             description: delDesc || `Deliverable assigned as part of ${eco.shortName} student innovation cohort.`,
             assignedStudentId: targetStudent.id,
@@ -88,6 +90,7 @@ export const StudentPortalPage = () => {
         });
         setDelTitle("");
         setDelDesc("");
+        setDelMilestoneName("Milestone 2: Prototype Fabrication & Laboratory Bench Testing");
         confetti({ particleCount: 50, spread: 50 });
         setActiveTab("my_tasks");
     };
@@ -372,17 +375,65 @@ export const StudentPortalPage = () => {
           <form onSubmit={handleDelegateTask} className="p-6 space-y-4 text-xs">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block font-semibold text-slate-700 mb-1">Target Project Milestone</label>
-                <select value={delMilestoneId} onChange={(e) => setDelMilestoneId(e.target.value)} className="w-full p-2 border border-slate-300 rounded bg-slate-50 focus:border-[#0f2942]">
-                  {milestones.map((m) => (<option key={m.id} value={m.id}>
-                      {m.displayName}
-                    </option>))}
-                </select>
+                <div className="flex items-center justify-between mb-1">
+                  <label className="block font-semibold text-slate-700">
+                    Target Project Milestone / Phase <span className="text-rose-600">*</span>
+                  </label>
+                  <span className="text-[10px] text-emerald-700 font-medium bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200">
+                    ✍️ Type Custom Milestone
+                  </span>
+                </div>
+                <input 
+                  type="text" 
+                  required 
+                  list="milestone-suggestions"
+                  value={delMilestoneName} 
+                  onChange={(e) => setDelMilestoneName(e.target.value)} 
+                  placeholder="Type custom milestone e.g. Milestone 2: Prototype Fabrication & LoRaWAN Node Assembly..." 
+                  className="w-full p-2.5 border border-slate-300 rounded focus:border-[#0f2942] focus:outline-none text-xs font-medium bg-white"
+                />
+                <datalist id="milestone-suggestions">
+                  {milestones.map((m) => (
+                    <option key={m.id} value={m.displayName} />
+                  ))}
+                  <option value="Milestone 1: Research, Chemical Formulation & 3D CAD Design" />
+                  <option value="Milestone 2: Prototype Fabrication & Laboratory Bench Testing" />
+                  <option value="Milestone 3: Field Testing & Pilot Calibration in District" />
+                  <option value="Milestone 4: Community Pilot Deployment & User Training" />
+                  <option value="Milestone 5: Impact Assessment, Patent Filing & Startup Incubation" />
+                  <option value="Sprint 1: Sensor Interfacing & LoRaWAN Gateway Assembly" />
+                  <option value="Sprint 2: Water Titration, Membrane Filtration & Pilot Stress Testing" />
+                  <option value="Sprint 3: AI Thermal UAV Flight Calibration & GeoTIFF Mapping" />
+                  <option value="Sprint 4: Solar PCM Thermal Cold-Chain 72-Hour Stress Test" />
+                  <option value="Sprint 5: Tribal SHG Ergonomic Field Manual & Bio-Inoculation" />
+                </datalist>
+
+                {/* Quick Selection Tags */}
+                <div className="mt-2 flex flex-wrap gap-1.5 items-center">
+                  <span className="text-[10px] text-slate-500 font-semibold">Quick Presets:</span>
+                  {[
+                    "Milestone 1: 3D CAD & Architecture",
+                    "Milestone 2: Prototype Fabrication & IoT",
+                    "Milestone 3: Field Testing & Calibration",
+                    "Milestone 4: Beneficiary Deployment"
+                  ].map((tpl) => (
+                    <button
+                      type="button"
+                      key={tpl}
+                      onClick={() => setDelMilestoneName(tpl)}
+                      className="text-[10px] bg-slate-100 hover:bg-slate-200 text-slate-700 px-2 py-0.5 rounded border border-slate-200 transition"
+                    >
+                      {tpl.split(":")[0]}
+                    </button>
+                  ))}
+                </div>
               </div>
 
               <div>
-                <label className="block font-semibold text-slate-700 mb-1">Assign to Student Innovator</label>
-                <select value={delStudentId} onChange={(e) => setDelStudentId(e.target.value)} className="w-full p-2 border border-slate-300 rounded bg-slate-50 focus:border-[#0f2942]">
+                <label className="block font-semibold text-slate-700 mb-1">
+                  Assign to Student Innovator <span className="text-rose-600">*</span>
+                </label>
+                <select value={delStudentId} onChange={(e) => setDelStudentId(e.target.value)} className="w-full p-2.5 border border-slate-300 rounded bg-slate-50 focus:border-[#0f2942] text-xs font-medium">
                   {eco.students.map((s) => (<option key={s.id} value={s.id}>
                       {s.fullName} ({s.role} - {s.discipline})
                     </option>))}
@@ -404,7 +455,7 @@ export const StudentPortalPage = () => {
 
             <div className="pt-2 border-t border-slate-200 flex justify-end">
               <button type="submit" className="px-5 py-2.5 bg-[#0f2942] hover:bg-[#163b5f] text-white font-semibold rounded shadow-xs flex items-center space-x-1.5">
-                <PlusSquareIcon className="w-3.5 h-3.5"/>
+                <Send className="w-3.5 h-3.5"/>
                 <span>Assign Task to Student &rarr;</span>
               </button>
             </div>

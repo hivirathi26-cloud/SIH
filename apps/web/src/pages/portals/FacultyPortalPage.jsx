@@ -35,6 +35,7 @@ export const FacultyPortalPage = () => {
     // Faculty task assignment state
     const [showAssignTask, setShowAssignTask] = useState(false);
     const [assignMilestoneId, setAssignMilestoneId] = useState(milestones[0]?.id || "");
+    const [assignMilestoneName, setAssignMilestoneName] = useState("Milestone 2: Prototype Fabrication & Laboratory Bench Testing");
     const [assignTitle, setAssignTitle] = useState("");
     const [assignDesc, setAssignDesc] = useState("");
     const [assignStudentId, setAssignStudentId] = useState(eco.students[0]?.id || "student-rahul");
@@ -105,15 +106,16 @@ export const FacultyPortalPage = () => {
     };
     const handleAssignTaskByFaculty = (e) => {
         e.preventDefault();
-        if (!assignTitle.trim())
+        if (!assignTitle.trim() || !assignMilestoneName.trim())
             return;
         const targetMilestone = milestones.find((m) => m.id === assignMilestoneId) || milestones[0];
         const targetStudent = eco.students.find((s) => s.id === assignStudentId) || eco.students[0];
+        const finalMilestoneName = assignMilestoneName.trim();
         assignStudentTask({
             proposalId: targetMilestone?.proposalId || eco.defaultProposalId,
             proposalTitle: targetMilestone?.displayName || `${eco.shortName} Innovation Project`,
-            milestoneId: targetMilestone.id,
-            milestoneName: targetMilestone.displayName,
+            milestoneId: targetMilestone?.id || `ms-${Date.now()}`,
+            milestoneName: finalMilestoneName,
             title: assignTitle,
             description: assignDesc || `Task assigned directly by ${eco.faculty.fullName} for laboratory milestone verification.`,
             assignedStudentId: targetStudent.id,
@@ -124,6 +126,7 @@ export const FacultyPortalPage = () => {
         });
         setAssignTitle("");
         setAssignDesc("");
+        setAssignMilestoneName("Milestone 2: Prototype Fabrication & Laboratory Bench Testing");
         setShowAssignTask(false);
         confetti({ particleCount: 50, spread: 50 });
     };
@@ -478,12 +481,31 @@ export const FacultyPortalPage = () => {
 
               <form onSubmit={handleAssignTaskByFaculty} className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="block font-semibold text-slate-700 mb-1">Target Milestone</label>
-                  <select value={assignMilestoneId} onChange={(e) => setAssignMilestoneId(e.target.value)} className="w-full p-2 border border-slate-300 rounded bg-white text-slate-800">
-                    {milestones.map((m) => (<option key={m.id} value={m.id}>
-                        {m.displayName}
-                      </option>))}
-                  </select>
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="block font-semibold text-slate-700">Target Milestone / Phase</label>
+                    <span className="text-[10px] text-emerald-700 font-medium bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200">
+                      ✍️ Type Custom Milestone
+                    </span>
+                  </div>
+                  <input 
+                    type="text" 
+                    required 
+                    list="faculty-milestone-suggestions"
+                    placeholder="e.g. Milestone 2: Prototype Fabrication & Laboratory Bench Testing" 
+                    value={assignMilestoneName} 
+                    onChange={(e) => setAssignMilestoneName(e.target.value)} 
+                    className="w-full p-2 border border-slate-300 rounded bg-white text-slate-800 text-xs font-medium"
+                  />
+                  <datalist id="faculty-milestone-suggestions">
+                    {milestones.map((m) => (
+                      <option key={m.id} value={m.displayName} />
+                    ))}
+                    <option value="Milestone 1: Research, Chemical Formulation & 3D CAD Design" />
+                    <option value="Milestone 2: Prototype Fabrication & Laboratory Bench Testing" />
+                    <option value="Milestone 3: Field Testing & Pilot Calibration in District" />
+                    <option value="Milestone 4: Community Pilot Deployment & User Training" />
+                    <option value="Milestone 5: Impact Assessment, Patent Filing & Startup Incubation" />
+                  </datalist>
                 </div>
 
                 <div>
