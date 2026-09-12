@@ -5,7 +5,7 @@ import { useAuth, getPortalPath } from "../../context/AuthContext";
 import { StatusPill } from "../../components/common/StatusPill";
 import { FileCheck, GraduationCap, Briefcase, ShieldCheck, ArrowRight, Users, Download, ExternalLink, User, X } from "lucide-react";
 export const LandingPage = () => {
-    const { problems, blockchainLedger = [] } = useApp();
+    const { problems } = useApp();
     const { loginAsRole } = useAuth();
     const navigate = useNavigate();
     const [searchQuery, setSearchQuery] = useState("");
@@ -27,7 +27,7 @@ export const LandingPage = () => {
       <section className="bg-white border-b border-slate-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-            <div className="lg:col-span-7 space-y-4">
+            <div className="lg:col-span-8 space-y-4">
               <div className="inline-flex items-center space-x-2 bg-slate-100 text-[#0f2942] px-3 py-1 rounded text-xs font-semibold border border-slate-300">
                 <span className="w-2 h-2 rounded-full bg-emerald-600"></span>
                 <span>NEP 2020 & Jharkhand State Innovation Policy 2026 Mandate</span>
@@ -57,180 +57,73 @@ export const LandingPage = () => {
               </div>
             </div>
 
-            {/* Official State Innovation Live Command Dashboard */}
-            <div className="lg:col-span-5 bg-[#0f2438] text-white rounded-xl border border-[#1e3e5f] shadow-lg overflow-hidden flex flex-col justify-between">
-              {/* Top Banner with live pulsing indicator */}
-              <div className="bg-[#0b1d30] px-4 py-2.5 border-b border-[#183a5a] flex items-center justify-between">
-                <div className="flex items-center space-x-2">
-                  <span className="relative flex h-2.5 w-2.5">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                    <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
-                  </span>
-                  <span className="text-xs font-bold uppercase tracking-wider text-slate-100 font-heading">
-                    राज्य नवाचार लाइव डैशबोर्ड | State Command Hub
-                  </span>
-                </div>
-                <span className="text-[10px] font-mono bg-emerald-950/80 text-emerald-400 px-2 py-0.5 rounded border border-emerald-800/60 font-semibold">
-                  LIVE NIC-SYNC
+            {/* Official Key Indicators & Notice Panel */}
+            <div className="lg:col-span-4 bg-[#f8fafc] p-4 sm:p-5 rounded-lg border border-slate-200 space-y-4">
+              <div className="flex items-center justify-between border-b border-slate-200 pb-2">
+                <span className="text-xs font-bold text-slate-800 uppercase tracking-wider">
+                  राज्य नवाचार मुख्य संकेतक | Indicators
+                </span>
+                <span className="text-[10px] bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded font-semibold">
+                  सत्यापित
                 </span>
               </div>
 
-              {/* Main KPI Grid & Data Stream */}
-              <div className="p-3.5 sm:p-4 space-y-3 text-xs">
-                {/* 4 Main KPI Tiles */}
-                <div className="grid grid-cols-2 gap-2">
-                  {/* KPI 1: Civic Challenges */}
-                  <div className="bg-[#142e47] p-2.5 rounded-lg border border-[#1e4265]">
-                    <div className="flex items-center justify-between text-[11px] text-slate-300">
-                      <span className="truncate">नागरिक समस्याएं (Challenges)</span>
-                      <FileCheck className="w-3.5 h-3.5 text-sky-400 shrink-0 ml-1" />
-                    </div>
-                    <div className="flex items-baseline space-x-1.5 mt-1">
-                      <span className="font-mono font-extrabold text-xl text-white">
-                        {problems.length + 580}
-                      </span>
-                      <span className="text-[10px] text-emerald-400 font-medium font-mono">96.8% Triaged</span>
-                    </div>
-                    <div className="text-[10px] text-slate-400 mt-1 flex justify-between font-mono">
-                      <span>Verified: {problems.length + 540}</span>
-                      <span className="text-emerald-300">Active: 168</span>
-                    </div>
-                  </div>
-
-                  {/* KPI 2: Partner HEIs & Academia */}
-                  <div className="bg-[#142e47] p-2.5 rounded-lg border border-[#1e4265]">
-                    <div className="flex items-center justify-between text-[11px] text-slate-300">
-                      <span className="truncate">संबद्ध संस्थान (Partner HEIs)</span>
-                      <GraduationCap className="w-3.5 h-3.5 text-indigo-400 shrink-0 ml-1" />
-                    </div>
-                    <div className="flex items-baseline space-x-1.5 mt-1">
-                      <span className="font-mono font-extrabold text-xl text-sky-300">
-                        5 Premier
-                      </span>
-                      <span className="text-[10px] text-indigo-300 font-medium font-mono">NIRF Apex</span>
-                    </div>
-                    <div className="text-[10px] text-slate-400 mt-1 flex justify-between">
-                      <span className="truncate">BIT • IIT • AIIMS</span>
-                      <span>BAU • NIT</span>
-                    </div>
-                  </div>
-
-                  {/* KPI 3: CSR Committed & Disbursed */}
-                  <div className="bg-[#142e47] p-2.5 rounded-lg border border-[#1e4265]">
-                    <div className="flex items-center justify-between text-[11px] text-slate-300">
-                      <span className="truncate">सीएसआर अनुदान (CSR Grants)</span>
-                      <Briefcase className="w-3.5 h-3.5 text-emerald-400 shrink-0 ml-1" />
-                    </div>
-                    <div className="flex items-baseline space-x-1.5 mt-1">
-                      <span className="font-mono font-extrabold text-xl text-emerald-400">
-                        ₹52.8 L
-                      </span>
-                      <span className="text-[10px] text-emerald-300 font-medium font-mono">Sec. 135</span>
-                    </div>
-                    <div className="text-[10px] text-slate-400 mt-1 flex justify-between font-mono">
-                      <span>Disbursed: ₹34.2 L</span>
-                      <span className="text-emerald-300">MoUs: 8</span>
-                    </div>
-                  </div>
-
-                  {/* KPI 4: 24 Districts Coverage */}
-                  <div className="bg-[#142e47] p-2.5 rounded-lg border border-[#1e4265]">
-                    <div className="flex items-center justify-between text-[11px] text-slate-300">
-                      <span className="truncate">ज़िला व्याप्ति (Saturation)</span>
-                      <ShieldCheck className="w-3.5 h-3.5 text-amber-400 shrink-0 ml-1" />
-                    </div>
-                    <div className="flex items-baseline space-x-1.5 mt-1">
-                      <span className="font-mono font-extrabold text-xl text-amber-300">
-                        24 / 24
-                      </span>
-                      <span className="text-[10px] text-amber-400 font-medium font-mono">100% Saturation</span>
-                    </div>
-                    <div className="text-[10px] text-slate-400 mt-1 flex justify-between font-mono">
-                      <span>260 Blocks</span>
-                      <span>4,345 PRIs</span>
-                    </div>
-                  </div>
+              {/* 4 Clean Metric Cards */}
+              <div className="grid grid-cols-2 gap-3 text-xs">
+                <div className="bg-white p-2.5 rounded border border-slate-200">
+                  <span className="text-slate-500 block text-[11px]">दर्ज समस्याएं (Challenges)</span>
+                  <span className="font-mono font-bold text-lg text-slate-900 block mt-0.5">{problems.length + 580}</span>
+                  <span className="text-[10px] text-emerald-700 font-medium">96% सत्यापित</span>
                 </div>
 
-                {/* Ground Innovation Domain Distribution */}
-                <div className="bg-[#142e47]/70 p-2.5 rounded-lg border border-[#1e4265] space-y-1.5">
-                  <div className="flex justify-between items-center text-[11px]">
-                    <span className="font-semibold text-slate-200">Domain Challenge Distribution (AI NLP Cluster)</span>
-                    <span className="text-[10px] text-slate-400 font-mono">24 Districts Triage</span>
-                  </div>
-                  {/* Multi-segment progress bar */}
-                  <div className="w-full h-2 rounded-full bg-slate-800 overflow-hidden flex">
-                    <div className="bg-sky-500 h-full" style={{ width: "28%" }} title="Water Resources: 28%"></div>
-                    <div className="bg-amber-500 h-full" style={{ width: "24%" }} title="Mining Remediation: 24%"></div>
-                    <div className="bg-emerald-500 h-full" style={{ width: "22%" }} title="Agriculture & Forestry: 22%"></div>
-                    <div className="bg-rose-500 h-full" style={{ width: "16%" }} title="Healthcare & MedTech: 16%"></div>
-                    <div className="bg-purple-500 h-full" style={{ width: "10%" }} title="Clean Energy & Infra: 10%"></div>
-                  </div>
-                  {/* Legend */}
-                  <div className="flex flex-wrap items-center justify-between text-[10px] text-slate-300 pt-0.5 gap-y-1 font-medium">
-                    <span className="flex items-center space-x-1">
-                      <span className="w-2 h-2 rounded-full bg-sky-500 inline-block"></span>
-                      <span>Water (28%)</span>
-                    </span>
-                    <span className="flex items-center space-x-1">
-                      <span className="w-2 h-2 rounded-full bg-amber-500 inline-block"></span>
-                      <span>Mining (24%)</span>
-                    </span>
-                    <span className="flex items-center space-x-1">
-                      <span className="w-2 h-2 rounded-full bg-emerald-500 inline-block"></span>
-                      <span>Agri (22%)</span>
-                    </span>
-                    <span className="flex items-center space-x-1">
-                      <span className="w-2 h-2 rounded-full bg-rose-500 inline-block"></span>
-                      <span>Health (16%)</span>
-                    </span>
-                    <span className="flex items-center space-x-1">
-                      <span className="w-2 h-2 rounded-full bg-purple-500 inline-block"></span>
-                      <span>Solar (10%)</span>
-                    </span>
-                  </div>
+                <div className="bg-white p-2.5 rounded border border-slate-200">
+                  <span className="text-slate-500 block text-[11px]">संबद्ध संस्थान (HEIs)</span>
+                  <span className="font-mono font-bold text-lg text-blue-900 block mt-0.5">5 प्रमुख</span>
+                  <span className="text-[10px] text-slate-500">BIT • IIT • AIIMS • NIT • BAU</span>
                 </div>
 
-                {/* 5-Stage NEP 2020 Lifecycle Pipeline */}
-                <div className="bg-[#142e47]/70 p-2.5 rounded-lg border border-[#1e4265] space-y-1.5">
-                  <div className="flex justify-between items-center text-[11px]">
-                    <span className="font-semibold text-slate-200">5-Stage NEP 2020 Resolution Pipeline</span>
-                    <span className="text-[10px] text-emerald-400 font-mono font-semibold">Stage 4 Active</span>
-                  </div>
-                  <div className="grid grid-cols-5 gap-1 text-center text-[10px]">
-                    <div className="bg-emerald-950/70 border border-emerald-500/40 p-1.5 rounded text-emerald-300">
-                      <span className="block font-bold">1. AI Triage</span>
-                      <span className="text-[9px] text-slate-400">100% Verified</span>
-                    </div>
-                    <div className="bg-emerald-950/70 border border-emerald-500/40 p-1.5 rounded text-emerald-300">
-                      <span className="block font-bold">2. HEI Match</span>
-                      <span className="text-[9px] text-slate-400">5 Premier</span>
-                    </div>
-                    <div className="bg-emerald-950/70 border border-emerald-500/40 p-1.5 rounded text-emerald-300">
-                      <span className="block font-bold">3. Lab Test</span>
-                      <span className="text-[9px] text-slate-400">NABL / CAD</span>
-                    </div>
-                    <div className="bg-sky-950/80 border border-sky-400/50 p-1.5 rounded text-sky-200 animate-pulse">
-                      <span className="block font-bold">4. Dual Sign</span>
-                      <span className="text-[9px] text-sky-300">Govt + Fac</span>
-                    </div>
-                    <div className="bg-slate-800/80 border border-slate-700 p-1.5 rounded text-slate-400">
-                      <span className="block font-bold">5. Scale</span>
-                      <span className="text-[9px] text-slate-500">Gram Sabha</span>
-                    </div>
-                  </div>
+                <div className="bg-white p-2.5 rounded border border-slate-200">
+                  <span className="text-slate-500 block text-[11px]">सीएसआर अनुदान (CSR)</span>
+                  <span className="font-mono font-bold text-lg text-emerald-800 block mt-0.5">₹52.8 लाख</span>
+                  <span className="text-[10px] text-slate-500">कंपनी अधिनियम धारा 135</span>
+                </div>
+
+                <div className="bg-white p-2.5 rounded border border-slate-200">
+                  <span className="text-slate-500 block text-[11px]">जिला व्याप्ति (Districts)</span>
+                  <span className="font-mono font-bold text-lg text-amber-800 block mt-0.5">24 / 24</span>
+                  <span className="text-[10px] text-slate-500">260 प्रखण्ड (100% कवरेज)</span>
                 </div>
               </div>
 
-              {/* Bottom Cryptographic Ledger Verification Bar */}
-              <div className="bg-[#091726] px-4 py-2 border-t border-[#183a5a] flex flex-wrap items-center justify-between text-[10px] text-slate-400">
-                <span className="flex items-center space-x-1.5">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block"></span>
-                  <span className="font-mono text-slate-300">MeghRaj Cloud • Ledger Block #{blockchainLedger.length + 4810}</span>
-                </span>
-                <span className="font-mono text-emerald-400 font-medium">
-                  SHA-256 Dual Sign Audit Verified
-                </span>
+              {/* What's New / नवीनतम सूचनाएं */}
+              <div className="pt-2 border-t border-slate-200 space-y-2 text-xs">
+                <div className="flex items-center justify-between">
+                  <span className="text-[11px] font-bold text-slate-700 uppercase tracking-wider">
+                    नवीनतम सूचनाएं (What's New)
+                  </span>
+                  <span className="text-[10px] text-blue-700 font-medium">
+                    सूचना पट्ट
+                  </span>
+                </div>
+                <ul className="space-y-1.5 text-slate-600 text-[11px]">
+                  <li className="flex items-start space-x-1.5">
+                    <span className="text-emerald-600 font-bold shrink-0">•</span>
+                    <span>NEP 2020: 24 जिलों में शैक्षणिक व कैपस्टोन अनुसंधान दिशानिर्देश जारी।</span>
+                  </li>
+                  <li className="flex items-start space-x-1.5">
+                    <span className="text-emerald-600 font-bold shrink-0">•</span>
+                    <span>जल संरक्षण एवं कृषि नवाचार परियोजनाओं हेतु CSR सह-अनुदान आमंत्रण।</span>
+                  </li>
+                  <li className="flex items-start space-x-1.5">
+                    <span className="text-emerald-600 font-bold shrink-0">•</span>
+                    <span>पंचायती राज संस्थाओं (PRIs) द्वारा ग्राम स्तर पर समस्या सत्यापन जारी।</span>
+                  </li>
+                </ul>
+              </div>
+
+              <div className="pt-2 border-t border-slate-200 text-[11px] text-slate-500 flex items-center justify-between">
+                <span>झारखंड सामाजिक नवाचार सहयोग पोर्टल</span>
+                <span className="text-slate-400">NIC स्टैंडर्ड्स</span>
               </div>
             </div>
           </div>
