@@ -481,12 +481,9 @@ export const FacultyPortalPage = () => {
 
               <form onSubmit={handleAssignTaskByFaculty} className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <div className="flex items-center justify-between mb-1">
-                    <label className="block font-semibold text-slate-700">Target Milestone / Phase</label>
-                    <span className="text-[10px] text-emerald-700 font-medium bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200">
-                      ✍️ Type Custom Milestone
-                    </span>
-                  </div>
+                  <label className="block font-semibold text-slate-700 mb-1">
+                    Target Milestone / Phase <span className="text-rose-600">*</span>
+                  </label>
                   <input 
                     type="text" 
                     required 

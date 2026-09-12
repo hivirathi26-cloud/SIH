@@ -375,21 +375,16 @@ export const StudentPortalPage = () => {
           <form onSubmit={handleDelegateTask} className="p-6 space-y-4 text-xs">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <div className="flex items-center justify-between mb-1">
-                  <label className="block font-semibold text-slate-700">
-                    Target Project Milestone / Phase <span className="text-rose-600">*</span>
-                  </label>
-                  <span className="text-[10px] text-emerald-700 font-medium bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200">
-                    ✍️ Type Custom Milestone
-                  </span>
-                </div>
+                <label className="block font-semibold text-slate-700 mb-1">
+                  Target Project Milestone / Phase <span className="text-rose-600">*</span>
+                </label>
                 <input 
                   type="text" 
                   required 
                   list="milestone-suggestions"
                   value={delMilestoneName} 
                   onChange={(e) => setDelMilestoneName(e.target.value)} 
-                  placeholder="Type custom milestone e.g. Milestone 2: Prototype Fabrication & LoRaWAN Node Assembly..." 
+                  placeholder="e.g. Milestone 2: Prototype Fabrication & LoRaWAN Node Assembly..." 
                   className="w-full p-2.5 border border-slate-300 rounded focus:border-[#0f2942] focus:outline-none text-xs font-medium bg-white"
                 />
                 <datalist id="milestone-suggestions">
@@ -401,32 +396,7 @@ export const StudentPortalPage = () => {
                   <option value="Milestone 3: Field Testing & Pilot Calibration in District" />
                   <option value="Milestone 4: Community Pilot Deployment & User Training" />
                   <option value="Milestone 5: Impact Assessment, Patent Filing & Startup Incubation" />
-                  <option value="Sprint 1: Sensor Interfacing & LoRaWAN Gateway Assembly" />
-                  <option value="Sprint 2: Water Titration, Membrane Filtration & Pilot Stress Testing" />
-                  <option value="Sprint 3: AI Thermal UAV Flight Calibration & GeoTIFF Mapping" />
-                  <option value="Sprint 4: Solar PCM Thermal Cold-Chain 72-Hour Stress Test" />
-                  <option value="Sprint 5: Tribal SHG Ergonomic Field Manual & Bio-Inoculation" />
                 </datalist>
-
-                {/* Quick Selection Tags */}
-                <div className="mt-2 flex flex-wrap gap-1.5 items-center">
-                  <span className="text-[10px] text-slate-500 font-semibold">Quick Presets:</span>
-                  {[
-                    "Milestone 1: 3D CAD & Architecture",
-                    "Milestone 2: Prototype Fabrication & IoT",
-                    "Milestone 3: Field Testing & Calibration",
-                    "Milestone 4: Beneficiary Deployment"
-                  ].map((tpl) => (
-                    <button
-                      type="button"
-                      key={tpl}
-                      onClick={() => setDelMilestoneName(tpl)}
-                      className="text-[10px] bg-slate-100 hover:bg-slate-200 text-slate-700 px-2 py-0.5 rounded border border-slate-200 transition"
-                    >
-                      {tpl.split(":")[0]}
-                    </button>
-                  ))}
-                </div>
               </div>
 
               <div>
